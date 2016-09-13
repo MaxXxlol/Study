@@ -1,0 +1,427 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0043)http://www.mechta34.com/it/qt4/qtdb001.html -->
+<HTML><HEAD><TITLE>Ю.В.Земсков. Программирование на C++ с использованием библиотеки Qt4</TITLE>
+<META http-equiv=Content-Type content="text/html; charset=windows-1251"><LINK 
+href="Images/s1.css" type=text/css rel=stylesheet>
+<META content="MSHTML 6.00.2900.2180" name=GENERATOR></HEAD>
+<BODY>
+<a href="qtdb000.htm">Назад</a> <a href="title.htm">Содержание</a> <a href="qtdb002.htm">Вперед</a>
+<H3>Подключение с базе данных и выполнение SQL-запросов</H3>Для подключения к 
+базе данных надо указать название SQL-драйвера, например: <CODE><PRE>QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL", "MyDB1");
+</PRE></CODE>Второй необязательный параметр позволяет задать имя соединения. 
+<P>Затем указывается имя сервера, название базы данных, имя пользователя и 
+пароль: <CODE><PRE>db.setHostName("localhost"); // или, например, "my1.server.ru"
+db.setDatabaseName("mydb1");
+db.setUserName("root");
+db.setPassword("mypassword");
+</PRE></CODE>Если сервер использует нестандартный порт, то придётся задать и 
+его: <CODE><PRE>db.setPort(НомерПорта);
+</PRE></CODE>В случае использования <CODE>QODBC</CODE> имя сервера не требуется, 
+а вместо названия базы данных указывается ODBC-псевдоним (алиас). 
+<P>SQLite не поддерживает авторизацию пользователей, поэтому ему требуется 
+указать только имя файла данных. Предопределённое имя <CODE>":memory:"</CODE> 
+позволяет размещать временную базу данных в оперативной памяти. 
+<P>После того, как все параметры подключения заданы, можно открыть соединение: 
+<CODE><PRE>bool connected = db.open();
+</PRE></CODE>Если подключение установить не удалось, то не плохо бы узнать 
+описание ошибки и сообщить его пользователю: <CODE><PRE>if (!connected) {
+    QMessageBox::critical( // Диалог с сообщением об ошибке.
+        parent,                      // Родительский виджет.
+        QObject::tr("Database Error"),   // Заголовок.
+        db.lastError().text());          // Текст сообщения.
+    return false; // Вернуть признак неудачного подключения.
+}
+</PRE></CODE>Если подключение установлено, то можно выполнить любой SQL-запрос, 
+например: <CODE><PRE>QSqlQuery sql;
+sql.exec("SELECT id, name, salary FROM empl WHERE salary&gt;=1000");
+</PRE></CODE>или <CODE><PRE>QSqlQuery sql("SELECT id, name, salary FROM empl WHERE salary&gt;=1000");
+</PRE></CODE>Здесь запрашиваются номера <CODE>id</CODE>, имена <CODE>name</CODE> 
+и оклады <CODE>salary</CODE> всех работников из таблицы <CODE>empl</CODE>, у 
+которых оклад не ниже 1&nbsp;000. Обратите внимание, что если при создании 
+объекта <CODE>QSqlQuery</CODE> указан текст запроса на языке SQL, то этот запрос 
+сразу выполняется. 
+<P>В обоих случаях в конструкторе запроса можно указать базу данных 
+<CODE>QSqlDatabase</CODE>, с которой он будет работать. Но как правило, 
+приложение открывает только одно соединение с единственной базой данных, поэтому 
+этот параметр принимает значение по умолчанию. 
+<P>Если при выполнении запроса возникла ошибка, то метод 
+<CODE>lastError()</CODE> позволяет вывести на экран её описание: <CODE><PRE>if ( ! query.isActive() )
+    QMessageBox::warning(
+        this, tr("Database Error"),
+        query.lastError().text() );
+</PRE></CODE>Иначе можно получить данные, которые сервер вернул в качестве 
+результата: <CODE><PRE>while ( sql.next() ) {
+    qint64 id = sql.value(0).toLongLong();
+    QString name = sql.value(1).toString();
+    double salary = sql.value(2).toDouble();
+    // .......
+}
+</PRE></CODE>Метод <CODE>QSqlQuery::next()</CODE> переводит курсор на очередную 
+запись результирующего набора данных или возвращает <CODE>false</CODE>, если 
+достигнут его конец. Метод <CODE>value(номер_столбца)</CODE> возвращает значение 
+типа <CODE>QVariant</CODE>, которое надо преобразовать к нужному типу с помощью 
+методов <CODE>QVariant::toInt</CODE>, <CODE>QVariant::toLongLong</CODE>, 
+<CODE>QVariant::toString</CODE>, <CODE>QVariant::toDouble</CODE>, 
+<CODE>QVariant::toDate</CODE>, <CODE>QVariant::toDateTime</CODE> и&nbsp;т.д. 
+<P>Кроме <CODE>next()</CODE>, для навигации по набору данных можно использовать 
+методы <CODE>first()</CODE>, <CODE>last()</CODE>, <CODE>previous()</CODE>, 
+<CODE>seek(int index, bool relative=false)</CODE>. Для увеличения быстродействия 
+набор данных лучше сделать однонаправленным, вызвав метод 
+<CODE>QSqlQuery::setForwardOnly(true)</CODE> до выполнения запроса, после этого 
+можно использовать только <CODE>next()</CODE>. 
+<P>Метод <CODE>QSqlQuery::size()</CODE> возвращает число записей, полученных в 
+результате выполнения запроса <CODE>SELECT</CODE> (-1, если была ошибка или если 
+драйвер данной СУБД не поддерживает эту функцию). При выполнении SQL-запросов 
+<CODE>INSERT</CODE>, <CODE>UPDATE</CODE> или <CODE>DELETE</CODE> вместо 
+<CODE>size()</CODE> надо использовать метод 
+<CODE>QSqlQuery::numRowsAffected()</CODE>. Чтобы узнать, возникла ли ошибка при 
+последнем выполнении запроса, используется метод 
+<CODE>QSqlQuery::lastError()</CODE>. Аналогичный метод имеет и класс 
+<CODE>QSqlDatabase</CODE>. В обоих случаях возвращается экземпляр класса 
+<CODE>QSqlError</CODE>. Тип ошибки можно выяснить, вызвав метод 
+<CODE>QSqlError::type()</CODE>. Возможные типы ошибок: 
+<CODE>QSqlError::NoError</CODE> (ошибок не было), 
+<CODE>QSqlError::ConnectionError</CODE> (ошибка соединения), 
+<CODE>QSqlError::StatementError</CODE> (синтаксическая ошибка в SQL-запросе), 
+<CODE>QSqlError::TransactionError</CODE> (ошибка транзакции) и 
+<CODE>QSqlError::UnknownError</CODE> (неизвестная ошибка). 
+<P>Если требуется выполнить большое количество однотипных SQL-операторов, то 
+эффективнее использовать запрос с параметрами: <CODE><PRE>QSqlQuery query;
+sql.prepare("INSERT INTO empl (id, name, salary) "
+            "VALUES (:id, :name, :salary)");
+for (int i=0; i&lt;N; i++) {
+    sql.bindValue(":id", arr_id[i]);
+    sql.bindValue(":name", arr_name[i]);
+    sql.bindValue(":salary", arr_salary[i]);
+    sql.exec();
+}
+</PRE></CODE>или, что же самое (только параметры безымянные): <CODE><PRE>QSqlQuery query;
+sql.prepare("INSERT INTO empl (id, name, salary) "
+            "VALUES (?, ?, ?)");
+for (int i=0; i&lt;N; i++) {
+    sql.addBindValue(arr_id[i]);
+    sql.addBindValue(arr_name[i]);
+    sql.addBindValue(arr_salary[i]);
+    sql.exec();
+}
+</PRE></CODE>Здесь выполняется вставка <CODE>N</CODE> записей, данные берутся из 
+массивов <CODE>arr_id</CODE>, <CODE>arr_name</CODE> и <CODE>arr_salary</CODE>. 
+<P>Если СУБД поддерживает механизм транзакций, то для начала новой транзакции 
+используется метод <CODE><PRE>bool QSqlDatabase::transaction()
+</PRE></CODE>для её подтверждения надо вызвать <CODE><PRE>bool QSqlDatabase::commit()
+</PRE></CODE>а для отмены: <CODE><PRE>bool QSqlDatabase::rollback()
+</PRE></CODE>Если СУБД не поддерживает транзакций, то вызовы 
+<CODE>transaction</CODE>, <CODE>commit</CODE> и <CODE>rollback</CODE> ничего не 
+делают. С помощью метода <CODE>QSqlDriver::hasFeature()</CODE> можно узнать, 
+поддерживается ли данным драйвером и СУБД та или иная функция, в том числе и 
+транзакции: <CODE><PRE>QSqlDriver *driver = QSqlDatabase::database().driver();
+if (driver-&gt;hasFeature(QSqlDriver::Transactions))
+    .......
+</PRE></CODE>Каждое соединение с базой данных может иметь только одну активную 
+транзакцию. Если этого недостаточно, всегда можно открыть ещё несколько 
+соединений с той же базой данных. 
+<P>Ссылку на соединение с базой данных можно получить, вызвав функцию 
+<CODE>QSqlDatabase::database(connectionName)</CODE>. Необязательный параметр 
+<CODE>connectionName</CODE> -- это имя соединения, которое было задано при его 
+создании с помощью <CODE>QSqlDatabase::addDatabase()</CODE>. 
+<P>По окончании работы с базой данных соединение надо закрыть: 
+<CODE>QSqlDatabase::close()</CODE>. Затем можно либо открыть его снова с помощью 
+метода <CODE>open()</CODE>, либо удалить из списка соединений, вызвав 
+статический метод <CODE>QSqlDatabase::removeDatabase(connectionName)</CODE>. 
+<P align=center><IMG src="Images/qtdb00_1.png"><BR>Выполнение 
+SQL-запросов (система Windows, драйвер QODBC) </P>
+<P align=center><IMG src="Images/qtdb00.png"><BR>Выполнение SQL-запросов 
+(система Linux, драйвер QMYSQL) </P>
+<P>В листингах приведён пример программы, работающей с базой данных, а на рис. 
+показан результат её работы в Windows и Linux. 
+<P><B>Листинг. Выполнение SQL-запросов (файл 
+<CODE>examples-qt/db00/db00.h</CODE>)</B> <PRE class=hl><A name=db00.h_1></A><SPAN class=line>    1 </SPAN><SPAN class=dir>#include &lt;QtGui&gt;</SPAN>
+<A name=db00.h_2></A><SPAN class=line>    2 </SPAN>
+<A name=db00.h_3></A><SPAN class=line>    3 </SPAN><SPAN class=kwc>class</SPAN> MyDialog <SPAN class=sym>:</SPAN> <SPAN class=kwc>public</SPAN> QDialog <SPAN class=sym>{</SPAN>
+<A name=db00.h_4></A><SPAN class=line>    4 </SPAN>    Q_OBJECT
+<A name=db00.h_5></A><SPAN class=line>    5 </SPAN><SPAN class=kwc>public</SPAN><SPAN class=sym>:</SPAN>
+<A name=db00.h_6></A><SPAN class=line>    6 </SPAN>    <SPAN class=kwd>MyDialog</SPAN><SPAN class=sym>(</SPAN>QWidget <SPAN class=sym>*</SPAN>parent<SPAN class=sym>=</SPAN><SPAN class=num>0</SPAN><SPAN class=sym>);</SPAN>
+<A name=db00.h_7></A><SPAN class=line>    7 </SPAN><SPAN class=kwc>protected</SPAN><SPAN class=sym>:</SPAN>
+<A name=db00.h_8></A><SPAN class=line>    8 </SPAN>    <SPAN class=kwc>virtual</SPAN> <SPAN class=kwb>void</SPAN> <SPAN class=kwd>closeEvent</SPAN><SPAN class=sym>(</SPAN>QCloseEvent <SPAN class=sym>*</SPAN>event<SPAN class=sym>);</SPAN>
+<A name=db00.h_9></A><SPAN class=line>    9 </SPAN><SPAN class=kwc>private</SPAN> slots<SPAN class=sym>:</SPAN>
+<A name=db00.h_10></A><SPAN class=line>   10 </SPAN>    <SPAN class=kwb>bool</SPAN> <SPAN class=kwd>start</SPAN><SPAN class=sym>();</SPAN>
+<A name=db00.h_11></A><SPAN class=line>   11 </SPAN><SPAN class=kwc>private</SPAN><SPAN class=sym>:</SPAN>
+<A name=db00.h_12></A><SPAN class=line>   12 </SPAN>    QComboBox <SPAN class=sym>*</SPAN>mode<SPAN class=sym>;</SPAN>   <SPAN class=slc>// Режим (драйвер).</SPAN>
+<A name=db00.h_13></A><SPAN class=line>   13 </SPAN>    QLineEdit <SPAN class=sym>*</SPAN>host<SPAN class=sym>;</SPAN>   <SPAN class=slc>// Хост.</SPAN>
+<A name=db00.h_14></A><SPAN class=line>   14 </SPAN>    QLineEdit <SPAN class=sym>*</SPAN>dbname<SPAN class=sym>;</SPAN> <SPAN class=slc>// Имя БД.</SPAN>
+<A name=db00.h_15></A><SPAN class=line>   15 </SPAN>    QLineEdit <SPAN class=sym>*</SPAN>user<SPAN class=sym>;</SPAN>   <SPAN class=slc>// Пользователь.</SPAN>
+<A name=db00.h_16></A><SPAN class=line>   16 </SPAN>    QLineEdit <SPAN class=sym>*</SPAN>password<SPAN class=sym>;</SPAN> <SPAN class=slc>// Пароль.</SPAN>
+<A name=db00.h_17></A><SPAN class=line>   17 </SPAN>    QTextEdit <SPAN class=sym>*</SPAN>scr<SPAN class=sym>;</SPAN>      <SPAN class=slc>// Для вывода сообщений.</SPAN>
+<A name=db00.h_18></A><SPAN class=line>   18 </SPAN>    QPushButton <SPAN class=sym>*</SPAN>btnStart<SPAN class=sym>;</SPAN> <SPAN class=slc>// Кнопка 'Старт'.</SPAN>
+<A name=db00.h_19></A><SPAN class=line>   19 </SPAN><SPAN class=sym></CODE>;</SPAN>
+</PRE>
+<P><B>Листинг. Выполнение SQL-запросов (файл 
+<CODE>examples-qt/db00/db00.cpp</CODE>)</B> <PRE class=hl><A name=db00.cpp_1></A><SPAN class=line>    1 </SPAN><SPAN class=dir>#include &lt;QtGui&gt;</SPAN>
+<A name=db00.cpp_2></A><SPAN class=line>    2 </SPAN><SPAN class=dir>#include &lt;QtSql&gt;</SPAN>
+<A name=db00.cpp_3></A><SPAN class=line>    3 </SPAN><SPAN class=dir>#include &lt;QtTest/QtTest&gt;</SPAN> <SPAN class=slc>// Для qWait().</SPAN>
+<A name=db00.cpp_4></A><SPAN class=line>    4 </SPAN><SPAN class=dir></SPAN>
+<A name=db00.cpp_5></A><SPAN class=line>    5 </SPAN><SPAN class=dir>#include</SPAN> <SPAN class=dstr>"db00.h"</SPAN><SPAN class=dir></SPAN>
+<A name=db00.cpp_6></A><SPAN class=line>    6 </SPAN>
+<A name=db00.cpp_7></A><SPAN class=line>    7 </SPAN>MyDialog<SPAN class=sym>::</SPAN><SPAN class=kwd>MyDialog</SPAN><SPAN class=sym>(</SPAN>QWidget <SPAN class=sym>*</SPAN>parent<SPAN class=sym>)</SPAN>
+<A name=db00.cpp_8></A><SPAN class=line>    8 </SPAN>        <SPAN class=sym>:</SPAN> <SPAN class=kwd>QDialog</SPAN><SPAN class=sym>(</SPAN>parent<SPAN class=sym>) {</SPAN>
+<A name=db00.cpp_9></A><SPAN class=line>    9 </SPAN>    QTextCodec <SPAN class=sym>*</SPAN>codec <SPAN class=sym>=</SPAN> QTextCodec<SPAN class=sym>::</SPAN><SPAN class=kwd>codecForName</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"CP1251"</SPAN><SPAN class=sym>);</SPAN>
+<A name=db00.cpp_10></A><SPAN class=line>   10 </SPAN>    QTextCodec<SPAN class=sym>::</SPAN><SPAN class=kwd>setCodecForTr</SPAN><SPAN class=sym>(</SPAN>codec<SPAN class=sym>);</SPAN>
+<A name=db00.cpp_11></A><SPAN class=line>   11 </SPAN>    QTextCodec<SPAN class=sym>::</SPAN><SPAN class=kwd>setCodecForCStrings</SPAN><SPAN class=sym>(</SPAN>codec<SPAN class=sym>);</SPAN>
+<A name=db00.cpp_12></A><SPAN class=line>   12 </SPAN>    QTextCodec<SPAN class=sym>::</SPAN><SPAN class=kwd>setCodecForLocale</SPAN><SPAN class=sym>(</SPAN>codec<SPAN class=sym>);</SPAN>
+<A name=db00.cpp_13></A><SPAN class=line>   13 </SPAN>
+<A name=db00.cpp_14></A><SPAN class=line>   14 </SPAN>    <SPAN class=kwd>setWindowFlags</SPAN><SPAN class=sym>(</SPAN>Qt<SPAN class=sym>::</SPAN>Window<SPAN class=sym>);</SPAN>
+<A name=db00.cpp_15></A><SPAN class=line>   15 </SPAN>
+<A name=db00.cpp_16></A><SPAN class=line>   16 </SPAN>    mode <SPAN class=sym>=</SPAN> <SPAN class=kwa>new</SPAN> <SPAN class=kwd>QComboBox</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwa>this</SPAN><SPAN class=sym>);</SPAN>
+<A name=db00.cpp_17></A><SPAN class=line>   17 </SPAN>    QStringList drivers <SPAN class=sym>=</SPAN> QSqlDatabase<SPAN class=sym>::</SPAN><SPAN class=kwd>drivers</SPAN><SPAN class=sym>();</SPAN>
+<A name=db00.cpp_18></A><SPAN class=line>   18 </SPAN>    drivers<SPAN class=sym>.</SPAN><SPAN class=kwd>removeAll</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"QMYSQL3"</SPAN><SPAN class=sym>);</SPAN>
+<A name=db00.cpp_19></A><SPAN class=line>   19 </SPAN>    drivers<SPAN class=sym>.</SPAN><SPAN class=kwd>removeAll</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"QOCI8"</SPAN><SPAN class=sym>);</SPAN>
+<A name=db00.cpp_20></A><SPAN class=line>   20 </SPAN>    drivers<SPAN class=sym>.</SPAN><SPAN class=kwd>removeAll</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"QODBC3"</SPAN><SPAN class=sym>);</SPAN>
+<A name=db00.cpp_21></A><SPAN class=line>   21 </SPAN>    drivers<SPAN class=sym>.</SPAN><SPAN class=kwd>removeAll</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"QPSQL7"</SPAN><SPAN class=sym>);</SPAN>
+<A name=db00.cpp_22></A><SPAN class=line>   22 </SPAN>    drivers<SPAN class=sym>.</SPAN><SPAN class=kwd>removeAll</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"QTDS7"</SPAN><SPAN class=sym>);</SPAN>
+<A name=db00.cpp_23></A><SPAN class=line>   23 </SPAN>    mode<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>addItems</SPAN><SPAN class=sym>(</SPAN>drivers<SPAN class=sym>);</SPAN>
+<A name=db00.cpp_24></A><SPAN class=line>   24 </SPAN>
+<A name=db00.cpp_25></A><SPAN class=line>   25 </SPAN>    host <SPAN class=sym>=</SPAN> <SPAN class=kwa>new</SPAN> <SPAN class=kwd>QLineEdit</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"localhost"</SPAN><SPAN class=sym>),</SPAN> <SPAN class=kwa>this</SPAN><SPAN class=sym>);</SPAN>
+<A name=db00.cpp_26></A><SPAN class=line>   26 </SPAN>    dbname <SPAN class=sym>=</SPAN> <SPAN class=kwa>new</SPAN> <SPAN class=kwd>QLineEdit</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwa>this</SPAN><SPAN class=sym>);</SPAN>
+<A name=db00.cpp_27></A><SPAN class=line>   27 </SPAN>    user <SPAN class=sym>=</SPAN> <SPAN class=kwa>new</SPAN> <SPAN class=kwd>QLineEdit</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwa>this</SPAN><SPAN class=sym>);</SPAN>
+<A name=db00.cpp_28></A><SPAN class=line>   28 </SPAN>    password <SPAN class=sym>=</SPAN> <SPAN class=kwa>new</SPAN> <SPAN class=kwd>QLineEdit</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwa>this</SPAN><SPAN class=sym>);</SPAN>
+<A name=db00.cpp_29></A><SPAN class=line>   29 </SPAN>    password<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setEchoMode</SPAN><SPAN class=sym>(</SPAN>QLineEdit<SPAN class=sym>::</SPAN>Password<SPAN class=sym>);</SPAN>
+<A name=db00.cpp_30></A><SPAN class=line>   30 </SPAN>
+<A name=db00.cpp_31></A><SPAN class=line>   31 </SPAN>    btnStart <SPAN class=sym>=</SPAN> <SPAN class=kwa>new</SPAN> <SPAN class=kwd>QPushButton</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Старт"</SPAN><SPAN class=sym>),</SPAN> <SPAN class=kwa>this</SPAN><SPAN class=sym>);</SPAN>
+<A name=db00.cpp_32></A><SPAN class=line>   32 </SPAN>
+<A name=db00.cpp_33></A><SPAN class=line>   33 </SPAN>    scr <SPAN class=sym>=</SPAN> <SPAN class=kwa>new</SPAN> <SPAN class=kwd>QTextEdit</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwa>this</SPAN><SPAN class=sym>);</SPAN>
+<A name=db00.cpp_34></A><SPAN class=line>   34 </SPAN>    scr<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setReadOnly</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwa>true</SPAN><SPAN class=sym>);</SPAN>
+<A name=db00.cpp_35></A><SPAN class=line>   35 </SPAN>
+<A name=db00.cpp_36></A><SPAN class=line>   36 </SPAN>    QGridLayout <SPAN class=sym>*</SPAN>layout <SPAN class=sym>=</SPAN> <SPAN class=kwa>new</SPAN> <SPAN class=kwd>QGridLayout</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwa>this</SPAN><SPAN class=sym>);</SPAN>
+<A name=db00.cpp_37></A><SPAN class=line>   37 </SPAN>    layout<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>addWidget</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwa>new</SPAN> <SPAN class=kwd>QLabel</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Режим:"</SPAN><SPAN class=sym>),</SPAN> <SPAN class=kwa>this</SPAN><SPAN class=sym>),</SPAN>
+<A name=db00.cpp_38></A><SPAN class=line>   38 </SPAN>                      <SPAN class=num>0</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>0</SPAN><SPAN class=sym>,</SPAN> Qt<SPAN class=sym>::</SPAN>AlignRight<SPAN class=sym>);</SPAN>
+<A name=db00.cpp_39></A><SPAN class=line>   39 </SPAN>    layout<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>addWidget</SPAN><SPAN class=sym>(</SPAN>mode<SPAN class=sym>,</SPAN> <SPAN class=num>0</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>1</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>1</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>3</SPAN><SPAN class=sym>);</SPAN>
+<A name=db00.cpp_40></A><SPAN class=line>   40 </SPAN>
+<A name=db00.cpp_41></A><SPAN class=line>   41 </SPAN>    layout<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>addWidget</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwa>new</SPAN> <SPAN class=kwd>QLabel</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Хост:"</SPAN><SPAN class=sym>),</SPAN> <SPAN class=kwa>this</SPAN><SPAN class=sym>),</SPAN>
+<A name=db00.cpp_42></A><SPAN class=line>   42 </SPAN>                      <SPAN class=num>1</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>0</SPAN><SPAN class=sym>,</SPAN> Qt<SPAN class=sym>::</SPAN>AlignRight<SPAN class=sym>);</SPAN>
+<A name=db00.cpp_43></A><SPAN class=line>   43 </SPAN>    layout<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>addWidget</SPAN><SPAN class=sym>(</SPAN>host<SPAN class=sym>,</SPAN> <SPAN class=num>1</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>1</SPAN><SPAN class=sym>);</SPAN>
+<A name=db00.cpp_44></A><SPAN class=line>   44 </SPAN>
+<A name=db00.cpp_45></A><SPAN class=line>   45 </SPAN>    layout<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>addWidget</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwa>new</SPAN> <SPAN class=kwd>QLabel</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"База данных:"</SPAN><SPAN class=sym>),</SPAN> <SPAN class=kwa>this</SPAN><SPAN class=sym>),</SPAN>
+<A name=db00.cpp_46></A><SPAN class=line>   46 </SPAN>                      <SPAN class=num>1</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>2</SPAN><SPAN class=sym>,</SPAN> Qt<SPAN class=sym>::</SPAN>AlignRight<SPAN class=sym>);</SPAN>
+<A name=db00.cpp_47></A><SPAN class=line>   47 </SPAN>    layout<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>addWidget</SPAN><SPAN class=sym>(</SPAN>dbname<SPAN class=sym>,</SPAN> <SPAN class=num>1</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>3</SPAN><SPAN class=sym>);</SPAN>
+<A name=db00.cpp_48></A><SPAN class=line>   48 </SPAN>
+<A name=db00.cpp_49></A><SPAN class=line>   49 </SPAN>    layout<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>addWidget</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwa>new</SPAN> <SPAN class=kwd>QLabel</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Пользователь:"</SPAN><SPAN class=sym>),</SPAN> <SPAN class=kwa>this</SPAN><SPAN class=sym>),</SPAN>
+<A name=db00.cpp_50></A><SPAN class=line>   50 </SPAN>                      <SPAN class=num>2</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>0</SPAN><SPAN class=sym>,</SPAN> Qt<SPAN class=sym>::</SPAN>AlignRight<SPAN class=sym>);</SPAN>
+<A name=db00.cpp_51></A><SPAN class=line>   51 </SPAN>    layout<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>addWidget</SPAN><SPAN class=sym>(</SPAN>user<SPAN class=sym>,</SPAN> <SPAN class=num>2</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>1</SPAN><SPAN class=sym>);</SPAN>
+<A name=db00.cpp_52></A><SPAN class=line>   52 </SPAN>
+<A name=db00.cpp_53></A><SPAN class=line>   53 </SPAN>    layout<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>addWidget</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwa>new</SPAN> <SPAN class=kwd>QLabel</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Пароль:"</SPAN><SPAN class=sym>),</SPAN> <SPAN class=kwa>this</SPAN><SPAN class=sym>),</SPAN>
+<A name=db00.cpp_54></A><SPAN class=line>   54 </SPAN>                      <SPAN class=num>2</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>2</SPAN><SPAN class=sym>,</SPAN> Qt<SPAN class=sym>::</SPAN>AlignRight<SPAN class=sym>);</SPAN>
+<A name=db00.cpp_55></A><SPAN class=line>   55 </SPAN>    layout<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>addWidget</SPAN><SPAN class=sym>(</SPAN>password<SPAN class=sym>,</SPAN> <SPAN class=num>2</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>3</SPAN><SPAN class=sym>);</SPAN>
+<A name=db00.cpp_56></A><SPAN class=line>   56 </SPAN>
+<A name=db00.cpp_57></A><SPAN class=line>   57 </SPAN>    layout<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>addWidget</SPAN><SPAN class=sym>(</SPAN>btnStart<SPAN class=sym>,</SPAN> <SPAN class=num>3</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>1</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>1</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>2</SPAN><SPAN class=sym>);</SPAN>
+<A name=db00.cpp_58></A><SPAN class=line>   58 </SPAN>    layout<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>addWidget</SPAN><SPAN class=sym>(</SPAN>scr<SPAN class=sym>,</SPAN> <SPAN class=num>4</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>0</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>1</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>4</SPAN><SPAN class=sym>);</SPAN>
+<A name=db00.cpp_59></A><SPAN class=line>   59 </SPAN>
+<A name=db00.cpp_60></A><SPAN class=line>   60 </SPAN>    layout<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setMargin</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>6</SPAN><SPAN class=sym>);</SPAN>
+<A name=db00.cpp_61></A><SPAN class=line>   61 </SPAN>    layout<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setSpacing</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>5</SPAN><SPAN class=sym>);</SPAN>
+<A name=db00.cpp_62></A><SPAN class=line>   62 </SPAN>    layout<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setColumnStretch</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>1</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>1</SPAN><SPAN class=sym>);</SPAN>
+<A name=db00.cpp_63></A><SPAN class=line>   63 </SPAN>    layout<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setColumnStretch</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>3</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>1</SPAN><SPAN class=sym>);</SPAN>
+<A name=db00.cpp_64></A><SPAN class=line>   64 </SPAN>    layout<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setRowStretch</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>4</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>1</SPAN><SPAN class=sym>);</SPAN>
+<A name=db00.cpp_65></A><SPAN class=line>   65 </SPAN>    <SPAN class=kwd>setLayout</SPAN><SPAN class=sym>(</SPAN>layout<SPAN class=sym>);</SPAN>
+<A name=db00.cpp_66></A><SPAN class=line>   66 </SPAN>
+<A name=db00.cpp_67></A><SPAN class=line>   67 </SPAN>    <SPAN class=kwd>connect</SPAN><SPAN class=sym>(</SPAN>btnStart<SPAN class=sym>,</SPAN> <SPAN class=kwd>SIGNAL</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>clicked</SPAN><SPAN class=sym>()),</SPAN> <SPAN class=kwa>this</SPAN><SPAN class=sym>,</SPAN> <SPAN class=kwd>SLOT</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>start</SPAN><SPAN class=sym>()));</SPAN>
+<A name=db00.cpp_68></A><SPAN class=line>   68 </SPAN><SPAN class=sym>}</SPAN>
+<A name=db00.cpp_69></A><SPAN class=line>   69 </SPAN>
+<A name=db00.cpp_70></A><SPAN class=line>   70 </SPAN><SPAN class=kwb>bool</SPAN> MyDialog<SPAN class=sym>::</SPAN><SPAN class=kwd>start</SPAN><SPAN class=sym>() {</SPAN>
+<A name=db00.cpp_71></A><SPAN class=line>   71 </SPAN>    scr<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>append</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Соединяюсь с базой данных..."</SPAN><SPAN class=sym>));</SPAN>
+<A name=db00.cpp_72></A><SPAN class=line>   72 </SPAN>    QSqlDatabase db <SPAN class=sym>=</SPAN> QSqlDatabase<SPAN class=sym>::</SPAN><SPAN class=kwd>addDatabase</SPAN><SPAN class=sym>(</SPAN>
+<A name=db00.cpp_73></A><SPAN class=line>   73 </SPAN>        mode<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>currentText</SPAN><SPAN class=sym>() );</SPAN>
+<A name=db00.cpp_74></A><SPAN class=line>   74 </SPAN>    db<SPAN class=sym>.</SPAN><SPAN class=kwd>setHostName</SPAN><SPAN class=sym>(</SPAN>host<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>text</SPAN><SPAN class=sym>());</SPAN>
+<A name=db00.cpp_75></A><SPAN class=line>   75 </SPAN>    db<SPAN class=sym>.</SPAN><SPAN class=kwd>setDatabaseName</SPAN><SPAN class=sym>(</SPAN>dbname<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>text</SPAN><SPAN class=sym>());</SPAN>
+<A name=db00.cpp_76></A><SPAN class=line>   76 </SPAN>    db<SPAN class=sym>.</SPAN><SPAN class=kwd>setUserName</SPAN><SPAN class=sym>(</SPAN>user<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>text</SPAN><SPAN class=sym>());</SPAN>
+<A name=db00.cpp_77></A><SPAN class=line>   77 </SPAN>    db<SPAN class=sym>.</SPAN><SPAN class=kwd>setPassword</SPAN><SPAN class=sym>(</SPAN>password<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>text</SPAN><SPAN class=sym>());</SPAN>
+<A name=db00.cpp_78></A><SPAN class=line>   78 </SPAN>    <SPAN class=kwa>if</SPAN> <SPAN class=sym>(</SPAN>db<SPAN class=sym>.</SPAN><SPAN class=kwd>open</SPAN><SPAN class=sym>()) {</SPAN>
+<A name=db00.cpp_79></A><SPAN class=line>   79 </SPAN>        mode<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setEnabled</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwa>false</SPAN><SPAN class=sym>);</SPAN>
+<A name=db00.cpp_80></A><SPAN class=line>   80 </SPAN>        host<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setEnabled</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwa>false</SPAN><SPAN class=sym>);</SPAN>
+<A name=db00.cpp_81></A><SPAN class=line>   81 </SPAN>        dbname<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setEnabled</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwa>false</SPAN><SPAN class=sym>);</SPAN>
+<A name=db00.cpp_82></A><SPAN class=line>   82 </SPAN>        user<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setEnabled</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwa>false</SPAN><SPAN class=sym>);</SPAN>
+<A name=db00.cpp_83></A><SPAN class=line>   83 </SPAN>        password<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setEnabled</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwa>false</SPAN><SPAN class=sym>);</SPAN>
+<A name=db00.cpp_84></A><SPAN class=line>   84 </SPAN>        btnStart<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setEnabled</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwa>false</SPAN><SPAN class=sym>);</SPAN>
+<A name=db00.cpp_85></A><SPAN class=line>   85 </SPAN>        scr<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>append</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Соединение установлено!"</SPAN><SPAN class=sym>));</SPAN>
+<A name=db00.cpp_86></A><SPAN class=line>   86 </SPAN>    <SPAN class=sym>}</SPAN><SPAN class=kwa>else</SPAN><SPAN class=sym>{</SPAN>
+<A name=db00.cpp_87></A><SPAN class=line>   87 </SPAN>        scr<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>append</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Не могу соединиться: "</SPAN><SPAN class=sym>));</SPAN>
+<A name=db00.cpp_88></A><SPAN class=line>   88 </SPAN>        scr<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>append</SPAN><SPAN class=sym>(</SPAN>db<SPAN class=sym>.</SPAN><SPAN class=kwd>lastError</SPAN><SPAN class=sym>().</SPAN><SPAN class=kwd>text</SPAN><SPAN class=sym>());</SPAN>
+<A name=db00.cpp_89></A><SPAN class=line>   89 </SPAN>        <SPAN class=kwa>return false</SPAN><SPAN class=sym>;</SPAN>
+<A name=db00.cpp_90></A><SPAN class=line>   90 </SPAN>    <SPAN class=sym>}</SPAN>
+<A name=db00.cpp_91></A><SPAN class=line>   91 </SPAN>
+<A name=db00.cpp_92></A><SPAN class=line>   92 </SPAN>    QSqlQuery sql <SPAN class=sym>=</SPAN> <SPAN class=kwd>QSqlQuery</SPAN><SPAN class=sym>();</SPAN>
+<A name=db00.cpp_93></A><SPAN class=line>   93 </SPAN>    <SPAN class=slc>//sql.exec(tr("SET NAMES 'cp1251'"));</SPAN>
+<A name=db00.cpp_94></A><SPAN class=line>   94 </SPAN>    QStringList dbtables <SPAN class=sym>=</SPAN> db<SPAN class=sym>.</SPAN><SPAN class=kwd>tables</SPAN><SPAN class=sym>(</SPAN>QSql<SPAN class=sym>::</SPAN>Tables<SPAN class=sym>);</SPAN>
+<A name=db00.cpp_95></A><SPAN class=line>   95 </SPAN>    <SPAN class=kwa>if</SPAN> <SPAN class=sym>(</SPAN>dbtables<SPAN class=sym>.</SPAN><SPAN class=kwd>contains</SPAN><SPAN class=sym>(</SPAN> <SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"employee"</SPAN><SPAN class=sym>),</SPAN>
+<A name=db00.cpp_96></A><SPAN class=line>   96 </SPAN>                           Qt<SPAN class=sym>::</SPAN>CaseInsensitive<SPAN class=sym>)) {</SPAN>
+<A name=db00.cpp_97></A><SPAN class=line>   97 </SPAN>        scr<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>append</SPAN><SPAN class=sym>(</SPAN> <SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN>
+<A name=db00.cpp_98></A><SPAN class=line>   98 </SPAN>                <SPAN class=str>"Таблица</SPAN> <SPAN class=esc>\"</SPAN><SPAN class=str>employee</SPAN><SPAN class=esc>\"</SPAN> <SPAN class=str>уже существует."</SPAN><SPAN class=sym>));</SPAN>
+<A name=db00.cpp_99></A><SPAN class=line>   99 </SPAN>        sql<SPAN class=sym>.</SPAN><SPAN class=kwd>exec</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"DROP TABLE employee"</SPAN><SPAN class=sym>));</SPAN>
+<A name=db00.cpp_100></A><SPAN class=line>  100 </SPAN>        <SPAN class=kwa>if</SPAN> <SPAN class=sym>(</SPAN> sql<SPAN class=sym>.</SPAN><SPAN class=kwd>lastError</SPAN><SPAN class=sym>().</SPAN><SPAN class=kwd>type</SPAN><SPAN class=sym>() ==</SPAN> QSqlError<SPAN class=sym>::</SPAN>NoError <SPAN class=sym>) {</SPAN>
+<A name=db00.cpp_101></A><SPAN class=line>  101 </SPAN>            scr<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>append</SPAN><SPAN class=sym>(</SPAN> <SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN>
+<A name=db00.cpp_102></A><SPAN class=line>  102 </SPAN>                <SPAN class=str>"Удалили таблицу</SPAN> <SPAN class=esc>\"</SPAN><SPAN class=str>employee</SPAN><SPAN class=esc>\"</SPAN> <SPAN class=str>"</SPAN><SPAN class=sym>));</SPAN>
+<A name=db00.cpp_103></A><SPAN class=line>  103 </SPAN>        <SPAN class=sym>}</SPAN><SPAN class=kwa>else</SPAN><SPAN class=sym>{</SPAN>
+<A name=db00.cpp_104></A><SPAN class=line>  104 </SPAN>            scr<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>append</SPAN><SPAN class=sym>(</SPAN> <SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN>
+<A name=db00.cpp_105></A><SPAN class=line>  105 </SPAN>                <SPAN class=str>"Не могу удалить таблицу</SPAN> <SPAN class=esc>\"</SPAN><SPAN class=str>employee</SPAN><SPAN class=esc>\"</SPAN><SPAN class=str>:"</SPAN><SPAN class=sym>));</SPAN>
+<A name=db00.cpp_106></A><SPAN class=line>  106 </SPAN>            scr<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>append</SPAN><SPAN class=sym>(</SPAN>sql<SPAN class=sym>.</SPAN><SPAN class=kwd>lastError</SPAN><SPAN class=sym>().</SPAN><SPAN class=kwd>text</SPAN><SPAN class=sym>());</SPAN>
+<A name=db00.cpp_107></A><SPAN class=line>  107 </SPAN>            <SPAN class=kwa>return false</SPAN><SPAN class=sym>;</SPAN>
+<A name=db00.cpp_108></A><SPAN class=line>  108 </SPAN>        <SPAN class=sym>}</SPAN>
+<A name=db00.cpp_109></A><SPAN class=line>  109 </SPAN>    <SPAN class=sym>}</SPAN>
+<A name=db00.cpp_110></A><SPAN class=line>  110 </SPAN>
+<A name=db00.cpp_111></A><SPAN class=line>  111 </SPAN>    sql<SPAN class=sym>.</SPAN><SPAN class=kwd>exec</SPAN><SPAN class=sym>(</SPAN> <SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN>
+<A name=db00.cpp_112></A><SPAN class=line>  112 </SPAN>        <SPAN class=str>"create table employee ( "</SPAN>
+<A name=db00.cpp_113></A><SPAN class=line>  113 </SPAN>        <SPAN class=str>"  id integer PRIMARY KEY, "</SPAN>
+<A name=db00.cpp_114></A><SPAN class=line>  114 </SPAN>        <SPAN class=str>"  name char(30) not null, "</SPAN>
+<A name=db00.cpp_115></A><SPAN class=line>  115 </SPAN>        <SPAN class=str>"  born date null, "</SPAN>
+<A name=db00.cpp_116></A><SPAN class=line>  116 </SPAN>        <SPAN class=str>"  salary numeric(12,2), "</SPAN>
+<A name=db00.cpp_117></A><SPAN class=line>  117 </SPAN>        <SPAN class=str>"  married boolean NULL ) "</SPAN> <SPAN class=sym>) );</SPAN>
+<A name=db00.cpp_118></A><SPAN class=line>  118 </SPAN>    <SPAN class=kwa>if</SPAN> <SPAN class=sym>(</SPAN> sql<SPAN class=sym>.</SPAN><SPAN class=kwd>lastError</SPAN><SPAN class=sym>().</SPAN><SPAN class=kwd>type</SPAN><SPAN class=sym>() ==</SPAN> QSqlError<SPAN class=sym>::</SPAN>NoError <SPAN class=sym>) {</SPAN>
+<A name=db00.cpp_119></A><SPAN class=line>  119 </SPAN>        scr<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>append</SPAN><SPAN class=sym>(</SPAN> <SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN>
+<A name=db00.cpp_120></A><SPAN class=line>  120 </SPAN>            <SPAN class=str>"Создали таблицу</SPAN> <SPAN class=esc>\"</SPAN><SPAN class=str>employee</SPAN><SPAN class=esc>\"</SPAN><SPAN class=str>."</SPAN><SPAN class=sym>));</SPAN>
+<A name=db00.cpp_121></A><SPAN class=line>  121 </SPAN>    <SPAN class=sym>}</SPAN><SPAN class=kwa>else</SPAN><SPAN class=sym>{</SPAN>
+<A name=db00.cpp_122></A><SPAN class=line>  122 </SPAN>        scr<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>append</SPAN><SPAN class=sym>(</SPAN> <SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN>
+<A name=db00.cpp_123></A><SPAN class=line>  123 </SPAN>                <SPAN class=str>"Не могу создать таблицу</SPAN> <SPAN class=esc>\"</SPAN><SPAN class=str>employee</SPAN><SPAN class=esc>\"</SPAN><SPAN class=str>:"</SPAN><SPAN class=sym>));</SPAN>
+<A name=db00.cpp_124></A><SPAN class=line>  124 </SPAN>        scr<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>append</SPAN><SPAN class=sym>(</SPAN>sql<SPAN class=sym>.</SPAN><SPAN class=kwd>lastError</SPAN><SPAN class=sym>().</SPAN><SPAN class=kwd>text</SPAN><SPAN class=sym>());</SPAN>
+<A name=db00.cpp_125></A><SPAN class=line>  125 </SPAN>        <SPAN class=kwa>return false</SPAN><SPAN class=sym>;</SPAN>
+<A name=db00.cpp_126></A><SPAN class=line>  126 </SPAN>    <SPAN class=sym>}</SPAN>
+<A name=db00.cpp_127></A><SPAN class=line>  127 </SPAN>
+<A name=db00.cpp_128></A><SPAN class=line>  128 </SPAN>    <SPAN class=kwa>if</SPAN> <SPAN class=sym>(</SPAN>sql<SPAN class=sym>.</SPAN><SPAN class=kwd>prepare</SPAN><SPAN class=sym>(</SPAN> <SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN>
+<A name=db00.cpp_129></A><SPAN class=line>  129 </SPAN>            <SPAN class=str>"INSERT INTO employee "</SPAN>
+<A name=db00.cpp_130></A><SPAN class=line>  130 </SPAN>            <SPAN class=str>"  VALUES (?, ?, ?, ?, ?)"</SPAN><SPAN class=sym>) ) ) {</SPAN>
+<A name=db00.cpp_131></A><SPAN class=line>  131 </SPAN>        <SPAN class=kwb>int</SPAN> arr_id<SPAN class=sym>[] = {</SPAN><SPAN class=num>123</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>345</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>501</SPAN><SPAN class=sym>};</SPAN>
+<A name=db00.cpp_132></A><SPAN class=line>  132 </SPAN>        QString arr_name<SPAN class=sym>[] = {</SPAN><SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Винни-Пух"</SPAN><SPAN class=sym>),</SPAN>
+<A name=db00.cpp_133></A><SPAN class=line>  133 </SPAN>                              <SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Ослик Иа"</SPAN><SPAN class=sym>),</SPAN>
+<A name=db00.cpp_134></A><SPAN class=line>  134 </SPAN>                              <SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Поросёнок"</SPAN><SPAN class=sym>)};</SPAN>
+<A name=db00.cpp_135></A><SPAN class=line>  135 </SPAN>        QDate arr_born<SPAN class=sym>[] = {</SPAN><SPAN class=kwd>QDate</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>1971</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>12</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>31</SPAN><SPAN class=sym>),</SPAN>
+<A name=db00.cpp_136></A><SPAN class=line>  136 </SPAN>                            <SPAN class=kwd>QDate</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>1965</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>2</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>23</SPAN><SPAN class=sym>),</SPAN>
+<A name=db00.cpp_137></A><SPAN class=line>  137 </SPAN>                            <SPAN class=kwd>QDate</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>1982</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>6</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>14</SPAN><SPAN class=sym>)};</SPAN>
+<A name=db00.cpp_138></A><SPAN class=line>  138 </SPAN>        <SPAN class=kwb>float</SPAN> arr_salary<SPAN class=sym>[] = {</SPAN><SPAN class=num>1234.56</SPAN>f<SPAN class=sym>,</SPAN> <SPAN class=num>2345.67</SPAN>f<SPAN class=sym>,</SPAN> <SPAN class=num>871</SPAN><SPAN class=sym>};</SPAN>
+<A name=db00.cpp_139></A><SPAN class=line>  139 </SPAN>        <SPAN class=kwb>int</SPAN> arr_married<SPAN class=sym>[] = {</SPAN><SPAN class=num>1</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>0</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>0</SPAN><SPAN class=sym>};</SPAN>
+<A name=db00.cpp_140></A><SPAN class=line>  140 </SPAN>
+<A name=db00.cpp_141></A><SPAN class=line>  141 </SPAN>        <SPAN class=kwa>for</SPAN> <SPAN class=sym>(</SPAN><SPAN class=kwb>unsigned int</SPAN> i<SPAN class=sym>=</SPAN><SPAN class=num>0</SPAN><SPAN class=sym>;</SPAN> i <SPAN class=sym>&lt;</SPAN> <SPAN class=num>3</SPAN><SPAN class=sym>;</SPAN> i<SPAN class=sym>++) {</SPAN>
+<A name=db00.cpp_142></A><SPAN class=line>  142 </SPAN>            sql<SPAN class=sym>.</SPAN><SPAN class=kwd>bindValue</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>0</SPAN><SPAN class=sym>,</SPAN> arr_id<SPAN class=sym>[</SPAN>i<SPAN class=sym>]);</SPAN>
+<A name=db00.cpp_143></A><SPAN class=line>  143 </SPAN>            sql<SPAN class=sym>.</SPAN><SPAN class=kwd>bindValue</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>1</SPAN><SPAN class=sym>,</SPAN> arr_name<SPAN class=sym>[</SPAN>i<SPAN class=sym>]);</SPAN>
+<A name=db00.cpp_144></A><SPAN class=line>  144 </SPAN>            sql<SPAN class=sym>.</SPAN><SPAN class=kwd>bindValue</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>2</SPAN><SPAN class=sym>,</SPAN> arr_born<SPAN class=sym>[</SPAN>i<SPAN class=sym>]);</SPAN>
+<A name=db00.cpp_145></A><SPAN class=line>  145 </SPAN>            sql<SPAN class=sym>.</SPAN><SPAN class=kwd>bindValue</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>3</SPAN><SPAN class=sym>,</SPAN> arr_salary<SPAN class=sym>[</SPAN>i<SPAN class=sym>]);</SPAN>
+<A name=db00.cpp_146></A><SPAN class=line>  146 </SPAN>            sql<SPAN class=sym>.</SPAN><SPAN class=kwd>bindValue</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>4</SPAN><SPAN class=sym>,</SPAN> arr_married<SPAN class=sym>[</SPAN>i<SPAN class=sym>]);</SPAN>
+<A name=db00.cpp_147></A><SPAN class=line>  147 </SPAN>            sql<SPAN class=sym>.</SPAN><SPAN class=kwd>exec</SPAN><SPAN class=sym>();</SPAN>
+<A name=db00.cpp_148></A><SPAN class=line>  148 </SPAN>            <SPAN class=kwa>if</SPAN> <SPAN class=sym>(</SPAN> sql<SPAN class=sym>.</SPAN><SPAN class=kwd>lastError</SPAN><SPAN class=sym>().</SPAN><SPAN class=kwd>type</SPAN><SPAN class=sym>() ==</SPAN> QSqlError<SPAN class=sym>::</SPAN>NoError <SPAN class=sym>) {</SPAN>
+<A name=db00.cpp_149></A><SPAN class=line>  149 </SPAN>                scr<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>append</SPAN><SPAN class=sym>(</SPAN> <SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN>
+<A name=db00.cpp_150></A><SPAN class=line>  150 </SPAN>                    <SPAN class=str>"Вставили новую запись."</SPAN><SPAN class=sym>));</SPAN>
+<A name=db00.cpp_151></A><SPAN class=line>  151 </SPAN>            <SPAN class=sym>}</SPAN><SPAN class=kwa>else</SPAN><SPAN class=sym>{</SPAN>
+<A name=db00.cpp_152></A><SPAN class=line>  152 </SPAN>                scr<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>append</SPAN><SPAN class=sym>(</SPAN> <SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN>
+<A name=db00.cpp_153></A><SPAN class=line>  153 </SPAN>                    <SPAN class=str>"Не могу вставить новую запись:"</SPAN><SPAN class=sym>));</SPAN>
+<A name=db00.cpp_154></A><SPAN class=line>  154 </SPAN>                scr<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>append</SPAN><SPAN class=sym>(</SPAN>sql<SPAN class=sym>.</SPAN><SPAN class=kwd>lastError</SPAN><SPAN class=sym>().</SPAN><SPAN class=kwd>text</SPAN><SPAN class=sym>());</SPAN>
+<A name=db00.cpp_155></A><SPAN class=line>  155 </SPAN>                <SPAN class=kwa>return false</SPAN><SPAN class=sym>;</SPAN>
+<A name=db00.cpp_156></A><SPAN class=line>  156 </SPAN>            <SPAN class=sym>}</SPAN>
+<A name=db00.cpp_157></A><SPAN class=line>  157 </SPAN>        <SPAN class=sym>}</SPAN>
+<A name=db00.cpp_158></A><SPAN class=line>  158 </SPAN>    <SPAN class=sym>}</SPAN><SPAN class=kwa>else</SPAN><SPAN class=sym>{</SPAN>
+<A name=db00.cpp_159></A><SPAN class=line>  159 </SPAN>        scr<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>append</SPAN><SPAN class=sym>(</SPAN> <SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN>
+<A name=db00.cpp_160></A><SPAN class=line>  160 </SPAN>                <SPAN class=str>"Не могу подготовить запрос:"</SPAN><SPAN class=sym>));</SPAN>
+<A name=db00.cpp_161></A><SPAN class=line>  161 </SPAN>        scr<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>append</SPAN><SPAN class=sym>(</SPAN>sql<SPAN class=sym>.</SPAN><SPAN class=kwd>lastError</SPAN><SPAN class=sym>().</SPAN><SPAN class=kwd>text</SPAN><SPAN class=sym>());</SPAN>
+<A name=db00.cpp_162></A><SPAN class=line>  162 </SPAN>        <SPAN class=kwa>return false</SPAN><SPAN class=sym>;</SPAN>
+<A name=db00.cpp_163></A><SPAN class=line>  163 </SPAN>    <SPAN class=sym>}</SPAN>
+<A name=db00.cpp_164></A><SPAN class=line>  164 </SPAN>
+<A name=db00.cpp_165></A><SPAN class=line>  165 </SPAN>    sql<SPAN class=sym>.</SPAN><SPAN class=kwd>exec</SPAN><SPAN class=sym>(</SPAN> <SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"SELECT * FROM employee "</SPAN><SPAN class=sym>) );</SPAN>
+<A name=db00.cpp_166></A><SPAN class=line>  166 </SPAN>    <SPAN class=kwa>if</SPAN> <SPAN class=sym>(</SPAN> sql<SPAN class=sym>.</SPAN><SPAN class=kwd>isActive</SPAN><SPAN class=sym>() ) {</SPAN>
+<A name=db00.cpp_167></A><SPAN class=line>  167 </SPAN>        QSqlRecord rec <SPAN class=sym>=</SPAN> sql<SPAN class=sym>.</SPAN><SPAN class=kwd>record</SPAN><SPAN class=sym>();</SPAN>
+<A name=db00.cpp_168></A><SPAN class=line>  168 </SPAN>        scr<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>append</SPAN><SPAN class=sym>(</SPAN> <SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN>
+<A name=db00.cpp_169></A><SPAN class=line>  169 </SPAN>            <SPAN class=str>"В таблице</SPAN> <SPAN class=esc>\"</SPAN><SPAN class=str>employee</SPAN><SPAN class=esc>\"</SPAN> <SPAN class=str>%1 столбцов: "</SPAN><SPAN class=sym>)</SPAN>
+<A name=db00.cpp_170></A><SPAN class=line>  170 </SPAN>            <SPAN class=sym>.</SPAN><SPAN class=kwd>arg</SPAN><SPAN class=sym>(</SPAN>rec<SPAN class=sym>.</SPAN><SPAN class=kwd>count</SPAN><SPAN class=sym>() ) );</SPAN>
+<A name=db00.cpp_171></A><SPAN class=line>  171 </SPAN>
+<A name=db00.cpp_172></A><SPAN class=line>  172 </SPAN>        QString fields<SPAN class=sym>;</SPAN>
+<A name=db00.cpp_173></A><SPAN class=line>  173 </SPAN>        <SPAN class=kwa>for</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwb>int</SPAN> j<SPAN class=sym>=</SPAN><SPAN class=num>0</SPAN><SPAN class=sym>;</SPAN> j<SPAN class=sym>&lt;</SPAN>rec<SPAN class=sym>.</SPAN><SPAN class=kwd>count</SPAN><SPAN class=sym>();</SPAN> j<SPAN class=sym>++)</SPAN>
+<A name=db00.cpp_174></A><SPAN class=line>  174 </SPAN>            fields <SPAN class=sym>+=</SPAN> rec<SPAN class=sym>.</SPAN><SPAN class=kwd>fieldName</SPAN><SPAN class=sym>(</SPAN>j<SPAN class=sym>) +</SPAN> <SPAN class=str>", "</SPAN><SPAN class=sym>;</SPAN>
+<A name=db00.cpp_175></A><SPAN class=line>  175 </SPAN>
+<A name=db00.cpp_176></A><SPAN class=line>  176 </SPAN>        scr<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>append</SPAN><SPAN class=sym>(</SPAN>fields<SPAN class=sym>);</SPAN>
+<A name=db00.cpp_177></A><SPAN class=line>  177 </SPAN>
+<A name=db00.cpp_178></A><SPAN class=line>  178 </SPAN>        scr<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>append</SPAN><SPAN class=sym>(</SPAN> <SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN>
+<A name=db00.cpp_179></A><SPAN class=line>  179 </SPAN>            <SPAN class=str>"В таблице</SPAN> <SPAN class=esc>\"</SPAN><SPAN class=str>employee</SPAN><SPAN class=esc>\"</SPAN> <SPAN class=str>%1 записей: "</SPAN><SPAN class=sym>)</SPAN>
+<A name=db00.cpp_180></A><SPAN class=line>  180 </SPAN>            <SPAN class=sym>.</SPAN><SPAN class=kwd>arg</SPAN><SPAN class=sym>(</SPAN>sql<SPAN class=sym>.</SPAN><SPAN class=kwd>size</SPAN><SPAN class=sym>() ) );</SPAN>
+<A name=db00.cpp_181></A><SPAN class=line>  181 </SPAN>
+<A name=db00.cpp_182></A><SPAN class=line>  182 </SPAN>        <SPAN class=kwa>while</SPAN> <SPAN class=sym>(</SPAN> sql<SPAN class=sym>.</SPAN><SPAN class=kwd>next</SPAN><SPAN class=sym>() ) {</SPAN>
+<A name=db00.cpp_183></A><SPAN class=line>  183 </SPAN>            <SPAN class=kwb>int</SPAN> id <SPAN class=sym>=</SPAN> sql<SPAN class=sym>.</SPAN><SPAN class=kwd>value</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>0</SPAN><SPAN class=sym>).</SPAN><SPAN class=kwd>toInt</SPAN><SPAN class=sym>();</SPAN>
+<A name=db00.cpp_184></A><SPAN class=line>  184 </SPAN>            QString name <SPAN class=sym>=</SPAN> sql<SPAN class=sym>.</SPAN><SPAN class=kwd>value</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>1</SPAN><SPAN class=sym>).</SPAN><SPAN class=kwd>toString</SPAN><SPAN class=sym>();</SPAN>
+<A name=db00.cpp_185></A><SPAN class=line>  185 </SPAN>            QDate born <SPAN class=sym>=</SPAN> sql<SPAN class=sym>.</SPAN><SPAN class=kwd>value</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>2</SPAN><SPAN class=sym>).</SPAN><SPAN class=kwd>toDate</SPAN><SPAN class=sym>();</SPAN>
+<A name=db00.cpp_186></A><SPAN class=line>  186 </SPAN>            <SPAN class=kwb>double</SPAN> salary <SPAN class=sym>=</SPAN> sql<SPAN class=sym>.</SPAN><SPAN class=kwd>value</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>3</SPAN><SPAN class=sym>).</SPAN><SPAN class=kwd>toDouble</SPAN><SPAN class=sym>();</SPAN>
+<A name=db00.cpp_187></A><SPAN class=line>  187 </SPAN>            <SPAN class=kwb>bool</SPAN> married <SPAN class=sym>=</SPAN> sql<SPAN class=sym>.</SPAN><SPAN class=kwd>value</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>4</SPAN><SPAN class=sym>).</SPAN><SPAN class=kwd>toBool</SPAN><SPAN class=sym>();</SPAN>
+<A name=db00.cpp_188></A><SPAN class=line>  188 </SPAN>            scr<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>append</SPAN><SPAN class=sym>(</SPAN> <SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN>
+<A name=db00.cpp_189></A><SPAN class=line>  189 </SPAN>                <SPAN class=str>"%1</SPAN><SPAN class=esc>\t</SPAN> <SPAN class=str>%2</SPAN><SPAN class=esc>\t</SPAN> <SPAN class=str>%3</SPAN><SPAN class=esc>\t</SPAN> <SPAN class=str>%4</SPAN><SPAN class=esc>\t</SPAN> <SPAN class=str>%5"</SPAN><SPAN class=sym>)</SPAN>
+<A name=db00.cpp_190></A><SPAN class=line>  190 </SPAN>                <SPAN class=sym>.</SPAN><SPAN class=kwd>arg</SPAN><SPAN class=sym>(</SPAN>id<SPAN class=sym>)</SPAN>
+<A name=db00.cpp_191></A><SPAN class=line>  191 </SPAN>                <SPAN class=sym>.</SPAN><SPAN class=kwd>arg</SPAN><SPAN class=sym>(</SPAN>name<SPAN class=sym>)</SPAN>
+<A name=db00.cpp_192></A><SPAN class=line>  192 </SPAN>                <SPAN class=sym>.</SPAN><SPAN class=kwd>arg</SPAN><SPAN class=sym>(</SPAN>born<SPAN class=sym>.</SPAN><SPAN class=kwd>toString</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"dd/MM/yyyy"</SPAN><SPAN class=sym>)))</SPAN>
+<A name=db00.cpp_193></A><SPAN class=line>  193 </SPAN>                <SPAN class=sym>.</SPAN><SPAN class=kwd>arg</SPAN><SPAN class=sym>(</SPAN>salary<SPAN class=sym>)</SPAN>
+<A name=db00.cpp_194></A><SPAN class=line>  194 </SPAN>                <SPAN class=sym>.</SPAN><SPAN class=kwd>arg</SPAN><SPAN class=sym>(</SPAN>married<SPAN class=sym>) );</SPAN>
+<A name=db00.cpp_195></A><SPAN class=line>  195 </SPAN>        <SPAN class=sym>}</SPAN>
+<A name=db00.cpp_196></A><SPAN class=line>  196 </SPAN>    <SPAN class=sym>}</SPAN><SPAN class=kwa>else</SPAN><SPAN class=sym>{</SPAN>
+<A name=db00.cpp_197></A><SPAN class=line>  197 </SPAN>        scr<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>append</SPAN><SPAN class=sym>(</SPAN> <SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN>
+<A name=db00.cpp_198></A><SPAN class=line>  198 </SPAN>                <SPAN class=str>"Не могу получить данные:"</SPAN><SPAN class=sym>));</SPAN>
+<A name=db00.cpp_199></A><SPAN class=line>  199 </SPAN>        scr<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>append</SPAN><SPAN class=sym>(</SPAN>sql<SPAN class=sym>.</SPAN><SPAN class=kwd>lastError</SPAN><SPAN class=sym>().</SPAN><SPAN class=kwd>text</SPAN><SPAN class=sym>());</SPAN>
+<A name=db00.cpp_200></A><SPAN class=line>  200 </SPAN>        <SPAN class=kwa>return false</SPAN><SPAN class=sym>;</SPAN>
+<A name=db00.cpp_201></A><SPAN class=line>  201 </SPAN>    <SPAN class=sym>}</SPAN>
+<A name=db00.cpp_202></A><SPAN class=line>  202 </SPAN>
+<A name=db00.cpp_203></A><SPAN class=line>  203 </SPAN>    scr<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>append</SPAN><SPAN class=sym>(</SPAN> <SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN>
+<A name=db00.cpp_204></A><SPAN class=line>  204 </SPAN>        <SPAN class=str>"При закрытии окна соединение с БД будет завершено."</SPAN><SPAN class=sym>));</SPAN>
+<A name=db00.cpp_205></A><SPAN class=line>  205 </SPAN>    <SPAN class=kwa>return true</SPAN><SPAN class=sym>;</SPAN>
+<A name=db00.cpp_206></A><SPAN class=line>  206 </SPAN><SPAN class=sym>}</SPAN>
+<A name=db00.cpp_207></A><SPAN class=line>  207 </SPAN>
+<A name=db00.cpp_208></A><SPAN class=line>  208 </SPAN><SPAN class=kwb>void</SPAN> MyDialog<SPAN class=sym>::</SPAN><SPAN class=kwd>closeEvent</SPAN><SPAN class=sym>(</SPAN>QCloseEvent <SPAN class=sym>*</SPAN>event<SPAN class=sym>) {</SPAN>
+<A name=db00.cpp_209></A><SPAN class=line>  209 </SPAN>    QSqlDatabase db <SPAN class=sym>=</SPAN> QSqlDatabase<SPAN class=sym>::</SPAN><SPAN class=kwd>database</SPAN><SPAN class=sym>();</SPAN>
+<A name=db00.cpp_210></A><SPAN class=line>  210 </SPAN>    <SPAN class=kwa>if</SPAN> <SPAN class=sym>(</SPAN>db<SPAN class=sym>.</SPAN><SPAN class=kwd>isOpen</SPAN><SPAN class=sym>()) {</SPAN>
+<A name=db00.cpp_211></A><SPAN class=line>  211 </SPAN>        db<SPAN class=sym>.</SPAN><SPAN class=kwd>close</SPAN><SPAN class=sym>();</SPAN>
+<A name=db00.cpp_212></A><SPAN class=line>  212 </SPAN>        scr<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>append</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"--------------------------"</SPAN><SPAN class=sym>);</SPAN>
+<A name=db00.cpp_213></A><SPAN class=line>  213 </SPAN>        scr<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>append</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Соединение с базой данных закрыто!"</SPAN><SPAN class=sym>));</SPAN>
+<A name=db00.cpp_214></A><SPAN class=line>  214 </SPAN>        QTest<SPAN class=sym>::</SPAN><SPAN class=kwd>qWait</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>1000</SPAN><SPAN class=sym>);</SPAN>    <SPAN class=slc>// Ждать 1 сек.</SPAN>
+<A name=db00.cpp_215></A><SPAN class=line>  215 </SPAN>    <SPAN class=sym>}</SPAN>
+<A name=db00.cpp_216></A><SPAN class=line>  216 </SPAN><SPAN class=sym>}</SPAN>
+<A name=db00.cpp_217></A><SPAN class=line>  217 </SPAN>
+<A name=db00.cpp_218></A><SPAN class=line>  218 </SPAN><SPAN class=kwb>int</SPAN> <SPAN class=kwd>main</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwb>int</SPAN> argc<SPAN class=sym>,</SPAN> <SPAN class=kwb>char</SPAN> <SPAN class=sym>*</SPAN>argv<SPAN class=sym>[]) {</SPAN>
+<A name=db00.cpp_219></A><SPAN class=line>  219 </SPAN>    QApplication <SPAN class=kwd>app</SPAN><SPAN class=sym>(</SPAN>argc<SPAN class=sym>,</SPAN> argv<SPAN class=sym>);</SPAN>
+<A name=db00.cpp_220></A><SPAN class=line>  220 </SPAN>
+<A name=db00.cpp_221></A><SPAN class=line>  221 </SPAN>    MyDialog <SPAN class=sym>*</SPAN>mainWin <SPAN class=sym>=</SPAN> <SPAN class=kwa>new</SPAN> <SPAN class=kwd>MyDialog</SPAN><SPAN class=sym>();</SPAN>
+<A name=db00.cpp_222></A><SPAN class=line>  222 </SPAN>    mainWin<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>show</SPAN><SPAN class=sym>();</SPAN>
+<A name=db00.cpp_223></A><SPAN class=line>  223 </SPAN>    <SPAN class=kwa>return</SPAN> app<SPAN class=sym>.</SPAN><SPAN class=kwd>exec</SPAN><SPAN class=sym>();</SPAN>
+<A name=db00.cpp_224></A><SPAN class=line>  224 </SPAN><SPAN class=sym>}</SPAN>
+</PRE>
+<UL>
+  <LI>(13) Установили для диалога флаг <CODE>Qt::Windows</CODE>, чтобы в 
+  заголовке окна появились кнопки сворачивания и восстановления. 
+  <LI>(15-22) Создали поле со списком и заполнили его названиями всех доступных 
+  драйверов SQL, кроме устаревших (17-21). 
+  <LI>(24-28) Создали однострочные поля для ввода параметров соединения. 
+  <LI>(30) Кнопка <CODE>Старт</CODE>. 
+  <LI>(32-33) Многострочное поле для вывода сообщений. 
+  <LI>(35-64) Расположили все элементы с помощью сеточного менеджера размещения. 
+
+  <LI>(66) Связали кнопку <CODE>Старт</CODE> с функцией <CODE>start()</CODE>. 
+  <LI>(69) Функция, выполняемая при нажатии на кнопку. 
+  <LI>(70) Вывели сообщение. 
+  <LI>(72-77) Создали соединение с базой данных. 
+  <LI>(78-83) Если соединение установлено, то менять параметры уже нельзя. 
+  <LI>(93) При необходимости сообщили серверу кодовую таблицу клиента. 
+  <LI>(94-95) Выяснили, существует ли в базе данных таблица 
+  <CODE>employee</CODE> (работники). 
+  <LI>(98) Если да, то удалили её. 
+  <LI>(110) Создали новую таблицу. 
+  <LI>(127-162) Выполнили серию SQL-запросов с параметрами для вставки новых 
+  записей в созданную таблицу. 
+  <LI>(164) Получили все записи таблицы. 
+  <LI>(166-173) Получили информацию о полях (столбцах). 
+  <LI>(177-193) Вывели на экран все записи (строки) таблицы. 
+  <LI>(207) Виртуальная функция <CODE>closeEvent</CODE> выполняется при закрытии 
+  окна. 
+  <LI>(209-210) Если соединение с базой данных открыто, то закрываем его. 
+  <LI>(211-213) Выводим сообщение и ждём секунду перед закрытием окна. Для 
+  компиляции проектов, использующих модуль <CODE>QtTest</CODE>, в файл проекта 
+  <CODE>*.pro</CODE> надо добавить строку 
+  <CODE>CONFIG&nbsp;+=&nbsp;qtestlib</CODE>. </LI></UL>
+<P>Перед компиляцией проекта, в котором используется модуль <CODE>QtSql</CODE>, 
+надо добавить в <CODE>pro</CODE>-файл строку <CODE>QT&nbsp;+=&nbsp;sql</CODE>. 
+<P>Перед выполнением этой программы требуется создать какую-нибудь базу данных: <PRE>create database db1 character set utf8;
+</PRE>
+<p>(вместо <CODE>utf8</CODE> можно использовать кодировки <CODE>cp1251</CODE> 
+  или <CODE>koi8r</CODE>); а перед использованием <CODE>QODBC</CODE> -- настроить 
+ODBC-псевдоним.</p>
+<p>&nbsp;</p>
+<div align="left"><a href="qtdb000.htm">Назад</a> <a href="title.htm">Содержание</a> <a href="qtdb002.htm">Вперед</a>
+  
+</div>
+</BODY></HTML>

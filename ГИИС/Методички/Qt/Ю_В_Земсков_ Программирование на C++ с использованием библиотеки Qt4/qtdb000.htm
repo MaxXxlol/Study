@@ -1,0 +1,96 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0043)http://www.mechta34.com/it/qt4/qtdb000.html -->
+<HTML><HEAD><TITLE>Ю.В.Земсков. Программирование на C++ с использованием библиотеки Qt4</TITLE>
+<META http-equiv=Content-Type content="text/html; charset=windows-1251"><LINK 
+href="Images/s1.css" type=text/css rel=stylesheet>
+<META content="MSHTML 6.00.2900.2180" name=GENERATOR></HEAD>
+<BODY>
+<a href="qt007.htm">Назад</a> <a href="title.htm">Содержание</a> <a href="qtdb001.htm">Вперед</a>
+<H2>Работа с базами данных в Qt4</H2>В библиотеке Qt4 имеются драйверы для 
+работы со следующими СУБД: 
+<UL>
+  <LI><CODE>QDB2</CODE> -- IBM DB2 версии не ниже 7.1; 
+  <LI><CODE>QIBASE</CODE> -- Borland InterBase; 
+  <LI><CODE>QMYSQL</CODE> -- MySQL; 
+  <LI><CODE>QOCI</CODE> -- Oracle; 
+  <LI><CODE>QODBC</CODE> -- ODBC (в том числе Microsoft SQL Server); 
+  <LI><CODE>QPSQL</CODE> -- PostgreSQL; 
+  <LI><CODE>QSQLITE</CODE> -- SQLite версии не ниже 3; 
+  <LI><CODE>QSQLITE2</CODE> -- SQLite версии 2; 
+  <LI><CODE>QTDS</CODE> -- Sybase Adaptive Server. </LI></UL>
+<P>В Qt4 Open Source Edition отсутствует поддержка коммерческих СУБД Oracle, 
+Sybase и DB2, т.к. драйверы для них распространяются под лицензией, не 
+совместимой с GPL. 
+<H3>Компиляция SQL-драйверов</H3>При компиляции Qt4 по умолчанию устанавливается 
+только драйвер <CODE>QSQLITE</CODE>. Чтобы подключить поддержку остальных СУБД, 
+надо при запуске <CODE>configure</CODE> указать параметры 
+<CODE>-qt-sql-mysql</CODE>, <CODE>-qt-sql-psql</CODE>, 
+<CODE>-qt-sql-odbc</CODE>, <CODE>-qt-sql-ibase</CODE> для компиляции 
+соответствующих статических библиотек или <CODE>-plugin-sql-mysql</CODE>, 
+<CODE>-plugin-sql-psql</CODE>, <CODE>-plugin-sql-odbc</CODE>, 
+<CODE>-plugin-sql-ibase</CODE> для компиляции динамических библиотек. 
+<P>Компилятору и компоновщику потребуются заголовочные файлы и библиотеки, 
+поставляемые вместе с соответствующими СУБД. Поэтому при запуске 
+<CODE>configure</CODE> обычно требуется указать параметр 
+<CODE>-Iпуть_к_h-файлам</CODE> и <CODE>-Lпуть_к_lib</CODE>. В результате 
+компиляции в каталоге <CODE>lib</CODE> появится нужная динамическая библиотека. 
+Чтобы узнать, драйверы каких СУБД уже установлены, можно открыть 
+демонстрационную программу <CODE>demos/sqlbrowser</CODE>. 
+<P>Если библиотека Qt уже скомпилирована, то можно просто зайти в каталог 
+<CODE>qt/src/plugins/sqldrivers/НужныйДрайвер</CODE> и выполнить компиляцию 
+находящегося там проекта <CODE>*.pro</CODE>. 
+<P>Например, для сборки драйвера ODBC в Windows: <CODE><PRE>cd %QTDIR%\src\plugins\sqldrivers\odbc
+qmake -o Makefile odbc.pro
+mingw32-make
+</PRE></CODE>При использовании Visual C++ последняя команда, разумеется, 
+<CODE>nmake</CODE>. 
+<P>В Linux: <CODE><PRE>cd $QTDIR/src/plugins/sqldrivers/odbc
+qmake "INCLUDEPATH+=/usr/local/unixODBC/include"
+      "LIBS+=-L/usr/local/unixODBC/lib -lodbc"
+make
+</PRE></CODE>
+<P>Для сборки драйвера PostgreSQL в Windows: <CODE><PRE>cd %QTDIR%\src\plugins\sqldrivers\psql
+qmake -o Makefile "INCLUDEPATH+=C:\psql\include"
+        "LIBS+=C:\psql\lib\ms\libpq.a" psql.pro
+mingw32-make
+</PRE></CODE>(все пути не должны содержать пробелов). 
+<P>В Linux: <CODE><PRE>cd $QTDIR/src/plugins/sqldrivers/psql
+qmake -o Makefile "INCLUDEPATH+=/usr/include/pgsql"
+        "LIBS+=-L/usr/lib -lpq" psql.pro
+make
+</PRE></CODE>Заметим, что драйвер <CODE>QPSQL</CODE> может работать только с 
+кодировкой <CODE>utf-8</CODE>. 
+<P>Для сборки драйвера MySQL в Windows: <CODE><PRE>cd %QTDIR%\src\plugins\sqldrivers\mysql
+qmake -o Makefile "INCLUDEPATH+=C:\MySQL\include"
+        "LIBS+=C:\MySQL\lib\opt\libmysql.a" mysql.pro
+mingw32-make
+</PRE></CODE>(все пути не должны содержать пробелов). Для компиляции с помощью 
+Microsoft Visual C++ вместо <CODE>libmysql.a</CODE> надо указать 
+<CODE>libmysql.lib</CODE>. 
+<P>В Linux: <CODE><PRE>cd $QTDIR/src/plugins/sqldrivers/mysql
+qmake -o Makefile "INCLUDEPATH+=/usr/local/include"
+        "LIBS+=-L/usr/local/lib -lmysqlclient_r" mysql.pro
+make
+</PRE></CODE>
+<P>Результат компиляции (динамические библиотеки) помещается в каталог 
+<CODE>plugins/sqldrivers</CODE>. 
+<P>Обычно для Windows поставляются библиотеки <CODE>*.lib</CODE>, рассчитанные 
+на использование компилятора Microsoft. Поскольку свободная версия Qt4 для 
+Windows поддерживает только MinGW, то перед сборкой SQL-драйвера придётся 
+сначала сгенерировать <CODE>def</CODE>-файл, например: <CODE><PRE>cd c:\mysql\lib\opt
+reimp -d libmysql.lib
+</PRE></CODE>(утилита <CODE>reimp</CODE> поставляется вместе с MSYS), а затем 
+сформировать библиотеку <CODE>*.a</CODE>: <CODE><PRE>dlltool -d libmysql.def -l libmysql.a libmysql.dll -k
+</PRE></CODE>
+<P>Перед выполнением приложений Qt, если используются SQL-драйверы, 
+скомпилированные в виде динамических библиотек, требуется позаботиться о том, 
+чтобы сами эти библиотеки, а также, в свою очредь, используемые ими библиотеки, 
+поставляемые с соответствующими СУБД, были доступны по стандартным путям поиска. 
+В окончательных релизах, поставляемых пользователю, Qt-драйверы 
+<CODE>qsql*</CODE> лучше всего размещать в подкаталоге 
+<CODE>./plugins/sqldrivers</CODE>, а используемые ими библиотеки -- либо в 
+каталоге самой программы, либо в стандартном каталоге 
+<CODE>Windows/system32</CODE> (для системы Windows) или <CODE>usr/lib</CODE> 
+(для Linux). </P>
+<a href="qt007.htm">Назад</a> <a href="title.htm">Содержание</a> <a href="qtdb001.htm">Вперед</a>
+</BODY></HTML>

@@ -1,0 +1,412 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0043)http://www.mechta34.com/it/qt4/qtdb004.html -->
+<HTML><HEAD><TITLE>Ю.В.Земсков. Программирование на C++ с использованием библиотеки Qt4</TITLE>
+<META http-equiv=Content-Type content="text/html; charset=windows-1251"><LINK 
+href="Images/s1.css" type=text/css rel=stylesheet>
+<META content="MSHTML 6.00.2900.2180" name=GENERATOR></HEAD>
+<BODY>
+<a href="qtdb003.htm">Назад</a> <a href="title.htm">Содержание</a>
+<H2>Делегаты для ячеек таблицы</H2>Делегаты -- это специальные классы, которые 
+могут использоваться для управления режимами отображения или редактирования 
+ячеек таблицы <CODE>QTableView</CODE>, равно как и элементов других 
+представлений (<CODE>QListView</CODE>, <CODE>QTreeView</CODE>). В данном разделе 
+мы определим делегатов для редактирования дат и чисел в ячейках таблицы. 
+<P align=center><IMG src="Images/qtdb03.png"> 
+<P>В листингах . и . приведён текст программы, а на рис. показан внешний вид 
+окна в момент ввода даты рождения. 
+<P><B>Листинг. Делегаты (файл <CODE>examples-qt/db03/db03.h</CODE>)</B> <PRE class=hl><A name=db03.h_1></A><SPAN class=line>    1 </SPAN><SPAN class=dir>#include &lt;QtGui&gt;</SPAN>
+<A name=db03.h_2></A><SPAN class=line>    2 </SPAN><SPAN class=dir>#include &lt;QtSql&gt;</SPAN>
+<A name=db03.h_3></A><SPAN class=line>    3 </SPAN>
+<A name=db03.h_4></A><SPAN class=line>    4 </SPAN><SPAN class=kwc>class</SPAN> MyModel <SPAN class=sym>:</SPAN> <SPAN class=kwc>public</SPAN> QSqlQueryModel <SPAN class=sym>{</SPAN>
+<A name=db03.h_5></A><SPAN class=line>    5 </SPAN>    Q_OBJECT
+<A name=db03.h_6></A><SPAN class=line>    6 </SPAN><SPAN class=kwc>public</SPAN><SPAN class=sym>:</SPAN>
+<A name=db03.h_7></A><SPAN class=line>    7 </SPAN>    <SPAN class=kwd>MyModel</SPAN><SPAN class=sym>(</SPAN>QObject <SPAN class=sym>*</SPAN>parent <SPAN class=sym>=</SPAN> <SPAN class=num>0</SPAN><SPAN class=sym>);</SPAN>
+<A name=db03.h_8></A><SPAN class=line>    8 </SPAN>    Qt<SPAN class=sym>::</SPAN>ItemFlags <SPAN class=kwd>flags</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwb>const</SPAN> QModelIndex <SPAN class=sym>&amp;</SPAN>index<SPAN class=sym>)</SPAN> <SPAN class=kwb>const</SPAN><SPAN class=sym>;</SPAN>
+<A name=db03.h_9></A><SPAN class=line>    9 </SPAN>    QVariant <SPAN class=kwd>data</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwb>const</SPAN> QModelIndex <SPAN class=sym>&amp;</SPAN>index<SPAN class=sym>,</SPAN>
+<A name=db03.h_10></A><SPAN class=line>   10 </SPAN>                  <SPAN class=kwb>int</SPAN> role <SPAN class=sym>=</SPAN> Qt<SPAN class=sym>::</SPAN>DisplayRole<SPAN class=sym>)</SPAN> <SPAN class=kwb>const</SPAN><SPAN class=sym>;</SPAN>
+<A name=db03.h_11></A><SPAN class=line>   11 </SPAN>    <SPAN class=kwb>bool</SPAN> <SPAN class=kwd>setData</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwb>const</SPAN> QModelIndex <SPAN class=sym>&amp;</SPAN>index<SPAN class=sym>,</SPAN>
+<A name=db03.h_12></A><SPAN class=line>   12 </SPAN>                 <SPAN class=kwb>const</SPAN> QVariant <SPAN class=sym>&amp;</SPAN>value<SPAN class=sym>,</SPAN> <SPAN class=kwb>int</SPAN> role<SPAN class=sym>);</SPAN>
+<A name=db03.h_13></A><SPAN class=line>   13 </SPAN><SPAN class=kwc>private</SPAN><SPAN class=sym>:</SPAN>
+<A name=db03.h_14></A><SPAN class=line>   14 </SPAN>    <SPAN class=kwb>void</SPAN> <SPAN class=kwd>refresh</SPAN><SPAN class=sym>();</SPAN>
+<A name=db03.h_15></A><SPAN class=line>   15 </SPAN><SPAN class=sym>};</SPAN>
+<A name=db03.h_16></A><SPAN class=line>   16 </SPAN>
+<A name=db03.h_17></A><SPAN class=line>   17 </SPAN><SPAN class=slc>//-----------------------------------------------</SPAN>
+<A name=db03.h_18></A><SPAN class=line>   18 </SPAN><SPAN class=kwc>class</SPAN> MyView <SPAN class=sym>:</SPAN> <SPAN class=kwc>public</SPAN> QTableView <SPAN class=sym>{</SPAN>
+<A name=db03.h_19></A><SPAN class=line>   19 </SPAN>    Q_OBJECT
+<A name=db03.h_20></A><SPAN class=line>   20 </SPAN><SPAN class=kwc>public</SPAN><SPAN class=sym>:</SPAN>
+<A name=db03.h_21></A><SPAN class=line>   21 </SPAN>    <SPAN class=kwd>MyView</SPAN><SPAN class=sym>(</SPAN>QWidget <SPAN class=sym>*</SPAN>parent <SPAN class=sym>=</SPAN> <SPAN class=num>0</SPAN><SPAN class=sym>);</SPAN>
+<A name=db03.h_22></A><SPAN class=line>   22 </SPAN><SPAN class=kwc>private</SPAN><SPAN class=sym>:</SPAN>
+<A name=db03.h_23></A><SPAN class=line>   23 </SPAN>    <SPAN class=kwc>virtual</SPAN> <SPAN class=kwb>void</SPAN> <SPAN class=kwd>resizeEvent</SPAN><SPAN class=sym>(</SPAN>QResizeEvent <SPAN class=sym>*</SPAN>event<SPAN class=sym>);</SPAN>
+<A name=db03.h_24></A><SPAN class=line>   24 </SPAN><SPAN class=sym>};</SPAN>
+<A name=db03.h_25></A><SPAN class=line>   25 </SPAN>
+<A name=db03.h_26></A><SPAN class=line>   26 </SPAN><SPAN class=slc>//-----------------------------------------------</SPAN>
+<A name=db03.h_27></A><SPAN class=line>   27 </SPAN><SPAN class=kwc>class</SPAN> MyDSBDelegate <SPAN class=sym>:</SPAN> <SPAN class=kwc>public</SPAN> QItemDelegate <SPAN class=sym>{</SPAN>
+<A name=db03.h_28></A><SPAN class=line>   28 </SPAN>    Q_OBJECT
+<A name=db03.h_29></A><SPAN class=line>   29 </SPAN><SPAN class=kwc>public</SPAN><SPAN class=sym>:</SPAN>
+<A name=db03.h_30></A><SPAN class=line>   30 </SPAN>    <SPAN class=kwd>MyDSBDelegate</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwb>double</SPAN> min<SPAN class=sym>=</SPAN><SPAN class=num>0.00</SPAN><SPAN class=sym>,</SPAN>
+<A name=db03.h_31></A><SPAN class=line>   31 </SPAN>                  <SPAN class=kwb>double</SPAN> max<SPAN class=sym>=</SPAN><SPAN class=num>999999999.99</SPAN><SPAN class=sym>,</SPAN>
+<A name=db03.h_32></A><SPAN class=line>   32 </SPAN>                  <SPAN class=kwb>double</SPAN> step<SPAN class=sym>=</SPAN><SPAN class=num>0.1</SPAN><SPAN class=sym>,</SPAN>
+<A name=db03.h_33></A><SPAN class=line>   33 </SPAN>                  <SPAN class=kwb>int</SPAN> precision<SPAN class=sym>=</SPAN><SPAN class=num>2</SPAN><SPAN class=sym>,</SPAN>
+<A name=db03.h_34></A><SPAN class=line>   34 </SPAN>                  QObject <SPAN class=sym>*</SPAN>parent <SPAN class=sym>=</SPAN> <SPAN class=num>0</SPAN><SPAN class=sym>);</SPAN>
+<A name=db03.h_35></A><SPAN class=line>   35 </SPAN>    QWidget <SPAN class=sym>*</SPAN><SPAN class=kwd>createEditor</SPAN><SPAN class=sym>(</SPAN>
+<A name=db03.h_36></A><SPAN class=line>   36 </SPAN>                QWidget <SPAN class=sym>*</SPAN>parent<SPAN class=sym>,</SPAN>
+<A name=db03.h_37></A><SPAN class=line>   37 </SPAN>                <SPAN class=kwb>const</SPAN> QStyleOptionViewItem <SPAN class=sym>&amp;</SPAN>option<SPAN class=sym>,</SPAN>
+<A name=db03.h_38></A><SPAN class=line>   38 </SPAN>                <SPAN class=kwb>const</SPAN> QModelIndex <SPAN class=sym>&amp;</SPAN>index<SPAN class=sym>)</SPAN> <SPAN class=kwb>const</SPAN><SPAN class=sym>;</SPAN>
+<A name=db03.h_39></A><SPAN class=line>   39 </SPAN>    <SPAN class=kwb>void</SPAN> <SPAN class=kwd>setEditorData</SPAN><SPAN class=sym>(</SPAN>QWidget <SPAN class=sym>*</SPAN>editor<SPAN class=sym>,</SPAN>
+<A name=db03.h_40></A><SPAN class=line>   40 </SPAN>                       <SPAN class=kwb>const</SPAN> QModelIndex <SPAN class=sym>&amp;</SPAN>index<SPAN class=sym>)</SPAN> <SPAN class=kwb>const</SPAN><SPAN class=sym>;</SPAN>
+<A name=db03.h_41></A><SPAN class=line>   41 </SPAN>    <SPAN class=kwb>void</SPAN> <SPAN class=kwd>setModelData</SPAN><SPAN class=sym>(</SPAN>QWidget <SPAN class=sym>*</SPAN>editor<SPAN class=sym>,</SPAN>
+<A name=db03.h_42></A><SPAN class=line>   42 </SPAN>                      QAbstractItemModel <SPAN class=sym>*</SPAN>model<SPAN class=sym>,</SPAN>
+<A name=db03.h_43></A><SPAN class=line>   43 </SPAN>                      <SPAN class=kwb>const</SPAN> QModelIndex <SPAN class=sym>&amp;</SPAN>index<SPAN class=sym>)</SPAN> <SPAN class=kwb>const</SPAN><SPAN class=sym>;</SPAN>
+<A name=db03.h_44></A><SPAN class=line>   44 </SPAN>    <SPAN class=kwb>void</SPAN> <SPAN class=kwd>updateEditorGeometry</SPAN><SPAN class=sym>(</SPAN>
+<A name=db03.h_45></A><SPAN class=line>   45 </SPAN>            QWidget <SPAN class=sym>*</SPAN>editor<SPAN class=sym>,</SPAN>
+<A name=db03.h_46></A><SPAN class=line>   46 </SPAN>            <SPAN class=kwb>const</SPAN> QStyleOptionViewItem <SPAN class=sym>&amp;</SPAN>option<SPAN class=sym>,</SPAN>
+<A name=db03.h_47></A><SPAN class=line>   47 </SPAN>            <SPAN class=kwb>const</SPAN> QModelIndex <SPAN class=sym>&amp;</SPAN>index<SPAN class=sym>)</SPAN> <SPAN class=kwb>const</SPAN><SPAN class=sym>;</SPAN>
+<A name=db03.h_48></A><SPAN class=line>   48 </SPAN><SPAN class=kwc>private</SPAN><SPAN class=sym>:</SPAN>
+<A name=db03.h_49></A><SPAN class=line>   49 </SPAN>    <SPAN class=kwb>double</SPAN> m_min<SPAN class=sym>;</SPAN>
+<A name=db03.h_50></A><SPAN class=line>   50 </SPAN>    <SPAN class=kwb>double</SPAN> m_max<SPAN class=sym>;</SPAN>
+<A name=db03.h_51></A><SPAN class=line>   51 </SPAN>    <SPAN class=kwb>double</SPAN> m_step<SPAN class=sym>;</SPAN>
+<A name=db03.h_52></A><SPAN class=line>   52 </SPAN>    <SPAN class=kwb>int</SPAN> m_precision<SPAN class=sym>;</SPAN>
+<A name=db03.h_53></A><SPAN class=line>   53 </SPAN><SPAN class=sym>};</SPAN>
+<A name=db03.h_54></A><SPAN class=line>   54 </SPAN>
+<A name=db03.h_55></A><SPAN class=line>   55 </SPAN><SPAN class=slc>//---------------------------------------------</SPAN>
+<A name=db03.h_56></A><SPAN class=line>   56 </SPAN><SPAN class=kwc>class</SPAN> MyDEDelegate <SPAN class=sym>:</SPAN> <SPAN class=kwc>public</SPAN> QItemDelegate <SPAN class=sym>{</SPAN>
+<A name=db03.h_57></A><SPAN class=line>   57 </SPAN>    Q_OBJECT
+<A name=db03.h_58></A><SPAN class=line>   58 </SPAN><SPAN class=kwc>public</SPAN><SPAN class=sym>:</SPAN>
+<A name=db03.h_59></A><SPAN class=line>   59 </SPAN>    <SPAN class=kwd>MyDEDelegate</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwb>bool</SPAN> calpopup <SPAN class=sym>=</SPAN> <SPAN class=kwa>true</SPAN><SPAN class=sym>,</SPAN>
+<A name=db03.h_60></A><SPAN class=line>   60 </SPAN>                 QObject <SPAN class=sym>*</SPAN>parent <SPAN class=sym>=</SPAN> <SPAN class=num>0</SPAN><SPAN class=sym>);</SPAN>
+<A name=db03.h_61></A><SPAN class=line>   61 </SPAN>    QWidget <SPAN class=sym>*</SPAN><SPAN class=kwd>createEditor</SPAN><SPAN class=sym>(</SPAN>
+<A name=db03.h_62></A><SPAN class=line>   62 </SPAN>                QWidget <SPAN class=sym>*</SPAN>parent<SPAN class=sym>,</SPAN>
+<A name=db03.h_63></A><SPAN class=line>   63 </SPAN>                <SPAN class=kwb>const</SPAN> QStyleOptionViewItem <SPAN class=sym>&amp;</SPAN>option<SPAN class=sym>,</SPAN>
+<A name=db03.h_64></A><SPAN class=line>   64 </SPAN>                <SPAN class=kwb>const</SPAN> QModelIndex <SPAN class=sym>&amp;</SPAN>index<SPAN class=sym>)</SPAN> <SPAN class=kwb>const</SPAN><SPAN class=sym>;</SPAN>
+<A name=db03.h_65></A><SPAN class=line>   65 </SPAN>    <SPAN class=kwb>void</SPAN> <SPAN class=kwd>setEditorData</SPAN><SPAN class=sym>(</SPAN>QWidget <SPAN class=sym>*</SPAN>editor<SPAN class=sym>,</SPAN>
+<A name=db03.h_66></A><SPAN class=line>   66 </SPAN>                       <SPAN class=kwb>const</SPAN> QModelIndex <SPAN class=sym>&amp;</SPAN>index<SPAN class=sym>)</SPAN> <SPAN class=kwb>const</SPAN><SPAN class=sym>;</SPAN>
+<A name=db03.h_67></A><SPAN class=line>   67 </SPAN>    <SPAN class=kwb>void</SPAN> <SPAN class=kwd>setModelData</SPAN><SPAN class=sym>(</SPAN>QWidget <SPAN class=sym>*</SPAN>editor<SPAN class=sym>,</SPAN>
+<A name=db03.h_68></A><SPAN class=line>   68 </SPAN>                      QAbstractItemModel <SPAN class=sym>*</SPAN>model<SPAN class=sym>,</SPAN>
+<A name=db03.h_69></A><SPAN class=line>   69 </SPAN>                      <SPAN class=kwb>const</SPAN> QModelIndex <SPAN class=sym>&amp;</SPAN>index<SPAN class=sym>)</SPAN> <SPAN class=kwb>const</SPAN><SPAN class=sym>;</SPAN>
+<A name=db03.h_70></A><SPAN class=line>   70 </SPAN>    <SPAN class=kwb>void</SPAN> <SPAN class=kwd>updateEditorGeometry</SPAN><SPAN class=sym>(</SPAN>
+<A name=db03.h_71></A><SPAN class=line>   71 </SPAN>            QWidget <SPAN class=sym>*</SPAN>editor<SPAN class=sym>,</SPAN>
+<A name=db03.h_72></A><SPAN class=line>   72 </SPAN>            <SPAN class=kwb>const</SPAN> QStyleOptionViewItem <SPAN class=sym>&amp;</SPAN>option<SPAN class=sym>,</SPAN>
+<A name=db03.h_73></A><SPAN class=line>   73 </SPAN>            <SPAN class=kwb>const</SPAN> QModelIndex <SPAN class=sym>&amp;</SPAN>index<SPAN class=sym>)</SPAN> <SPAN class=kwb>const</SPAN><SPAN class=sym>;</SPAN>
+<A name=db03.h_74></A><SPAN class=line>   74 </SPAN><SPAN class=kwc>private</SPAN><SPAN class=sym>:</SPAN>
+<A name=db03.h_75></A><SPAN class=line>   75 </SPAN>    <SPAN class=kwb>bool</SPAN> m_calpopup<SPAN class=sym>;</SPAN>
+<A name=db03.h_76></A><SPAN class=line>   76 </SPAN><SPAN class=sym>};</SPAN>
+</PRE>
+<UL>
+  <LI>(4-15) Модель таблицы. 
+  <LI>(18-24) Представление таблицы. 
+  <LI>(27-53) Класс-делегат для вещественных чисел (на основе элемента 
+  <CODE>QDoubleSpinBox</CODE>). 
+  <LI>(56-76) Класс-делегат для ввода даты (на основе элемента 
+  <CODE>QDateEdit</CODE>). </LI></UL>
+<P><B>Листинг. Делегаты (файл <CODE>examples-qt/db03/db03.cpp</CODE>)</B> <PRE class=hl><A name=db03.cpp_1></A><SPAN class=line>    1 </SPAN><SPAN class=slc>// Таблица базы данных: делегаты</SPAN>
+<A name=db03.cpp_2></A><SPAN class=line>    2 </SPAN>
+<A name=db03.cpp_3></A><SPAN class=line>    3 </SPAN><SPAN class=dir>#include &lt;QtGui&gt;</SPAN>
+<A name=db03.cpp_4></A><SPAN class=line>    4 </SPAN><SPAN class=dir>#include &lt;QtSql&gt;</SPAN>
+<A name=db03.cpp_5></A><SPAN class=line>    5 </SPAN>
+<A name=db03.cpp_6></A><SPAN class=line>    6 </SPAN><SPAN class=dir>#include</SPAN> <SPAN class=dstr>"db03.h"</SPAN><SPAN class=dir></SPAN>
+<A name=db03.cpp_7></A><SPAN class=line>    7 </SPAN>
+<A name=db03.cpp_8></A><SPAN class=line>    8 </SPAN>MyModel<SPAN class=sym>::</SPAN><SPAN class=kwd>MyModel</SPAN><SPAN class=sym>(</SPAN>QObject <SPAN class=sym>*</SPAN>parent<SPAN class=sym>)</SPAN>
+<A name=db03.cpp_9></A><SPAN class=line>    9 </SPAN>       <SPAN class=sym>:</SPAN> <SPAN class=kwd>QSqlQueryModel</SPAN><SPAN class=sym>(</SPAN>parent<SPAN class=sym>) {</SPAN>
+<A name=db03.cpp_10></A><SPAN class=line>   10 </SPAN>    <SPAN class=kwd>refresh</SPAN><SPAN class=sym>();</SPAN>
+<A name=db03.cpp_11></A><SPAN class=line>   11 </SPAN><SPAN class=sym>}</SPAN>
+<A name=db03.cpp_12></A><SPAN class=line>   12 </SPAN>
+<A name=db03.cpp_13></A><SPAN class=line>   13 </SPAN>Qt<SPAN class=sym>::</SPAN>ItemFlags MyModel<SPAN class=sym>::</SPAN><SPAN class=kwd>flags</SPAN><SPAN class=sym>(</SPAN>
+<A name=db03.cpp_14></A><SPAN class=line>   14 </SPAN>        <SPAN class=kwb>const</SPAN> QModelIndex <SPAN class=sym>&amp;</SPAN>index<SPAN class=sym>)</SPAN> <SPAN class=kwb>const</SPAN> <SPAN class=sym>{</SPAN>
+<A name=db03.cpp_15></A><SPAN class=line>   15 </SPAN>
+<A name=db03.cpp_16></A><SPAN class=line>   16 </SPAN>    Qt<SPAN class=sym>::</SPAN>ItemFlags flags <SPAN class=sym>=</SPAN> QSqlQueryModel<SPAN class=sym>::</SPAN><SPAN class=kwd>flags</SPAN><SPAN class=sym>(</SPAN>index<SPAN class=sym>);</SPAN>
+<A name=db03.cpp_17></A><SPAN class=line>   17 </SPAN>    <SPAN class=kwa>if</SPAN> <SPAN class=sym>(</SPAN>index<SPAN class=sym>.</SPAN><SPAN class=kwd>column</SPAN><SPAN class=sym>() &gt;=</SPAN> <SPAN class=num>1</SPAN> <SPAN class=sym>&amp;&amp;</SPAN> index<SPAN class=sym>.</SPAN><SPAN class=kwd>column</SPAN><SPAN class=sym>() &lt;</SPAN> <SPAN class=num>4</SPAN><SPAN class=sym>)</SPAN>
+<A name=db03.cpp_18></A><SPAN class=line>   18 </SPAN>        flags <SPAN class=sym>|=</SPAN> Qt<SPAN class=sym>::</SPAN>ItemIsEditable<SPAN class=sym>;</SPAN>
+<A name=db03.cpp_19></A><SPAN class=line>   19 </SPAN>    <SPAN class=kwa>if</SPAN> <SPAN class=sym>(</SPAN>index<SPAN class=sym>.</SPAN><SPAN class=kwd>column</SPAN><SPAN class=sym>() ==</SPAN> <SPAN class=num>4</SPAN><SPAN class=sym>)</SPAN>
+<A name=db03.cpp_20></A><SPAN class=line>   20 </SPAN>        flags <SPAN class=sym>|=</SPAN> Qt<SPAN class=sym>::</SPAN>ItemIsUserCheckable<SPAN class=sym>;</SPAN>
+<A name=db03.cpp_21></A><SPAN class=line>   21 </SPAN>    <SPAN class=kwa>return</SPAN> flags<SPAN class=sym>;</SPAN>
+<A name=db03.cpp_22></A><SPAN class=line>   22 </SPAN><SPAN class=sym>}</SPAN>
+<A name=db03.cpp_23></A><SPAN class=line>   23 </SPAN>
+<A name=db03.cpp_24></A><SPAN class=line>   24 </SPAN>QVariant MyModel<SPAN class=sym>::</SPAN><SPAN class=kwd>data</SPAN><SPAN class=sym>(</SPAN>
+<A name=db03.cpp_25></A><SPAN class=line>   25 </SPAN>            <SPAN class=kwb>const</SPAN> QModelIndex <SPAN class=sym>&amp;</SPAN>index<SPAN class=sym>,</SPAN>
+<A name=db03.cpp_26></A><SPAN class=line>   26 </SPAN>            <SPAN class=kwb>int</SPAN> role<SPAN class=sym>)</SPAN> <SPAN class=kwb>const</SPAN> <SPAN class=sym>{</SPAN>
+<A name=db03.cpp_27></A><SPAN class=line>   27 </SPAN>
+<A name=db03.cpp_28></A><SPAN class=line>   28 </SPAN>    QVariant value <SPAN class=sym>=</SPAN> QSqlQueryModel<SPAN class=sym>::</SPAN><SPAN class=kwd>data</SPAN><SPAN class=sym>(</SPAN>index<SPAN class=sym>,</SPAN> role<SPAN class=sym>);</SPAN>
+<A name=db03.cpp_29></A><SPAN class=line>   29 </SPAN>
+<A name=db03.cpp_30></A><SPAN class=line>   30 </SPAN>    <SPAN class=kwa>switch</SPAN> <SPAN class=sym>(</SPAN>role<SPAN class=sym>) {</SPAN>
+<A name=db03.cpp_31></A><SPAN class=line>   31 </SPAN>
+<A name=db03.cpp_32></A><SPAN class=line>   32 </SPAN>    <SPAN class=kwa>case</SPAN> Qt<SPAN class=sym>::</SPAN>DisplayRole<SPAN class=sym>:</SPAN>
+<A name=db03.cpp_33></A><SPAN class=line>   33 </SPAN>    <SPAN class=kwa>case</SPAN> Qt<SPAN class=sym>::</SPAN>EditRole<SPAN class=sym>:</SPAN>
+<A name=db03.cpp_34></A><SPAN class=line>   34 </SPAN>        <SPAN class=kwa>if</SPAN> <SPAN class=sym>(</SPAN>index<SPAN class=sym>.</SPAN><SPAN class=kwd>column</SPAN><SPAN class=sym>() ==</SPAN> <SPAN class=num>0</SPAN><SPAN class=sym>)</SPAN>
+<A name=db03.cpp_35></A><SPAN class=line>   35 </SPAN>            <SPAN class=kwa>return</SPAN> value<SPAN class=sym>.</SPAN><SPAN class=kwd>toString</SPAN><SPAN class=sym>().</SPAN><SPAN class=kwd>prepend</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"№"</SPAN><SPAN class=sym>));</SPAN>
+<A name=db03.cpp_36></A><SPAN class=line>   36 </SPAN>        <SPAN class=kwa>else if</SPAN> <SPAN class=sym>(</SPAN>index<SPAN class=sym>.</SPAN><SPAN class=kwd>column</SPAN><SPAN class=sym>() ==</SPAN> <SPAN class=num>2</SPAN> <SPAN class=sym>&amp;&amp;</SPAN> role <SPAN class=sym>==</SPAN> Qt<SPAN class=sym>::</SPAN>DisplayRole<SPAN class=sym>)</SPAN>
+<A name=db03.cpp_37></A><SPAN class=line>   37 </SPAN>            <SPAN class=kwa>return</SPAN> value<SPAN class=sym>.</SPAN><SPAN class=kwd>toDate</SPAN><SPAN class=sym>().</SPAN><SPAN class=kwd>toString</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"dd.MM.yyyy"</SPAN><SPAN class=sym>);</SPAN>
+<A name=db03.cpp_38></A><SPAN class=line>   38 </SPAN>        <SPAN class=kwa>else if</SPAN> <SPAN class=sym>(</SPAN>index<SPAN class=sym>.</SPAN><SPAN class=kwd>column</SPAN><SPAN class=sym>() ==</SPAN> <SPAN class=num>3</SPAN> <SPAN class=sym>&amp;&amp;</SPAN> role <SPAN class=sym>==</SPAN> Qt<SPAN class=sym>::</SPAN>DisplayRole<SPAN class=sym>)</SPAN>
+<A name=db03.cpp_39></A><SPAN class=line>   39 </SPAN>            <SPAN class=kwa>return</SPAN> <SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"%1"</SPAN><SPAN class=sym>)</SPAN>
+<A name=db03.cpp_40></A><SPAN class=line>   40 </SPAN>                   <SPAN class=sym>.</SPAN><SPAN class=kwd>arg</SPAN><SPAN class=sym>(</SPAN>value<SPAN class=sym>.</SPAN><SPAN class=kwd>toDouble</SPAN><SPAN class=sym>(),</SPAN> <SPAN class=num>0</SPAN><SPAN class=sym>,</SPAN> <SPAN class=str>'f'</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>2</SPAN><SPAN class=sym>);</SPAN>
+<A name=db03.cpp_41></A><SPAN class=line>   41 </SPAN>        <SPAN class=kwa>else if</SPAN> <SPAN class=sym>(</SPAN>index<SPAN class=sym>.</SPAN><SPAN class=kwd>column</SPAN><SPAN class=sym>() ==</SPAN> <SPAN class=num>4</SPAN> <SPAN class=sym>&amp;&amp;</SPAN> role <SPAN class=sym>==</SPAN> Qt<SPAN class=sym>::</SPAN>DisplayRole<SPAN class=sym>)</SPAN>
+<A name=db03.cpp_42></A><SPAN class=line>   42 </SPAN>            <SPAN class=kwa>return</SPAN> value<SPAN class=sym>.</SPAN><SPAN class=kwd>toInt</SPAN><SPAN class=sym>() !=</SPAN> <SPAN class=num>0</SPAN> ? <SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Да"</SPAN><SPAN class=sym>) :</SPAN> <SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Нет"</SPAN><SPAN class=sym>);</SPAN>
+<A name=db03.cpp_43></A><SPAN class=line>   43 </SPAN>        <SPAN class=kwa>else</SPAN>
+<A name=db03.cpp_44></A><SPAN class=line>   44 </SPAN>            <SPAN class=kwa>return</SPAN> value<SPAN class=sym>;</SPAN>
+<A name=db03.cpp_45></A><SPAN class=line>   45 </SPAN>
+<A name=db03.cpp_46></A><SPAN class=line>   46 </SPAN>    <SPAN class=kwa>case</SPAN> Qt<SPAN class=sym>::</SPAN>TextColorRole<SPAN class=sym>:</SPAN>
+<A name=db03.cpp_47></A><SPAN class=line>   47 </SPAN>        <SPAN class=kwa>if</SPAN><SPAN class=sym>(</SPAN>index<SPAN class=sym>.</SPAN><SPAN class=kwd>column</SPAN><SPAN class=sym>() ==</SPAN> <SPAN class=num>1</SPAN><SPAN class=sym>)</SPAN>
+<A name=db03.cpp_48></A><SPAN class=line>   48 </SPAN>            <SPAN class=kwa>return</SPAN> <SPAN class=kwd>qVariantFromValue</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>QColor</SPAN><SPAN class=sym>(</SPAN>Qt<SPAN class=sym>::</SPAN>blue<SPAN class=sym>));</SPAN>
+<A name=db03.cpp_49></A><SPAN class=line>   49 </SPAN>        <SPAN class=kwa>else</SPAN>
+<A name=db03.cpp_50></A><SPAN class=line>   50 </SPAN>            <SPAN class=kwa>return</SPAN> value<SPAN class=sym>;</SPAN>
+<A name=db03.cpp_51></A><SPAN class=line>   51 </SPAN>
+<A name=db03.cpp_52></A><SPAN class=line>   52 </SPAN>    <SPAN class=kwa>case</SPAN> Qt<SPAN class=sym>::</SPAN>TextAlignmentRole<SPAN class=sym>:</SPAN>
+<A name=db03.cpp_53></A><SPAN class=line>   53 </SPAN>        <SPAN class=kwa>if</SPAN><SPAN class=sym>(</SPAN>index<SPAN class=sym>.</SPAN><SPAN class=kwd>column</SPAN><SPAN class=sym>() ==</SPAN> <SPAN class=num>3</SPAN><SPAN class=sym>)</SPAN>
+<A name=db03.cpp_54></A><SPAN class=line>   54 </SPAN>            <SPAN class=kwa>return</SPAN> <SPAN class=kwb>int</SPAN><SPAN class=sym>(</SPAN>Qt<SPAN class=sym>::</SPAN>AlignRight <SPAN class=sym>|</SPAN> Qt<SPAN class=sym>::</SPAN>AlignVCenter<SPAN class=sym>);</SPAN>
+<A name=db03.cpp_55></A><SPAN class=line>   55 </SPAN>        <SPAN class=kwa>else if</SPAN><SPAN class=sym>(</SPAN>index<SPAN class=sym>.</SPAN><SPAN class=kwd>column</SPAN><SPAN class=sym>() ==</SPAN> <SPAN class=num>2</SPAN> <SPAN class=sym>||</SPAN> index<SPAN class=sym>.</SPAN><SPAN class=kwd>column</SPAN><SPAN class=sym>() ==</SPAN> <SPAN class=num>4</SPAN><SPAN class=sym>)</SPAN>
+<A name=db03.cpp_56></A><SPAN class=line>   56 </SPAN>            <SPAN class=kwa>return</SPAN> <SPAN class=kwb>int</SPAN><SPAN class=sym>(</SPAN>Qt<SPAN class=sym>::</SPAN>AlignHCenter <SPAN class=sym>|</SPAN> Qt<SPAN class=sym>::</SPAN>AlignVCenter<SPAN class=sym>);</SPAN>
+<A name=db03.cpp_57></A><SPAN class=line>   57 </SPAN>        <SPAN class=kwa>else</SPAN>
+<A name=db03.cpp_58></A><SPAN class=line>   58 </SPAN>            <SPAN class=kwa>return</SPAN> <SPAN class=kwb>int</SPAN><SPAN class=sym>(</SPAN>Qt<SPAN class=sym>::</SPAN>AlignLeft <SPAN class=sym>|</SPAN> Qt<SPAN class=sym>::</SPAN>AlignVCenter<SPAN class=sym>);</SPAN>
+<A name=db03.cpp_59></A><SPAN class=line>   59 </SPAN>
+<A name=db03.cpp_60></A><SPAN class=line>   60 </SPAN>    <SPAN class=kwa>case</SPAN> Qt<SPAN class=sym>::</SPAN>FontRole<SPAN class=sym>:</SPAN>
+<A name=db03.cpp_61></A><SPAN class=line>   61 </SPAN>        <SPAN class=kwa>if</SPAN><SPAN class=sym>(</SPAN>index<SPAN class=sym>.</SPAN><SPAN class=kwd>column</SPAN><SPAN class=sym>() ==</SPAN> <SPAN class=num>1</SPAN><SPAN class=sym>) {</SPAN>
+<A name=db03.cpp_62></A><SPAN class=line>   62 </SPAN>            QFont font <SPAN class=sym>=</SPAN> <SPAN class=kwd>QFont</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Helvetica"</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>10</SPAN><SPAN class=sym>,</SPAN> QFont<SPAN class=sym>::</SPAN>Bold<SPAN class=sym>);</SPAN>
+<A name=db03.cpp_63></A><SPAN class=line>   63 </SPAN>            <SPAN class=kwa>return</SPAN> <SPAN class=kwd>qVariantFromValue</SPAN><SPAN class=sym>(</SPAN>font<SPAN class=sym>);</SPAN>
+<A name=db03.cpp_64></A><SPAN class=line>   64 </SPAN>        <SPAN class=sym>}</SPAN><SPAN class=kwa>else</SPAN>
+<A name=db03.cpp_65></A><SPAN class=line>   65 </SPAN>            <SPAN class=kwa>return</SPAN> value<SPAN class=sym>;</SPAN>
+<A name=db03.cpp_66></A><SPAN class=line>   66 </SPAN>
+<A name=db03.cpp_67></A><SPAN class=line>   67 </SPAN>    <SPAN class=kwa>case</SPAN> Qt<SPAN class=sym>::</SPAN>BackgroundColorRole<SPAN class=sym>: {</SPAN>
+<A name=db03.cpp_68></A><SPAN class=line>   68 </SPAN>        <SPAN class=kwb>int</SPAN> a <SPAN class=sym>= (</SPAN>index<SPAN class=sym>.</SPAN><SPAN class=kwd>row</SPAN><SPAN class=sym>() %</SPAN> <SPAN class=num>2</SPAN><SPAN class=sym>)</SPAN> ? <SPAN class=num>14</SPAN> <SPAN class=sym>:</SPAN> <SPAN class=num>0</SPAN><SPAN class=sym>;</SPAN>
+<A name=db03.cpp_69></A><SPAN class=line>   69 </SPAN>        <SPAN class=kwa>if</SPAN><SPAN class=sym>(</SPAN>index<SPAN class=sym>.</SPAN><SPAN class=kwd>column</SPAN><SPAN class=sym>() ==</SPAN> <SPAN class=num>0</SPAN><SPAN class=sym>)</SPAN>
+<A name=db03.cpp_70></A><SPAN class=line>   70 </SPAN>            <SPAN class=kwa>return</SPAN> <SPAN class=kwd>qVariantFromValue</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>QColor</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>220</SPAN><SPAN class=sym>,</SPAN><SPAN class=num>240</SPAN><SPAN class=sym>-</SPAN>a<SPAN class=sym>,</SPAN><SPAN class=num>230</SPAN><SPAN class=sym>-</SPAN>a<SPAN class=sym>));</SPAN>
+<A name=db03.cpp_71></A><SPAN class=line>   71 </SPAN>        <SPAN class=kwa>else if</SPAN><SPAN class=sym>(</SPAN>index<SPAN class=sym>.</SPAN><SPAN class=kwd>column</SPAN><SPAN class=sym>() ==</SPAN> <SPAN class=num>4</SPAN><SPAN class=sym>)</SPAN>
+<A name=db03.cpp_72></A><SPAN class=line>   72 </SPAN>            <SPAN class=kwa>return</SPAN> <SPAN class=kwd>qVariantFromValue</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>QColor</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>200</SPAN><SPAN class=sym>,</SPAN><SPAN class=num>220</SPAN><SPAN class=sym>-</SPAN>a<SPAN class=sym>,</SPAN><SPAN class=num>255</SPAN><SPAN class=sym>-</SPAN>a<SPAN class=sym>));</SPAN>
+<A name=db03.cpp_73></A><SPAN class=line>   73 </SPAN>        <SPAN class=kwa>else</SPAN>
+<A name=db03.cpp_74></A><SPAN class=line>   74 </SPAN>            <SPAN class=kwa>return</SPAN> value<SPAN class=sym>;</SPAN>
+<A name=db03.cpp_75></A><SPAN class=line>   75 </SPAN>    <SPAN class=sym>}</SPAN>
+<A name=db03.cpp_76></A><SPAN class=line>   76 </SPAN>    <SPAN class=kwa>case</SPAN> Qt<SPAN class=sym>::</SPAN>CheckStateRole<SPAN class=sym>:</SPAN>
+<A name=db03.cpp_77></A><SPAN class=line>   77 </SPAN>        <SPAN class=kwa>if</SPAN> <SPAN class=sym>(</SPAN>index<SPAN class=sym>.</SPAN><SPAN class=kwd>column</SPAN><SPAN class=sym>() ==</SPAN> <SPAN class=num>4</SPAN><SPAN class=sym>)</SPAN>
+<A name=db03.cpp_78></A><SPAN class=line>   78 </SPAN>            <SPAN class=kwa>return</SPAN> <SPAN class=sym>(</SPAN>QSqlQueryModel<SPAN class=sym>::</SPAN><SPAN class=kwd>data</SPAN><SPAN class=sym>(</SPAN>index<SPAN class=sym>).</SPAN><SPAN class=kwd>toInt</SPAN><SPAN class=sym>() !=</SPAN> <SPAN class=num>0</SPAN><SPAN class=sym>)</SPAN> ?
+<A name=db03.cpp_79></A><SPAN class=line>   79 </SPAN>                    Qt<SPAN class=sym>::</SPAN>Checked <SPAN class=sym>:</SPAN> Qt<SPAN class=sym>::</SPAN>Unchecked<SPAN class=sym>;</SPAN>
+<A name=db03.cpp_80></A><SPAN class=line>   80 </SPAN>        <SPAN class=kwa>else</SPAN>
+<A name=db03.cpp_81></A><SPAN class=line>   81 </SPAN>            <SPAN class=kwa>return</SPAN> value<SPAN class=sym>;</SPAN>
+<A name=db03.cpp_82></A><SPAN class=line>   82 </SPAN>
+<A name=db03.cpp_83></A><SPAN class=line>   83 </SPAN>    <SPAN class=kwa>case</SPAN> Qt<SPAN class=sym>::</SPAN>SizeHintRole<SPAN class=sym>:</SPAN>
+<A name=db03.cpp_84></A><SPAN class=line>   84 </SPAN>        <SPAN class=kwa>if</SPAN> <SPAN class=sym>(</SPAN>index<SPAN class=sym>.</SPAN><SPAN class=kwd>column</SPAN><SPAN class=sym>() ==</SPAN> <SPAN class=num>0</SPAN><SPAN class=sym>)</SPAN>
+<A name=db03.cpp_85></A><SPAN class=line>   85 </SPAN>            <SPAN class=kwa>return</SPAN> <SPAN class=kwd>QSize</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>70</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>10</SPAN><SPAN class=sym>);</SPAN>
+<A name=db03.cpp_86></A><SPAN class=line>   86 </SPAN>        <SPAN class=kwa>if</SPAN> <SPAN class=sym>(</SPAN>index<SPAN class=sym>.</SPAN><SPAN class=kwd>column</SPAN><SPAN class=sym>() ==</SPAN> <SPAN class=num>4</SPAN><SPAN class=sym>)</SPAN>
+<A name=db03.cpp_87></A><SPAN class=line>   87 </SPAN>            <SPAN class=kwa>return</SPAN> <SPAN class=kwd>QSize</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>60</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>10</SPAN><SPAN class=sym>);</SPAN>
+<A name=db03.cpp_88></A><SPAN class=line>   88 </SPAN>        <SPAN class=kwa>else</SPAN>
+<A name=db03.cpp_89></A><SPAN class=line>   89 </SPAN>            <SPAN class=kwa>return</SPAN> <SPAN class=kwd>QSize</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>110</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>10</SPAN><SPAN class=sym>);</SPAN>
+<A name=db03.cpp_90></A><SPAN class=line>   90 </SPAN>    <SPAN class=sym>}</SPAN>
+<A name=db03.cpp_91></A><SPAN class=line>   91 </SPAN>    <SPAN class=kwa>return</SPAN> value<SPAN class=sym>;</SPAN>
+<A name=db03.cpp_92></A><SPAN class=line>   92 </SPAN><SPAN class=sym>}</SPAN>
+<A name=db03.cpp_93></A><SPAN class=line>   93 </SPAN>
+<A name=db03.cpp_94></A><SPAN class=line>   94 </SPAN><SPAN class=kwb>bool</SPAN> MyModel<SPAN class=sym>::</SPAN><SPAN class=kwd>setData</SPAN><SPAN class=sym>(</SPAN>
+<A name=db03.cpp_95></A><SPAN class=line>   95 </SPAN>            <SPAN class=kwb>const</SPAN> QModelIndex <SPAN class=sym>&amp;</SPAN>index<SPAN class=sym>,</SPAN>
+<A name=db03.cpp_96></A><SPAN class=line>   96 </SPAN>            <SPAN class=kwb>const</SPAN> QVariant <SPAN class=sym>&amp;</SPAN>value<SPAN class=sym>,</SPAN>
+<A name=db03.cpp_97></A><SPAN class=line>   97 </SPAN>            <SPAN class=kwb>int</SPAN> <SPAN class=com>/* role */</SPAN><SPAN class=sym>) {</SPAN>
+<A name=db03.cpp_98></A><SPAN class=line>   98 </SPAN>    <SPAN class=kwa>if</SPAN> <SPAN class=sym>(</SPAN>index<SPAN class=sym>.</SPAN><SPAN class=kwd>column</SPAN><SPAN class=sym>() &lt;</SPAN> <SPAN class=num>1</SPAN> <SPAN class=sym>||</SPAN> index<SPAN class=sym>.</SPAN><SPAN class=kwd>column</SPAN><SPAN class=sym>() &gt;</SPAN> <SPAN class=num>4</SPAN><SPAN class=sym>)</SPAN>
+<A name=db03.cpp_99></A><SPAN class=line>   99 </SPAN>        <SPAN class=kwa>return false</SPAN><SPAN class=sym>;</SPAN>
+<A name=db03.cpp_100></A><SPAN class=line>  100 </SPAN>
+<A name=db03.cpp_101></A><SPAN class=line>  101 </SPAN>    QModelIndex primaryKeyIndex <SPAN class=sym>=</SPAN> QSqlQueryModel<SPAN class=sym>::</SPAN><SPAN class=kwd>index</SPAN><SPAN class=sym>(</SPAN>
+<A name=db03.cpp_102></A><SPAN class=line>  102 </SPAN>        index<SPAN class=sym>.</SPAN><SPAN class=kwd>row</SPAN><SPAN class=sym>(),</SPAN> <SPAN class=num>0</SPAN><SPAN class=sym>);</SPAN>
+<A name=db03.cpp_103></A><SPAN class=line>  103 </SPAN>    <SPAN class=kwb>int</SPAN> id <SPAN class=sym>=</SPAN> QSqlQueryModel<SPAN class=sym>::</SPAN><SPAN class=kwd>data</SPAN><SPAN class=sym>(</SPAN>primaryKeyIndex<SPAN class=sym>).</SPAN><SPAN class=kwd>toInt</SPAN><SPAN class=sym>();</SPAN>
+<A name=db03.cpp_104></A><SPAN class=line>  104 </SPAN>
+<A name=db03.cpp_105></A><SPAN class=line>  105 </SPAN>    <SPAN class=slc>//clear(); // Если надо полностью перерисовать таблицу.</SPAN>
+<A name=db03.cpp_106></A><SPAN class=line>  106 </SPAN>
+<A name=db03.cpp_107></A><SPAN class=line>  107 </SPAN>    <SPAN class=kwb>bool</SPAN> ok<SPAN class=sym>;</SPAN>
+<A name=db03.cpp_108></A><SPAN class=line>  108 </SPAN>    QSqlQuery query<SPAN class=sym>;</SPAN>
+<A name=db03.cpp_109></A><SPAN class=line>  109 </SPAN>    <SPAN class=kwa>if</SPAN> <SPAN class=sym>(</SPAN>index<SPAN class=sym>.</SPAN><SPAN class=kwd>column</SPAN><SPAN class=sym>() ==</SPAN> <SPAN class=num>1</SPAN><SPAN class=sym>) {</SPAN>
+<A name=db03.cpp_110></A><SPAN class=line>  110 </SPAN>        query<SPAN class=sym>.</SPAN><SPAN class=kwd>prepare</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"update employee set name = ? where id = ?"</SPAN><SPAN class=sym>);</SPAN>
+<A name=db03.cpp_111></A><SPAN class=line>  111 </SPAN>        query<SPAN class=sym>.</SPAN><SPAN class=kwd>addBindValue</SPAN><SPAN class=sym>(</SPAN>value<SPAN class=sym>.</SPAN><SPAN class=kwd>toString</SPAN><SPAN class=sym>());</SPAN>
+<A name=db03.cpp_112></A><SPAN class=line>  112 </SPAN>        query<SPAN class=sym>.</SPAN><SPAN class=kwd>addBindValue</SPAN><SPAN class=sym>(</SPAN>id<SPAN class=sym>);</SPAN>
+<A name=db03.cpp_113></A><SPAN class=line>  113 </SPAN>    <SPAN class=sym>}</SPAN><SPAN class=kwa>else if</SPAN><SPAN class=sym>(</SPAN>index<SPAN class=sym>.</SPAN><SPAN class=kwd>column</SPAN><SPAN class=sym>() ==</SPAN> <SPAN class=num>2</SPAN><SPAN class=sym>) {</SPAN>
+<A name=db03.cpp_114></A><SPAN class=line>  114 </SPAN>        query<SPAN class=sym>.</SPAN><SPAN class=kwd>prepare</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"update employee set born = ? where id = ?"</SPAN><SPAN class=sym>);</SPAN>
+<A name=db03.cpp_115></A><SPAN class=line>  115 </SPAN>        query<SPAN class=sym>.</SPAN><SPAN class=kwd>addBindValue</SPAN><SPAN class=sym>(</SPAN>value<SPAN class=sym>.</SPAN><SPAN class=kwd>toDate</SPAN><SPAN class=sym>());</SPAN>
+<A name=db03.cpp_116></A><SPAN class=line>  116 </SPAN>        query<SPAN class=sym>.</SPAN><SPAN class=kwd>addBindValue</SPAN><SPAN class=sym>(</SPAN>id<SPAN class=sym>);</SPAN>
+<A name=db03.cpp_117></A><SPAN class=line>  117 </SPAN>    <SPAN class=sym>}</SPAN><SPAN class=kwa>else if</SPAN><SPAN class=sym>(</SPAN>index<SPAN class=sym>.</SPAN><SPAN class=kwd>column</SPAN><SPAN class=sym>() ==</SPAN> <SPAN class=num>3</SPAN><SPAN class=sym>) {</SPAN>
+<A name=db03.cpp_118></A><SPAN class=line>  118 </SPAN>        query<SPAN class=sym>.</SPAN><SPAN class=kwd>prepare</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"update employee set salary = ? where id = ?"</SPAN><SPAN class=sym>);</SPAN>
+<A name=db03.cpp_119></A><SPAN class=line>  119 </SPAN>        query<SPAN class=sym>.</SPAN><SPAN class=kwd>addBindValue</SPAN><SPAN class=sym>(</SPAN>value<SPAN class=sym>.</SPAN><SPAN class=kwd>toDouble</SPAN><SPAN class=sym>());</SPAN>
+<A name=db03.cpp_120></A><SPAN class=line>  120 </SPAN>        query<SPAN class=sym>.</SPAN><SPAN class=kwd>addBindValue</SPAN><SPAN class=sym>(</SPAN>id<SPAN class=sym>);</SPAN>
+<A name=db03.cpp_121></A><SPAN class=line>  121 </SPAN>    <SPAN class=sym>}</SPAN><SPAN class=kwa>else if</SPAN><SPAN class=sym>(</SPAN>index<SPAN class=sym>.</SPAN><SPAN class=kwd>column</SPAN><SPAN class=sym>() ==</SPAN> <SPAN class=num>4</SPAN><SPAN class=sym>) {</SPAN>
+<A name=db03.cpp_122></A><SPAN class=line>  122 </SPAN>        query<SPAN class=sym>.</SPAN><SPAN class=kwd>prepare</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"update employee set married = ? where id = ?"</SPAN><SPAN class=sym>);</SPAN>
+<A name=db03.cpp_123></A><SPAN class=line>  123 </SPAN>        query<SPAN class=sym>.</SPAN><SPAN class=kwd>addBindValue</SPAN><SPAN class=sym>(</SPAN>value<SPAN class=sym>.</SPAN><SPAN class=kwd>toInt</SPAN><SPAN class=sym>());</SPAN>
+<A name=db03.cpp_124></A><SPAN class=line>  124 </SPAN>        query<SPAN class=sym>.</SPAN><SPAN class=kwd>addBindValue</SPAN><SPAN class=sym>(</SPAN>id<SPAN class=sym>);</SPAN>
+<A name=db03.cpp_125></A><SPAN class=line>  125 </SPAN>    <SPAN class=sym>}</SPAN>
+<A name=db03.cpp_126></A><SPAN class=line>  126 </SPAN>    ok <SPAN class=sym>=</SPAN> query<SPAN class=sym>.</SPAN><SPAN class=kwd>exec</SPAN><SPAN class=sym>();</SPAN>
+<A name=db03.cpp_127></A><SPAN class=line>  127 </SPAN>    <SPAN class=kwd>refresh</SPAN><SPAN class=sym>();</SPAN>
+<A name=db03.cpp_128></A><SPAN class=line>  128 </SPAN>    <SPAN class=kwa>return</SPAN> ok<SPAN class=sym>;</SPAN>
+<A name=db03.cpp_129></A><SPAN class=line>  129 </SPAN><SPAN class=sym>}</SPAN>
+<A name=db03.cpp_130></A><SPAN class=line>  130 </SPAN>
+<A name=db03.cpp_131></A><SPAN class=line>  131 </SPAN><SPAN class=kwb>void</SPAN> MyModel<SPAN class=sym>::</SPAN><SPAN class=kwd>refresh</SPAN><SPAN class=sym>() {</SPAN>
+<A name=db03.cpp_132></A><SPAN class=line>  132 </SPAN>    <SPAN class=kwd>setQuery</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"select * from employee"</SPAN><SPAN class=sym>);</SPAN>
+<A name=db03.cpp_133></A><SPAN class=line>  133 </SPAN>
+<A name=db03.cpp_134></A><SPAN class=line>  134 </SPAN>    <SPAN class=kwd>setHeaderData</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>0</SPAN><SPAN class=sym>,</SPAN> Qt<SPAN class=sym>::</SPAN>Horizontal<SPAN class=sym>,</SPAN>
+<A name=db03.cpp_135></A><SPAN class=line>  135 </SPAN>                  <SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Табельн.</SPAN><SPAN class=esc>\n</SPAN><SPAN class=str>номер"</SPAN><SPAN class=sym>));</SPAN>
+<A name=db03.cpp_136></A><SPAN class=line>  136 </SPAN>    <SPAN class=kwd>setHeaderData</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>1</SPAN><SPAN class=sym>,</SPAN> Qt<SPAN class=sym>::</SPAN>Horizontal<SPAN class=sym>,</SPAN>
+<A name=db03.cpp_137></A><SPAN class=line>  137 </SPAN>                  <SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Имя"</SPAN><SPAN class=sym>));</SPAN>
+<A name=db03.cpp_138></A><SPAN class=line>  138 </SPAN>    <SPAN class=kwd>setHeaderData</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>2</SPAN><SPAN class=sym>,</SPAN> Qt<SPAN class=sym>::</SPAN>Horizontal<SPAN class=sym>,</SPAN>
+<A name=db03.cpp_139></A><SPAN class=line>  139 </SPAN>                  <SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"День рождения"</SPAN><SPAN class=sym>));</SPAN>
+<A name=db03.cpp_140></A><SPAN class=line>  140 </SPAN>    <SPAN class=kwd>setHeaderData</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>3</SPAN><SPAN class=sym>,</SPAN> Qt<SPAN class=sym>::</SPAN>Horizontal<SPAN class=sym>,</SPAN>
+<A name=db03.cpp_141></A><SPAN class=line>  141 </SPAN>                  <SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Зарплата"</SPAN><SPAN class=sym>));</SPAN>
+<A name=db03.cpp_142></A><SPAN class=line>  142 </SPAN>    <SPAN class=kwd>setHeaderData</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>4</SPAN><SPAN class=sym>,</SPAN> Qt<SPAN class=sym>::</SPAN>Horizontal<SPAN class=sym>,</SPAN>
+<A name=db03.cpp_143></A><SPAN class=line>  143 </SPAN>                  <SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Женат/</SPAN><SPAN class=esc>\n</SPAN><SPAN class=str>замужем"</SPAN><SPAN class=sym>));</SPAN>
+<A name=db03.cpp_144></A><SPAN class=line>  144 </SPAN><SPAN class=sym>}</SPAN>
+<A name=db03.cpp_145></A><SPAN class=line>  145 </SPAN>
+<A name=db03.cpp_146></A><SPAN class=line>  146 </SPAN><SPAN class=slc>//------------------------------------</SPAN>
+<A name=db03.cpp_147></A><SPAN class=line>  147 </SPAN>MyView<SPAN class=sym>::</SPAN><SPAN class=kwd>MyView</SPAN><SPAN class=sym>(</SPAN>QWidget <SPAN class=sym>*</SPAN>parent<SPAN class=sym>)</SPAN>
+<A name=db03.cpp_148></A><SPAN class=line>  148 </SPAN>      <SPAN class=sym>:</SPAN> <SPAN class=kwd>QTableView</SPAN><SPAN class=sym>(</SPAN>parent<SPAN class=sym>) {</SPAN>
+<A name=db03.cpp_149></A><SPAN class=line>  149 </SPAN>
+<A name=db03.cpp_150></A><SPAN class=line>  150 </SPAN>    MyDSBDelegate <SPAN class=sym>*</SPAN>dsbd <SPAN class=sym>=</SPAN> <SPAN class=kwa>new</SPAN> <SPAN class=kwd>MyDSBDelegate</SPAN><SPAN class=sym>(</SPAN>
+<A name=db03.cpp_151></A><SPAN class=line>  151 </SPAN>        <SPAN class=num>0.0</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>999999.99</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>0.05</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>2</SPAN><SPAN class=sym>,</SPAN> <SPAN class=kwa>this</SPAN><SPAN class=sym>);</SPAN>
+<A name=db03.cpp_152></A><SPAN class=line>  152 </SPAN>    <SPAN class=kwd>setItemDelegateForColumn</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>3</SPAN><SPAN class=sym>,</SPAN> dsbd<SPAN class=sym>);</SPAN>
+<A name=db03.cpp_153></A><SPAN class=line>  153 </SPAN>
+<A name=db03.cpp_154></A><SPAN class=line>  154 </SPAN>    MyDEDelegate <SPAN class=sym>*</SPAN>ded <SPAN class=sym>=</SPAN> <SPAN class=kwa>new</SPAN> <SPAN class=kwd>MyDEDelegate</SPAN><SPAN class=sym>(</SPAN>
+<A name=db03.cpp_155></A><SPAN class=line>  155 </SPAN>            <SPAN class=kwa>true</SPAN><SPAN class=sym>,</SPAN> <SPAN class=kwa>this</SPAN><SPAN class=sym>);</SPAN>
+<A name=db03.cpp_156></A><SPAN class=line>  156 </SPAN>    <SPAN class=kwd>setItemDelegateForColumn</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>2</SPAN><SPAN class=sym>,</SPAN> ded<SPAN class=sym>);</SPAN>
+<A name=db03.cpp_157></A><SPAN class=line>  157 </SPAN><SPAN class=sym>}</SPAN>
+<A name=db03.cpp_158></A><SPAN class=line>  158 </SPAN>
+<A name=db03.cpp_159></A><SPAN class=line>  159 </SPAN><SPAN class=kwb>void</SPAN> MyView<SPAN class=sym>::</SPAN><SPAN class=kwd>resizeEvent</SPAN><SPAN class=sym>(</SPAN>QResizeEvent <SPAN class=sym>*</SPAN>event<SPAN class=sym>) {</SPAN>
+<A name=db03.cpp_160></A><SPAN class=line>  160 </SPAN>    <SPAN class=kwd>resizeRowsToContents</SPAN><SPAN class=sym>();</SPAN>
+<A name=db03.cpp_161></A><SPAN class=line>  161 </SPAN>    // <SPAN class=kwd>resizeColumnsToContents</SPAN><SPAN class=sym>();</SPAN>
+<A name=db03.cpp_162></A><SPAN class=line>  162 </SPAN>    QTableView<SPAN class=sym>::</SPAN><SPAN class=kwd>resizeEvent</SPAN><SPAN class=sym>(</SPAN>event<SPAN class=sym>);</SPAN>
+<A name=db03.cpp_163></A><SPAN class=line>  163 </SPAN><SPAN class=sym>}</SPAN>
+<A name=db03.cpp_164></A><SPAN class=line>  164 </SPAN>
+<A name=db03.cpp_165></A><SPAN class=line>  165 </SPAN><SPAN class=slc>//------------------------------------</SPAN>
+<A name=db03.cpp_166></A><SPAN class=line>  166 </SPAN>MyDSBDelegate<SPAN class=sym>::</SPAN><SPAN class=kwd>MyDSBDelegate</SPAN><SPAN class=sym>(</SPAN>
+<A name=db03.cpp_167></A><SPAN class=line>  167 </SPAN>                  <SPAN class=kwb>double</SPAN> min<SPAN class=sym>,</SPAN>
+<A name=db03.cpp_168></A><SPAN class=line>  168 </SPAN>                  <SPAN class=kwb>double</SPAN> max<SPAN class=sym>,</SPAN>
+<A name=db03.cpp_169></A><SPAN class=line>  169 </SPAN>                  <SPAN class=kwb>double</SPAN> step<SPAN class=sym>,</SPAN>
+<A name=db03.cpp_170></A><SPAN class=line>  170 </SPAN>                  <SPAN class=kwb>int</SPAN> precision<SPAN class=sym>,</SPAN>
+<A name=db03.cpp_171></A><SPAN class=line>  171 </SPAN>                  QObject <SPAN class=sym>*</SPAN>parent<SPAN class=sym>)</SPAN>
+<A name=db03.cpp_172></A><SPAN class=line>  172 </SPAN>             <SPAN class=sym>:</SPAN> <SPAN class=kwd>QItemDelegate</SPAN><SPAN class=sym>(</SPAN>parent<SPAN class=sym>),</SPAN>
+<A name=db03.cpp_173></A><SPAN class=line>  173 </SPAN>               <SPAN class=kwd>m_min</SPAN><SPAN class=sym>(</SPAN>min<SPAN class=sym>),</SPAN>
+<A name=db03.cpp_174></A><SPAN class=line>  174 </SPAN>               <SPAN class=kwd>m_max</SPAN><SPAN class=sym>(</SPAN>max<SPAN class=sym>),</SPAN>
+<A name=db03.cpp_175></A><SPAN class=line>  175 </SPAN>               <SPAN class=kwd>m_step</SPAN><SPAN class=sym>(</SPAN>step<SPAN class=sym>),</SPAN>
+<A name=db03.cpp_176></A><SPAN class=line>  176 </SPAN>               <SPAN class=kwd>m_precision</SPAN><SPAN class=sym>(</SPAN>precision<SPAN class=sym>) {</SPAN>
+<A name=db03.cpp_177></A><SPAN class=line>  177 </SPAN><SPAN class=sym>}</SPAN>
+<A name=db03.cpp_178></A><SPAN class=line>  178 </SPAN>
+<A name=db03.cpp_179></A><SPAN class=line>  179 </SPAN>QWidget <SPAN class=sym>*</SPAN>MyDSBDelegate<SPAN class=sym>::</SPAN><SPAN class=kwd>createEditor</SPAN><SPAN class=sym>(</SPAN>
+<A name=db03.cpp_180></A><SPAN class=line>  180 </SPAN>            QWidget <SPAN class=sym>*</SPAN>parent<SPAN class=sym>,</SPAN>
+<A name=db03.cpp_181></A><SPAN class=line>  181 </SPAN>            <SPAN class=kwb>const</SPAN> QStyleOptionViewItem<SPAN class=sym>&amp;</SPAN> <SPAN class=com>/* option */</SPAN><SPAN class=sym>,</SPAN>
+<A name=db03.cpp_182></A><SPAN class=line>  182 </SPAN>            <SPAN class=kwb>const</SPAN> QModelIndex<SPAN class=sym>&amp;</SPAN> <SPAN class=com>/* index */</SPAN><SPAN class=sym>)</SPAN> <SPAN class=kwb>const</SPAN> <SPAN class=sym>{</SPAN>
+<A name=db03.cpp_183></A><SPAN class=line>  183 </SPAN>    QDoubleSpinBox <SPAN class=sym>*</SPAN>editor <SPAN class=sym>=</SPAN> <SPAN class=kwa>new</SPAN> <SPAN class=kwd>QDoubleSpinBox</SPAN><SPAN class=sym>(</SPAN>parent<SPAN class=sym>);</SPAN>
+<A name=db03.cpp_184></A><SPAN class=line>  184 </SPAN>    editor<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setMinimum</SPAN><SPAN class=sym>(</SPAN>m_min<SPAN class=sym>);</SPAN>
+<A name=db03.cpp_185></A><SPAN class=line>  185 </SPAN>    editor<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setMaximum</SPAN><SPAN class=sym>(</SPAN>m_max<SPAN class=sym>);</SPAN>
+<A name=db03.cpp_186></A><SPAN class=line>  186 </SPAN>    editor<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setDecimals</SPAN><SPAN class=sym>(</SPAN>m_precision<SPAN class=sym>);</SPAN>
+<A name=db03.cpp_187></A><SPAN class=line>  187 </SPAN>    editor<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setSingleStep</SPAN><SPAN class=sym>(</SPAN>m_step<SPAN class=sym>);</SPAN>
+<A name=db03.cpp_188></A><SPAN class=line>  188 </SPAN>    editor<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>installEventFilter</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwa>const_cast</SPAN><SPAN class=sym>&lt;</SPAN>MyDSBDelegate<SPAN class=sym>*&gt;(</SPAN><SPAN class=kwa>this</SPAN><SPAN class=sym>));</SPAN>
+<A name=db03.cpp_189></A><SPAN class=line>  189 </SPAN>    <SPAN class=kwa>return</SPAN> editor<SPAN class=sym>;</SPAN>
+<A name=db03.cpp_190></A><SPAN class=line>  190 </SPAN><SPAN class=sym>}</SPAN>
+<A name=db03.cpp_191></A><SPAN class=line>  191 </SPAN>
+<A name=db03.cpp_192></A><SPAN class=line>  192 </SPAN><SPAN class=kwb>void</SPAN> MyDSBDelegate<SPAN class=sym>::</SPAN><SPAN class=kwd>setEditorData</SPAN><SPAN class=sym>(</SPAN>
+<A name=db03.cpp_193></A><SPAN class=line>  193 </SPAN>                QWidget <SPAN class=sym>*</SPAN>editor<SPAN class=sym>,</SPAN>
+<A name=db03.cpp_194></A><SPAN class=line>  194 </SPAN>                <SPAN class=kwb>const</SPAN> QModelIndex <SPAN class=sym>&amp;</SPAN>index<SPAN class=sym>)</SPAN> <SPAN class=kwb>const</SPAN> <SPAN class=sym>{</SPAN>
+<A name=db03.cpp_195></A><SPAN class=line>  195 </SPAN>    <SPAN class=kwb>double</SPAN> value <SPAN class=sym>=</SPAN> index<SPAN class=sym>.</SPAN><SPAN class=kwd>model</SPAN><SPAN class=sym>()-&gt;</SPAN><SPAN class=kwd>data</SPAN><SPAN class=sym>(</SPAN>
+<A name=db03.cpp_196></A><SPAN class=line>  196 </SPAN>            index<SPAN class=sym>,</SPAN> Qt<SPAN class=sym>::</SPAN>EditRole<SPAN class=sym>).</SPAN><SPAN class=kwd>toDouble</SPAN><SPAN class=sym>();</SPAN>
+<A name=db03.cpp_197></A><SPAN class=line>  197 </SPAN>    QDoubleSpinBox <SPAN class=sym>*</SPAN>dsb <SPAN class=sym>=</SPAN> <SPAN class=kwa>static_cast</SPAN><SPAN class=sym>&lt;</SPAN>QDoubleSpinBox<SPAN class=sym>*&gt;(</SPAN>editor<SPAN class=sym>);</SPAN>
+<A name=db03.cpp_198></A><SPAN class=line>  198 </SPAN>    dsb<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setValue</SPAN><SPAN class=sym>(</SPAN>value<SPAN class=sym>);</SPAN>
+<A name=db03.cpp_199></A><SPAN class=line>  199 </SPAN><SPAN class=sym>}</SPAN>
+<A name=db03.cpp_200></A><SPAN class=line>  200 </SPAN>
+<A name=db03.cpp_201></A><SPAN class=line>  201 </SPAN><SPAN class=kwb>void</SPAN> MyDSBDelegate<SPAN class=sym>::</SPAN><SPAN class=kwd>setModelData</SPAN><SPAN class=sym>(</SPAN>
+<A name=db03.cpp_202></A><SPAN class=line>  202 </SPAN>            QWidget <SPAN class=sym>*</SPAN>editor<SPAN class=sym>,</SPAN>
+<A name=db03.cpp_203></A><SPAN class=line>  203 </SPAN>            QAbstractItemModel <SPAN class=sym>*</SPAN>model<SPAN class=sym>,</SPAN>
+<A name=db03.cpp_204></A><SPAN class=line>  204 </SPAN>            <SPAN class=kwb>const</SPAN> QModelIndex<SPAN class=sym>&amp;</SPAN> index<SPAN class=sym>)</SPAN> <SPAN class=kwb>const</SPAN> <SPAN class=sym>{</SPAN>
+<A name=db03.cpp_205></A><SPAN class=line>  205 </SPAN>    QDoubleSpinBox <SPAN class=sym>*</SPAN>dsb <SPAN class=sym>=</SPAN> <SPAN class=kwa>static_cast</SPAN><SPAN class=sym>&lt;</SPAN>QDoubleSpinBox<SPAN class=sym>*&gt;(</SPAN>editor<SPAN class=sym>);</SPAN>
+<A name=db03.cpp_206></A><SPAN class=line>  206 </SPAN>    dsb<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>interpretText</SPAN><SPAN class=sym>();</SPAN>
+<A name=db03.cpp_207></A><SPAN class=line>  207 </SPAN>    <SPAN class=kwb>double</SPAN> value <SPAN class=sym>=</SPAN> dsb<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>value</SPAN><SPAN class=sym>();</SPAN>
+<A name=db03.cpp_208></A><SPAN class=line>  208 </SPAN>    model<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setData</SPAN><SPAN class=sym>(</SPAN>index<SPAN class=sym>,</SPAN> value<SPAN class=sym>);</SPAN>
+<A name=db03.cpp_209></A><SPAN class=line>  209 </SPAN><SPAN class=sym>}</SPAN>
+<A name=db03.cpp_210></A><SPAN class=line>  210 </SPAN>
+<A name=db03.cpp_211></A><SPAN class=line>  211 </SPAN><SPAN class=kwb>void</SPAN> MyDSBDelegate<SPAN class=sym>::</SPAN><SPAN class=kwd>updateEditorGeometry</SPAN><SPAN class=sym>(</SPAN>
+<A name=db03.cpp_212></A><SPAN class=line>  212 </SPAN>            QWidget <SPAN class=sym>*</SPAN>editor<SPAN class=sym>,</SPAN>
+<A name=db03.cpp_213></A><SPAN class=line>  213 </SPAN>            <SPAN class=kwb>const</SPAN> QStyleOptionViewItem <SPAN class=sym>&amp;</SPAN>option<SPAN class=sym>,</SPAN>
+<A name=db03.cpp_214></A><SPAN class=line>  214 </SPAN>            <SPAN class=kwb>const</SPAN> QModelIndex<SPAN class=sym>&amp;</SPAN> <SPAN class=com>/* index */</SPAN><SPAN class=sym>)</SPAN> <SPAN class=kwb>const</SPAN> <SPAN class=sym>{</SPAN>
+<A name=db03.cpp_215></A><SPAN class=line>  215 </SPAN>    editor<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setGeometry</SPAN><SPAN class=sym>(</SPAN>option<SPAN class=sym>.</SPAN>rect<SPAN class=sym>);</SPAN>
+<A name=db03.cpp_216></A><SPAN class=line>  216 </SPAN><SPAN class=sym>}</SPAN>
+<A name=db03.cpp_217></A><SPAN class=line>  217 </SPAN>
+<A name=db03.cpp_218></A><SPAN class=line>  218 </SPAN><SPAN class=slc>//------------------------------------</SPAN>
+<A name=db03.cpp_219></A><SPAN class=line>  219 </SPAN>MyDEDelegate<SPAN class=sym>::</SPAN><SPAN class=kwd>MyDEDelegate</SPAN><SPAN class=sym>(</SPAN>
+<A name=db03.cpp_220></A><SPAN class=line>  220 </SPAN>                    <SPAN class=kwb>bool</SPAN> calpopup<SPAN class=sym>,</SPAN>
+<A name=db03.cpp_221></A><SPAN class=line>  221 </SPAN>                    QObject <SPAN class=sym>*</SPAN>parent<SPAN class=sym>)</SPAN>
+<A name=db03.cpp_222></A><SPAN class=line>  222 </SPAN>            <SPAN class=sym>:</SPAN> <SPAN class=kwd>QItemDelegate</SPAN><SPAN class=sym>(</SPAN>parent<SPAN class=sym>),</SPAN>
+<A name=db03.cpp_223></A><SPAN class=line>  223 </SPAN>              <SPAN class=kwd>m_calpopup</SPAN><SPAN class=sym>(</SPAN>calpopup<SPAN class=sym>) {</SPAN>
+<A name=db03.cpp_224></A><SPAN class=line>  224 </SPAN><SPAN class=sym>}</SPAN>
+<A name=db03.cpp_225></A><SPAN class=line>  225 </SPAN>
+<A name=db03.cpp_226></A><SPAN class=line>  226 </SPAN>QWidget <SPAN class=sym>*</SPAN>MyDEDelegate<SPAN class=sym>::</SPAN><SPAN class=kwd>createEditor</SPAN><SPAN class=sym>(</SPAN>
+<A name=db03.cpp_227></A><SPAN class=line>  227 </SPAN>            QWidget <SPAN class=sym>*</SPAN>parent<SPAN class=sym>,</SPAN>
+<A name=db03.cpp_228></A><SPAN class=line>  228 </SPAN>            <SPAN class=kwb>const</SPAN> QStyleOptionViewItem<SPAN class=sym>&amp;</SPAN> <SPAN class=com>/* option */</SPAN><SPAN class=sym>,</SPAN>
+<A name=db03.cpp_229></A><SPAN class=line>  229 </SPAN>            <SPAN class=kwb>const</SPAN> QModelIndex<SPAN class=sym>&amp;</SPAN> <SPAN class=com>/* index */</SPAN><SPAN class=sym>)</SPAN> <SPAN class=kwb>const</SPAN> <SPAN class=sym>{</SPAN>
+<A name=db03.cpp_230></A><SPAN class=line>  230 </SPAN>    QDateEdit <SPAN class=sym>*</SPAN>editor <SPAN class=sym>=</SPAN> <SPAN class=kwa>new</SPAN> <SPAN class=kwd>QDateEdit</SPAN><SPAN class=sym>(</SPAN>parent<SPAN class=sym>);</SPAN>
+<A name=db03.cpp_231></A><SPAN class=line>  231 </SPAN>    editor<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setCalendarPopup</SPAN><SPAN class=sym>(</SPAN>m_calpopup<SPAN class=sym>);</SPAN>
+<A name=db03.cpp_232></A><SPAN class=line>  232 </SPAN>    editor<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>installEventFilter</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwa>const_cast</SPAN><SPAN class=sym>&lt;</SPAN>MyDEDelegate<SPAN class=sym>*&gt;(</SPAN><SPAN class=kwa>this</SPAN><SPAN class=sym>));</SPAN>
+<A name=db03.cpp_233></A><SPAN class=line>  233 </SPAN>    <SPAN class=kwa>return</SPAN> editor<SPAN class=sym>;</SPAN>
+<A name=db03.cpp_234></A><SPAN class=line>  234 </SPAN><SPAN class=sym>}</SPAN>
+<A name=db03.cpp_235></A><SPAN class=line>  235 </SPAN>
+<A name=db03.cpp_236></A><SPAN class=line>  236 </SPAN><SPAN class=kwb>void</SPAN> MyDEDelegate<SPAN class=sym>::</SPAN><SPAN class=kwd>setEditorData</SPAN><SPAN class=sym>(</SPAN>
+<A name=db03.cpp_237></A><SPAN class=line>  237 </SPAN>                QWidget <SPAN class=sym>*</SPAN>editor<SPAN class=sym>,</SPAN>
+<A name=db03.cpp_238></A><SPAN class=line>  238 </SPAN>                <SPAN class=kwb>const</SPAN> QModelIndex <SPAN class=sym>&amp;</SPAN>index<SPAN class=sym>)</SPAN> <SPAN class=kwb>const</SPAN> <SPAN class=sym>{</SPAN>
+<A name=db03.cpp_239></A><SPAN class=line>  239 </SPAN>    QDate value <SPAN class=sym>=</SPAN> index<SPAN class=sym>.</SPAN><SPAN class=kwd>model</SPAN><SPAN class=sym>()-&gt;</SPAN><SPAN class=kwd>data</SPAN><SPAN class=sym>(</SPAN>
+<A name=db03.cpp_240></A><SPAN class=line>  240 </SPAN>            index<SPAN class=sym>,</SPAN> Qt<SPAN class=sym>::</SPAN>EditRole<SPAN class=sym>).</SPAN><SPAN class=kwd>toDate</SPAN><SPAN class=sym>();</SPAN>
+<A name=db03.cpp_241></A><SPAN class=line>  241 </SPAN>    QDateEdit <SPAN class=sym>*</SPAN>de <SPAN class=sym>=</SPAN> <SPAN class=kwa>static_cast</SPAN><SPAN class=sym>&lt;</SPAN>QDateEdit<SPAN class=sym>*&gt;(</SPAN>editor<SPAN class=sym>);</SPAN>
+<A name=db03.cpp_242></A><SPAN class=line>  242 </SPAN>    de<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setDate</SPAN><SPAN class=sym>(</SPAN>value<SPAN class=sym>);</SPAN>
+<A name=db03.cpp_243></A><SPAN class=line>  243 </SPAN><SPAN class=sym>}</SPAN>
+<A name=db03.cpp_244></A><SPAN class=line>  244 </SPAN>
+<A name=db03.cpp_245></A><SPAN class=line>  245 </SPAN><SPAN class=kwb>void</SPAN> MyDEDelegate<SPAN class=sym>::</SPAN><SPAN class=kwd>setModelData</SPAN><SPAN class=sym>(</SPAN>
+<A name=db03.cpp_246></A><SPAN class=line>  246 </SPAN>            QWidget <SPAN class=sym>*</SPAN>editor<SPAN class=sym>,</SPAN>
+<A name=db03.cpp_247></A><SPAN class=line>  247 </SPAN>            QAbstractItemModel <SPAN class=sym>*</SPAN>model<SPAN class=sym>,</SPAN>
+<A name=db03.cpp_248></A><SPAN class=line>  248 </SPAN>            <SPAN class=kwb>const</SPAN> QModelIndex<SPAN class=sym>&amp;</SPAN> index<SPAN class=sym>)</SPAN> <SPAN class=kwb>const</SPAN> <SPAN class=sym>{</SPAN>
+<A name=db03.cpp_249></A><SPAN class=line>  249 </SPAN>    QDateEdit <SPAN class=sym>*</SPAN>de <SPAN class=sym>=</SPAN> <SPAN class=kwa>static_cast</SPAN><SPAN class=sym>&lt;</SPAN>QDateEdit<SPAN class=sym>*&gt;(</SPAN>editor<SPAN class=sym>);</SPAN>
+<A name=db03.cpp_250></A><SPAN class=line>  250 </SPAN>    de<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>interpretText</SPAN><SPAN class=sym>();</SPAN>
+<A name=db03.cpp_251></A><SPAN class=line>  251 </SPAN>    QDate value <SPAN class=sym>=</SPAN> de<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>date</SPAN><SPAN class=sym>();</SPAN>
+<A name=db03.cpp_252></A><SPAN class=line>  252 </SPAN>    model<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setData</SPAN><SPAN class=sym>(</SPAN>index<SPAN class=sym>,</SPAN> value<SPAN class=sym>);</SPAN>
+<A name=db03.cpp_253></A><SPAN class=line>  253 </SPAN><SPAN class=sym>}</SPAN>
+<A name=db03.cpp_254></A><SPAN class=line>  254 </SPAN>
+<A name=db03.cpp_255></A><SPAN class=line>  255 </SPAN><SPAN class=kwb>void</SPAN> MyDEDelegate<SPAN class=sym>::</SPAN><SPAN class=kwd>updateEditorGeometry</SPAN><SPAN class=sym>(</SPAN>
+<A name=db03.cpp_256></A><SPAN class=line>  256 </SPAN>            QWidget <SPAN class=sym>*</SPAN>editor<SPAN class=sym>,</SPAN>
+<A name=db03.cpp_257></A><SPAN class=line>  257 </SPAN>            <SPAN class=kwb>const</SPAN> QStyleOptionViewItem <SPAN class=sym>&amp;</SPAN>option<SPAN class=sym>,</SPAN>
+<A name=db03.cpp_258></A><SPAN class=line>  258 </SPAN>            <SPAN class=kwb>const</SPAN> QModelIndex<SPAN class=sym>&amp;</SPAN> <SPAN class=com>/* index */</SPAN><SPAN class=sym>)</SPAN> <SPAN class=kwb>const</SPAN> <SPAN class=sym>{</SPAN>
+<A name=db03.cpp_259></A><SPAN class=line>  259 </SPAN>    editor<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setGeometry</SPAN><SPAN class=sym>(</SPAN>option<SPAN class=sym>.</SPAN>rect<SPAN class=sym>);</SPAN>
+<A name=db03.cpp_260></A><SPAN class=line>  260 </SPAN><SPAN class=sym>}</SPAN>
+<A name=db03.cpp_261></A><SPAN class=line>  261 </SPAN>
+<A name=db03.cpp_262></A><SPAN class=line>  262 </SPAN><SPAN class=slc>//------------------------------------</SPAN>
+<A name=db03.cpp_263></A><SPAN class=line>  263 </SPAN><SPAN class=kwb>int</SPAN> <SPAN class=kwd>main</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwb>int</SPAN> argc<SPAN class=sym>,</SPAN> <SPAN class=kwb>char</SPAN> <SPAN class=sym>*</SPAN>argv<SPAN class=sym>[]) {</SPAN>
+<A name=db03.cpp_264></A><SPAN class=line>  264 </SPAN>
+<A name=db03.cpp_265></A><SPAN class=line>  265 </SPAN>    QApplication <SPAN class=kwd>app</SPAN><SPAN class=sym>(</SPAN>argc<SPAN class=sym>,</SPAN> argv<SPAN class=sym>);</SPAN>
+<A name=db03.cpp_266></A><SPAN class=line>  266 </SPAN>
+<A name=db03.cpp_267></A><SPAN class=line>  267 </SPAN>    QTextCodec <SPAN class=sym>*</SPAN>codec <SPAN class=sym>=</SPAN> QTextCodec<SPAN class=sym>::</SPAN><SPAN class=kwd>codecForName</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"CP1251"</SPAN><SPAN class=sym>);</SPAN>
+<A name=db03.cpp_268></A><SPAN class=line>  268 </SPAN>    QTextCodec<SPAN class=sym>::</SPAN><SPAN class=kwd>setCodecForTr</SPAN><SPAN class=sym>(</SPAN>codec<SPAN class=sym>);</SPAN>
+<A name=db03.cpp_269></A><SPAN class=line>  269 </SPAN>    QTextCodec<SPAN class=sym>::</SPAN><SPAN class=kwd>setCodecForCStrings</SPAN><SPAN class=sym>(</SPAN>codec<SPAN class=sym>);</SPAN>
+<A name=db03.cpp_270></A><SPAN class=line>  270 </SPAN>
+<A name=db03.cpp_271></A><SPAN class=line>  271 </SPAN>    QSqlDatabase db <SPAN class=sym>=</SPAN> QSqlDatabase<SPAN class=sym>::</SPAN><SPAN class=kwd>addDatabase</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"QODBC"</SPAN><SPAN class=sym>);</SPAN>
+<A name=db03.cpp_272></A><SPAN class=line>  272 </SPAN>    db<SPAN class=sym>.</SPAN><SPAN class=kwd>setDatabaseName</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"mysql_db1"</SPAN><SPAN class=sym>);</SPAN>
+<A name=db03.cpp_273></A><SPAN class=line>  273 </SPAN>    db<SPAN class=sym>.</SPAN><SPAN class=kwd>setUserName</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>""</SPAN><SPAN class=sym>);</SPAN>
+<A name=db03.cpp_274></A><SPAN class=line>  274 </SPAN>    db<SPAN class=sym>.</SPAN><SPAN class=kwd>setPassword</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>""</SPAN><SPAN class=sym>);</SPAN>
+<A name=db03.cpp_275></A><SPAN class=line>  275 </SPAN>    db<SPAN class=sym>.</SPAN><SPAN class=kwd>open</SPAN><SPAN class=sym>();</SPAN>
+<A name=db03.cpp_276></A><SPAN class=line>  276 </SPAN>
+<A name=db03.cpp_277></A><SPAN class=line>  277 </SPAN>    // QSqlQuery q<SPAN class=sym>;</SPAN>
+<A name=db03.cpp_278></A><SPAN class=line>  278 </SPAN>    // q<SPAN class=sym>.</SPAN><SPAN class=kwd>exec</SPAN><SPAN class=sym>(</SPAN>QObject<SPAN class=sym>::</SPAN><SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"SET NAMES 'cp1251'"</SPAN><SPAN class=sym>));</SPAN>
+<A name=db03.cpp_279></A><SPAN class=line>  279 </SPAN>
+<A name=db03.cpp_280></A><SPAN class=line>  280 </SPAN>    MyModel <SPAN class=sym>*</SPAN>model <SPAN class=sym>=</SPAN> <SPAN class=kwa>new</SPAN> <SPAN class=kwd>MyModel</SPAN><SPAN class=sym>();</SPAN>
+<A name=db03.cpp_281></A><SPAN class=line>  281 </SPAN>
+<A name=db03.cpp_282></A><SPAN class=line>  282 </SPAN>    MyView <SPAN class=sym>*</SPAN>view <SPAN class=sym>=</SPAN> <SPAN class=kwa>new</SPAN> <SPAN class=kwd>MyView</SPAN><SPAN class=sym>();</SPAN>
+<A name=db03.cpp_283></A><SPAN class=line>  283 </SPAN>    view<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setModel</SPAN><SPAN class=sym>(</SPAN>model<SPAN class=sym>);</SPAN>
+<A name=db03.cpp_284></A><SPAN class=line>  284 </SPAN>
+<A name=db03.cpp_285></A><SPAN class=line>  285 </SPAN>    view<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setAlternatingRowColors</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwa>true</SPAN><SPAN class=sym>);</SPAN>
+<A name=db03.cpp_286></A><SPAN class=line>  286 </SPAN>    view<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>resizeRowsToContents</SPAN><SPAN class=sym>();</SPAN>
+<A name=db03.cpp_287></A><SPAN class=line>  287 </SPAN>    view<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>resizeColumnsToContents</SPAN><SPAN class=sym>();</SPAN>
+<A name=db03.cpp_288></A><SPAN class=line>  288 </SPAN>    view<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>show</SPAN><SPAN class=sym>();</SPAN>
+<A name=db03.cpp_289></A><SPAN class=line>  289 </SPAN>
+<A name=db03.cpp_290></A><SPAN class=line>  290 </SPAN>    <SPAN class=kwa>return</SPAN> app<SPAN class=sym>.</SPAN><SPAN class=kwd>exec</SPAN><SPAN class=sym>();</SPAN>
+<A name=db03.cpp_291></A><SPAN class=line>  291 </SPAN><SPAN class=sym>}</SPAN>
+</PRE>
+<UL>
+  <LI>(1-144) Начало листинга повторяет текст предыдущей программы. 
+  <LI>(150-151) Создаём экземпляр делегата для редактирования вещественных 
+  чисел; первые два параметра конструктора -- разрешённый диапазон, третий 
+  параметр -- шаг изменения, четвёртый -- количество знаков после запятой, пятый 
+  -- родительский виджет. 
+  <LI>(152) Связали только что созданный экземпляр делегата с третим (считая с 
+  нуля) столбцом таблицы. 
+  <LI>(154-156) Создали экземпляр делегата для редактирования даты (первый 
+  параметр конструктора определяет, будет ли при вводе даты использоваться 
+  всплывающее окно календаря) и связали его со вторым столбцом таблицы. 
+  <LI>(159-163) Реализация метода <CODE>resizeEvent</CODE> взята из предыдущей 
+  программы. 
+  <LI>(166-177) Конструктор делегата для редактирования вещественных чисел. 
+  Параметры: диапазон, шаг, точность и указатель на родительский виджет. 
+  <LI>(179-190) 
+  <LI>() 
+  <LI>() </LI></UL>
+  <a href="qtdb003.htm">Назад</a> <a href="title.htm">Содержание</a>
+  </BODY></HTML>

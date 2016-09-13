@@ -1,0 +1,318 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0041)http://www.mechta34.com/it/qt4/qt006.html -->
+<HTML><HEAD><TITLE>Ю.В.Земсков. Программирование на C++ с использованием библиотеки Qt4</TITLE>
+<META http-equiv=Content-Type content="text/html; charset=windows-1251"><LINK 
+href="Images/s1.css" type=text/css rel=stylesheet>
+<META content="MSHTML 6.00.2900.2180" name=GENERATOR></HEAD>
+<BODY>
+<a href="qt005.htm">Назад</a> <a href="title.htm">Содержание</a> <a href="qt007.htm">Вперед</a>
+<H2>Размещение элементов в окне</H2>
+<H3>"Ручное" размещение</H3>С помощью метода <CODE>setGeometry(int x, int y, int 
+w, int h)</CODE> или <CODE>setGeometry(const QRect&amp;)</CODE> можно задать 
+положение и размер любого визуального элемента в пикселах. Для установки 
+размеров без изменения положения может использоваться метод <CODE>resize(int w, 
+int h)</CODE> или <CODE>resize(const QSize&amp;)</CODE>. Наоборот, для 
+перемещения элемента в нужную позицию с сохранением прежних размеров служит 
+метод <CODE>move(int x, int y)</CODE> или <CODE>move(const QPoint&amp;)</CODE>. 
+<P>Недостатком жёсткого варианта размещения элементов интерфейса является то, 
+что пользователь не может изменить размер окна диалога (или изменение размеров 
+окна не влияет на взаимное положение и размеры всех его элементов). В результате 
+при низком разрешении монитора всё выглядит слишком крупно, а то и вовсе не 
+помещается на экран, при высоком&nbsp;-- наоборот, слишком мелко. Кроме того, в 
+различных операционных системах используются разные шрифты, поэтому надписи и 
+поля ввода, прекрасно смотревшиеся в одной системе, при переносе на другую 
+платформу могут не уместиться в прежних границах. К тому же в солидных 
+программных продуктах принято давать пользователю возможность настраивать 
+интерфейс программы по своему вкусу, в частности, изменять гарнитуру и размер 
+шрифта. А при локализации (переводе интерфейса программы на другой язык) всё ещё 
+больше усложняется. 
+<P>Очевидный (но не лучший) способ решить хотя бы некоторые из перечисленных 
+проблем заключается в том, чтобы в виртуальном методе <CODE>resizeEvent</CODE>, 
+автоматически выполняемом при изменении размеров окна, пересчитывать размеры и 
+положение всех элементов. Пример программирования такого диалога приведён в 
+листингах 8 и 9, а внешний вид окна&nbsp;-- на рис. 
+<P align=center><IMG src="Images/qt03.png"> <BR>Рис. Перерасчёт геометрии в 
+методе <CODE>resizeEvent</CODE> 
+<P><B>Листинг 8. Перерасчёт геометрии в методе <CODE>resizeEvent</CODE> (файл 
+<CODE>examples-qt/03/03.h</CODE>)</B> <PRE class=hl><A name=03.h_1></A><SPAN class=line>    1 </SPAN><SPAN class=slc>// Перерасчёт геометрии всех элементов при изменении размеров окна</SPAN>
+<A name=03.h_2></A><SPAN class=line>    2 </SPAN>
+<A name=03.h_3></A><SPAN class=line>    3 </SPAN><SPAN class=dir>#include &lt;QtGui&gt;</SPAN>
+<A name=03.h_4></A><SPAN class=line>    4 </SPAN>
+<A name=03.h_5></A><SPAN class=line>    5 </SPAN><SPAN class=kwc>class</SPAN> MyDialog <SPAN class=sym>:</SPAN> <SPAN class=kwc>public</SPAN> QDialog <SPAN class=sym>{</SPAN>
+<A name=03.h_6></A><SPAN class=line>    6 </SPAN>    Q_OBJECT
+<A name=03.h_7></A><SPAN class=line>    7 </SPAN>
+<A name=03.h_8></A><SPAN class=line>    8 </SPAN><SPAN class=kwc>public</SPAN><SPAN class=sym>:</SPAN>
+<A name=03.h_9></A><SPAN class=line>    9 </SPAN>    <SPAN class=kwd>MyDialog</SPAN><SPAN class=sym>();</SPAN>
+<A name=03.h_10></A><SPAN class=line>   10 </SPAN>
+<A name=03.h_11></A><SPAN class=line>   11 </SPAN><SPAN class=kwc>protected</SPAN><SPAN class=sym>:</SPAN>
+<A name=03.h_12></A><SPAN class=line>   12 </SPAN>    <SPAN class=kwc>virtual</SPAN> <SPAN class=kwb>void</SPAN> <SPAN class=kwd>resizeEvent</SPAN><SPAN class=sym>(</SPAN>QResizeEvent <SPAN class=sym>*</SPAN>event<SPAN class=sym>);</SPAN>
+<A name=03.h_13></A><SPAN class=line>   13 </SPAN>
+<A name=03.h_14></A><SPAN class=line>   14 </SPAN><SPAN class=kwc>private</SPAN><SPAN class=sym>:</SPAN>
+<A name=03.h_15></A><SPAN class=line>   15 </SPAN>    QLabel <SPAN class=sym>*</SPAN>lb<SPAN class=sym>;</SPAN>          <SPAN class=slc>// Текстовая метка.</SPAN>
+<A name=03.h_16></A><SPAN class=line>   16 </SPAN>    QLineEdit <SPAN class=sym>*</SPAN>le<SPAN class=sym>;</SPAN>       <SPAN class=slc>// Строковое поле ввода.</SPAN>
+<A name=03.h_17></A><SPAN class=line>   17 </SPAN>    QComboBox <SPAN class=sym>*</SPAN>cb<SPAN class=sym>;</SPAN>       <SPAN class=slc>// Поле ввода с раскрывающимся списком.</SPAN>
+<A name=03.h_18></A><SPAN class=line>   18 </SPAN>    QSpinBox <SPAN class=sym>*</SPAN>sb<SPAN class=sym>;</SPAN>        <SPAN class=slc>// Целочисленное поле ввода с кнопками</SPAN>
+<A name=03.h_19></A><SPAN class=line>   19 </SPAN>                         <SPAN class=slc>// инкремента/декремента.</SPAN>
+<A name=03.h_20></A><SPAN class=line>   20 </SPAN>    QCheckBox <SPAN class=sym>*</SPAN>chb<SPAN class=sym>;</SPAN>      <SPAN class=slc>// Независимый переключатель</SPAN>
+<A name=03.h_21></A><SPAN class=line>   21 </SPAN>                         <SPAN class=slc>// с двумя состояниями.</SPAN>
+<A name=03.h_22></A><SPAN class=line>   22 </SPAN>    QDoubleSpinBox <SPAN class=sym>*</SPAN>dsb<SPAN class=sym>;</SPAN> <SPAN class=slc>// Поле ввода вещественного значения</SPAN>
+<A name=03.h_23></A><SPAN class=line>   23 </SPAN>                         <SPAN class=slc>// с кнопками инкремента/декремента.</SPAN>
+<A name=03.h_24></A><SPAN class=line>   24 </SPAN>    QDateTimeEdit <SPAN class=sym>*</SPAN>dte<SPAN class=sym>;</SPAN>  <SPAN class=slc>// Поле ввода даты и времени.</SPAN>
+<A name=03.h_25></A><SPAN class=line>   25 </SPAN>    QGroupBox  <SPAN class=sym>*</SPAN>gb<SPAN class=sym>;</SPAN>      <SPAN class=slc>// Рамка с надписью вокруг группы элементов.</SPAN>
+<A name=03.h_26></A><SPAN class=line>   26 </SPAN>    QRadioButton <SPAN class=sym>*</SPAN>rb1<SPAN class=sym>;</SPAN>   <SPAN class=slc>// Три</SPAN>
+<A name=03.h_27></A><SPAN class=line>   27 </SPAN>    QRadioButton <SPAN class=sym>*</SPAN>rb2<SPAN class=sym>;</SPAN>   <SPAN class=slc>// зависимых</SPAN>
+<A name=03.h_28></A><SPAN class=line>   28 </SPAN>    QRadioButton <SPAN class=sym>*</SPAN>rb3<SPAN class=sym>;</SPAN>   <SPAN class=slc>// переключателя.</SPAN>
+<A name=03.h_29></A><SPAN class=line>   29 </SPAN>    QPushButton <SPAN class=sym>*</SPAN>btn1<SPAN class=sym>;</SPAN>   <SPAN class=slc>// Кнопка "Сохранить".</SPAN>
+<A name=03.h_30></A><SPAN class=line>   30 </SPAN>    QPushButton <SPAN class=sym>*</SPAN>btn2<SPAN class=sym>;</SPAN>   <SPAN class=slc>// Кнопка "Отменить".</SPAN>
+<A name=03.h_31></A><SPAN class=line>   31 </SPAN><SPAN class=sym>};</SPAN>
+</PRE>
+<UL>
+  <LI>(5) Объявили класс <CODE>MyDialog</CODE>, в качестве базового использовали 
+  стандартный класс диалога библиотеки&nbsp;Qt. 
+  <LI>(9) Конструктор диалога. 
+  <LI>(15-30) Указатели на все визуальные элементы необходимо сделать членами 
+  класса, чтобы иметь к ним доступ из метода <CODE>resizeEvent</CODE>. 
+</LI></UL><B>Листинг 9. Перерасчёт геометрии в методе <CODE>resizeEvent</CODE> 
+(файл <CODE>examples-qt/03/03.cpp</CODE>)</B> <PRE class=hl><A name=03.cpp_1></A><SPAN class=line>    1 </SPAN><SPAN class=slc>// Перерасчёт геометрии всех элементов при изменении размеров окна</SPAN>
+<A name=03.cpp_2></A><SPAN class=line>    2 </SPAN>
+<A name=03.cpp_3></A><SPAN class=line>    3 </SPAN><SPAN class=dir>#include</SPAN> <SPAN class=dstr>"03.h"</SPAN><SPAN class=dir></SPAN>
+<A name=03.cpp_4></A><SPAN class=line>    4 </SPAN>
+<A name=03.cpp_5></A><SPAN class=line>    5 </SPAN>MyDialog<SPAN class=sym>::</SPAN><SPAN class=kwd>MyDialog</SPAN><SPAN class=sym>() {</SPAN>
+<A name=03.cpp_6></A><SPAN class=line>    6 </SPAN>
+<A name=03.cpp_7></A><SPAN class=line>    7 </SPAN>    QTextCodec <SPAN class=sym>*</SPAN>codec <SPAN class=sym>=</SPAN> QTextCodec<SPAN class=sym>::</SPAN><SPAN class=kwd>codecForName</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"CP1251"</SPAN><SPAN class=sym>);</SPAN>
+<A name=03.cpp_8></A><SPAN class=line>    8 </SPAN>    QTextCodec<SPAN class=sym>::</SPAN><SPAN class=kwd>setCodecForTr</SPAN><SPAN class=sym>(</SPAN>codec<SPAN class=sym>);</SPAN>
+<A name=03.cpp_9></A><SPAN class=line>    9 </SPAN>
+<A name=03.cpp_10></A><SPAN class=line>   10 </SPAN>    lb <SPAN class=sym>=</SPAN> <SPAN class=kwa>new</SPAN> <SPAN class=kwd>QLabel</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Метка:"</SPAN><SPAN class=sym>),</SPAN> <SPAN class=kwa>this</SPAN><SPAN class=sym>);</SPAN>
+<A name=03.cpp_11></A><SPAN class=line>   11 </SPAN>
+<A name=03.cpp_12></A><SPAN class=line>   12 </SPAN>    le <SPAN class=sym>=</SPAN> <SPAN class=kwa>new</SPAN> <SPAN class=kwd>QLineEdit</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Строка"</SPAN><SPAN class=sym>),</SPAN> <SPAN class=kwa>this</SPAN><SPAN class=sym>);</SPAN>
+<A name=03.cpp_13></A><SPAN class=line>   13 </SPAN>
+<A name=03.cpp_14></A><SPAN class=line>   14 </SPAN>    cb <SPAN class=sym>=</SPAN> <SPAN class=kwa>new</SPAN> <SPAN class=kwd>QComboBox</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwa>this</SPAN><SPAN class=sym>);</SPAN>
+<A name=03.cpp_15></A><SPAN class=line>   15 </SPAN>    cb<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>addItem</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Первый"</SPAN><SPAN class=sym>));</SPAN>
+<A name=03.cpp_16></A><SPAN class=line>   16 </SPAN>    cb<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>addItem</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Второй"</SPAN><SPAN class=sym>));</SPAN>
+<A name=03.cpp_17></A><SPAN class=line>   17 </SPAN>    cb<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>addItem</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Третий"</SPAN><SPAN class=sym>));</SPAN>
+<A name=03.cpp_18></A><SPAN class=line>   18 </SPAN>    cb<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setCurrentIndex</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>2</SPAN><SPAN class=sym>);</SPAN>
+<A name=03.cpp_19></A><SPAN class=line>   19 </SPAN>    cb<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setEditable</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwa>true</SPAN><SPAN class=sym>);</SPAN>
+<A name=03.cpp_20></A><SPAN class=line>   20 </SPAN>    cb<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setInsertPolicy</SPAN><SPAN class=sym>(</SPAN>QComboBox<SPAN class=sym>::</SPAN>InsertAtBottom<SPAN class=sym>);</SPAN>
+<A name=03.cpp_21></A><SPAN class=line>   21 </SPAN>
+<A name=03.cpp_22></A><SPAN class=line>   22 </SPAN>    sb <SPAN class=sym>=</SPAN> <SPAN class=kwa>new</SPAN> <SPAN class=kwd>QSpinBox</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwa>this</SPAN><SPAN class=sym>);</SPAN>
+<A name=03.cpp_23></A><SPAN class=line>   23 </SPAN>    sb<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setValue</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>5</SPAN><SPAN class=sym>);</SPAN>
+<A name=03.cpp_24></A><SPAN class=line>   24 </SPAN>
+<A name=03.cpp_25></A><SPAN class=line>   25 </SPAN>    chb <SPAN class=sym>=</SPAN> <SPAN class=kwa>new</SPAN> <SPAN class=kwd>QCheckBox</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Пометка"</SPAN><SPAN class=sym>),</SPAN> <SPAN class=kwa>this</SPAN><SPAN class=sym>);</SPAN>
+<A name=03.cpp_26></A><SPAN class=line>   26 </SPAN>    chb<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setCheckState</SPAN><SPAN class=sym>(</SPAN>Qt<SPAN class=sym>::</SPAN>Checked<SPAN class=sym>);</SPAN>
+<A name=03.cpp_27></A><SPAN class=line>   27 </SPAN>
+<A name=03.cpp_28></A><SPAN class=line>   28 </SPAN>    dsb <SPAN class=sym>=</SPAN> <SPAN class=kwa>new</SPAN> <SPAN class=kwd>QDoubleSpinBox</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwa>this</SPAN><SPAN class=sym>);</SPAN>
+<A name=03.cpp_29></A><SPAN class=line>   29 </SPAN>    dsb<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setMaximum</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>200.0</SPAN><SPAN class=sym>);</SPAN>
+<A name=03.cpp_30></A><SPAN class=line>   30 </SPAN>    dsb<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setDecimals</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>2</SPAN><SPAN class=sym>);</SPAN>
+<A name=03.cpp_31></A><SPAN class=line>   31 </SPAN>    dsb<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setSingleStep</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>0.25</SPAN><SPAN class=sym>);</SPAN>
+<A name=03.cpp_32></A><SPAN class=line>   32 </SPAN>    dsb<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setValue</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>100.25</SPAN><SPAN class=sym>);</SPAN>
+<A name=03.cpp_33></A><SPAN class=line>   33 </SPAN>
+<A name=03.cpp_34></A><SPAN class=line>   34 </SPAN>    dte <SPAN class=sym>=</SPAN> <SPAN class=kwa>new</SPAN> <SPAN class=kwd>QDateTimeEdit</SPAN><SPAN class=sym>(</SPAN>
+<A name=03.cpp_35></A><SPAN class=line>   35 </SPAN>        <SPAN class=kwd>QDateTime</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>QDate</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>2007</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>2</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>5</SPAN><SPAN class=sym>),</SPAN> <SPAN class=kwd>QTime</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>13</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>35</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>55</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>10</SPAN><SPAN class=sym>)),</SPAN>
+<A name=03.cpp_36></A><SPAN class=line>   36 </SPAN>        <SPAN class=kwa>this</SPAN><SPAN class=sym>);</SPAN>
+<A name=03.cpp_37></A><SPAN class=line>   37 </SPAN>
+<A name=03.cpp_38></A><SPAN class=line>   38 </SPAN>    gb <SPAN class=sym>=</SPAN> <SPAN class=kwa>new</SPAN> <SPAN class=kwd>QGroupBox</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Выбрать одно из трёх:"</SPAN><SPAN class=sym>),</SPAN> <SPAN class=kwa>this</SPAN><SPAN class=sym>);</SPAN>
+<A name=03.cpp_39></A><SPAN class=line>   39 </SPAN>
+<A name=03.cpp_40></A><SPAN class=line>   40 </SPAN>    rb1 <SPAN class=sym>=</SPAN> <SPAN class=kwa>new</SPAN> <SPAN class=kwd>QRadioButton</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Один"</SPAN><SPAN class=sym>),</SPAN> gb<SPAN class=sym>);</SPAN>
+<A name=03.cpp_41></A><SPAN class=line>   41 </SPAN>
+<A name=03.cpp_42></A><SPAN class=line>   42 </SPAN>    rb2 <SPAN class=sym>=</SPAN> <SPAN class=kwa>new</SPAN> <SPAN class=kwd>QRadioButton</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Два"</SPAN><SPAN class=sym>),</SPAN> gb<SPAN class=sym>);</SPAN>
+<A name=03.cpp_43></A><SPAN class=line>   43 </SPAN>
+<A name=03.cpp_44></A><SPAN class=line>   44 </SPAN>    rb3 <SPAN class=sym>=</SPAN> <SPAN class=kwa>new</SPAN> <SPAN class=kwd>QRadioButton</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Три"</SPAN><SPAN class=sym>),</SPAN> gb<SPAN class=sym>);</SPAN>
+<A name=03.cpp_45></A><SPAN class=line>   45 </SPAN>
+<A name=03.cpp_46></A><SPAN class=line>   46 </SPAN>    rb2<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setChecked</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwa>true</SPAN><SPAN class=sym>);</SPAN>
+<A name=03.cpp_47></A><SPAN class=line>   47 </SPAN>
+<A name=03.cpp_48></A><SPAN class=line>   48 </SPAN>    btn1 <SPAN class=sym>=</SPAN> <SPAN class=kwa>new</SPAN> <SPAN class=kwd>QPushButton</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Сохранить"</SPAN><SPAN class=sym>),</SPAN> <SPAN class=kwa>this</SPAN><SPAN class=sym>);</SPAN>
+<A name=03.cpp_49></A><SPAN class=line>   49 </SPAN>
+<A name=03.cpp_50></A><SPAN class=line>   50 </SPAN>    btn2 <SPAN class=sym>=</SPAN> <SPAN class=kwa>new</SPAN> <SPAN class=kwd>QPushButton</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Отменить"</SPAN><SPAN class=sym>),</SPAN> <SPAN class=kwa>this</SPAN><SPAN class=sym>);</SPAN>
+<A name=03.cpp_51></A><SPAN class=line>   51 </SPAN>
+<A name=03.cpp_52></A><SPAN class=line>   52 </SPAN>    <SPAN class=kwd>setMinimumSize</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>160</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>205</SPAN><SPAN class=sym>);</SPAN>
+<A name=03.cpp_53></A><SPAN class=line>   53 </SPAN><SPAN class=sym>}</SPAN>
+<A name=03.cpp_54></A><SPAN class=line>   54 </SPAN>
+<A name=03.cpp_55></A><SPAN class=line>   55 </SPAN><SPAN class=kwb>void</SPAN> MyDialog<SPAN class=sym>::</SPAN><SPAN class=kwd>resizeEvent</SPAN><SPAN class=sym>(</SPAN>QResizeEvent<SPAN class=sym>*</SPAN> <SPAN class=com>/* event */</SPAN> <SPAN class=sym>) {</SPAN>
+<A name=03.cpp_56></A><SPAN class=line>   56 </SPAN>    <SPAN class=kwb>int</SPAN> dw <SPAN class=sym>=</SPAN> <SPAN class=kwd>width</SPAN><SPAN class=sym>() -</SPAN> <SPAN class=kwd>minimumWidth</SPAN><SPAN class=sym>();</SPAN>
+<A name=03.cpp_57></A><SPAN class=line>   57 </SPAN>    <SPAN class=kwb>int</SPAN> dh <SPAN class=sym>=</SPAN> <SPAN class=kwd>height</SPAN><SPAN class=sym>() -</SPAN> <SPAN class=kwd>minimumHeight</SPAN><SPAN class=sym>();</SPAN>
+<A name=03.cpp_58></A><SPAN class=line>   58 </SPAN>
+<A name=03.cpp_59></A><SPAN class=line>   59 </SPAN>    lb<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setGeometry</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>5</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>6</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>45</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>24</SPAN><SPAN class=sym>);</SPAN>
+<A name=03.cpp_60></A><SPAN class=line>   60 </SPAN>    le<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setGeometry</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>55</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>6</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>100</SPAN><SPAN class=sym>+</SPAN>dw<SPAN class=sym>,</SPAN> <SPAN class=num>24</SPAN><SPAN class=sym>);</SPAN>
+<A name=03.cpp_61></A><SPAN class=line>   61 </SPAN>
+<A name=03.cpp_62></A><SPAN class=line>   62 </SPAN>    cb<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setGeometry</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>5</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>36</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>80</SPAN><SPAN class=sym>+</SPAN>dw<SPAN class=sym>*</SPAN><SPAN class=num>2</SPAN><SPAN class=sym>/</SPAN><SPAN class=num>3</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>24</SPAN><SPAN class=sym>);</SPAN>
+<A name=03.cpp_63></A><SPAN class=line>   63 </SPAN>    sb<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setGeometry</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>95</SPAN><SPAN class=sym>+</SPAN>dw<SPAN class=sym>*</SPAN><SPAN class=num>2</SPAN><SPAN class=sym>/</SPAN><SPAN class=num>3</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>36</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>60</SPAN><SPAN class=sym>+</SPAN>dw<SPAN class=sym>/</SPAN><SPAN class=num>3</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>24</SPAN><SPAN class=sym>);</SPAN>
+<A name=03.cpp_64></A><SPAN class=line>   64 </SPAN>
+<A name=03.cpp_65></A><SPAN class=line>   65 </SPAN>    chb<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setGeometry</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>5</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>65</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>70</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>24</SPAN><SPAN class=sym>);</SPAN>
+<A name=03.cpp_66></A><SPAN class=line>   66 </SPAN>    dsb<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setGeometry</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>95</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>65</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>60</SPAN><SPAN class=sym>+</SPAN>dw<SPAN class=sym>,</SPAN> <SPAN class=num>24</SPAN><SPAN class=sym>);</SPAN>
+<A name=03.cpp_67></A><SPAN class=line>   67 </SPAN>
+<A name=03.cpp_68></A><SPAN class=line>   68 </SPAN>    dte<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setGeometry</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>5</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>95</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>150</SPAN><SPAN class=sym>+</SPAN>dw<SPAN class=sym>,</SPAN> <SPAN class=num>24</SPAN><SPAN class=sym>);</SPAN>
+<A name=03.cpp_69></A><SPAN class=line>   69 </SPAN>
+<A name=03.cpp_70></A><SPAN class=line>   70 </SPAN>    gb<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setGeometry</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>5</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>120</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>150</SPAN><SPAN class=sym>+</SPAN>dw<SPAN class=sym>,</SPAN> <SPAN class=num>40</SPAN><SPAN class=sym>);</SPAN>
+<A name=03.cpp_71></A><SPAN class=line>   71 </SPAN>    rb1<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setGeometry</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>5</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>15</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>45</SPAN><SPAN class=sym>+</SPAN>dw<SPAN class=sym>/</SPAN><SPAN class=num>3</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>24</SPAN><SPAN class=sym>);</SPAN>
+<A name=03.cpp_72></A><SPAN class=line>   72 </SPAN>    rb2<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setGeometry</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>55</SPAN><SPAN class=sym>+</SPAN>dw<SPAN class=sym>/</SPAN><SPAN class=num>3</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>15</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>45</SPAN><SPAN class=sym>+</SPAN>dw<SPAN class=sym>/</SPAN><SPAN class=num>3</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>24</SPAN><SPAN class=sym>);</SPAN>
+<A name=03.cpp_73></A><SPAN class=line>   73 </SPAN>    rb3<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setGeometry</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>105</SPAN><SPAN class=sym>+</SPAN>dw<SPAN class=sym>*</SPAN><SPAN class=num>2</SPAN><SPAN class=sym>/</SPAN><SPAN class=num>3</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>15</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>45</SPAN><SPAN class=sym>+</SPAN>dw<SPAN class=sym>/</SPAN><SPAN class=num>3</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>24</SPAN><SPAN class=sym>);</SPAN>
+<A name=03.cpp_74></A><SPAN class=line>   74 </SPAN>
+<A name=03.cpp_75></A><SPAN class=line>   75 </SPAN>    btn1<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setGeometry</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>5</SPAN><SPAN class=sym>+</SPAN>dw<SPAN class=sym>/</SPAN><SPAN class=num>4</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>170</SPAN><SPAN class=sym>+</SPAN>dh<SPAN class=sym>,</SPAN> <SPAN class=num>70</SPAN><SPAN class=sym>+</SPAN>dw<SPAN class=sym>/</SPAN><SPAN class=num>4</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>29</SPAN><SPAN class=sym>);</SPAN>
+<A name=03.cpp_76></A><SPAN class=line>   76 </SPAN>    btn2<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setGeometry</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>85</SPAN><SPAN class=sym>+</SPAN>dw<SPAN class=sym>/</SPAN><SPAN class=num>2</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>170</SPAN><SPAN class=sym>+</SPAN>dh<SPAN class=sym>,</SPAN> <SPAN class=num>70</SPAN><SPAN class=sym>+</SPAN>dw<SPAN class=sym>/</SPAN><SPAN class=num>4</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>29</SPAN><SPAN class=sym>);</SPAN>
+<A name=03.cpp_77></A><SPAN class=line>   77 </SPAN><SPAN class=sym>}</SPAN>
+<A name=03.cpp_78></A><SPAN class=line>   78 </SPAN>
+<A name=03.cpp_79></A><SPAN class=line>   79 </SPAN><SPAN class=kwb>int</SPAN> <SPAN class=kwd>main</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwb>int</SPAN> argc<SPAN class=sym>,</SPAN> <SPAN class=kwb>char</SPAN> <SPAN class=sym>*</SPAN>argv<SPAN class=sym>[]) {</SPAN>
+<A name=03.cpp_80></A><SPAN class=line>   80 </SPAN>
+<A name=03.cpp_81></A><SPAN class=line>   81 </SPAN>    QApplication <SPAN class=kwd>app</SPAN><SPAN class=sym>(</SPAN>argc<SPAN class=sym>,</SPAN> argv<SPAN class=sym>);</SPAN>
+<A name=03.cpp_82></A><SPAN class=line>   82 </SPAN>
+<A name=03.cpp_83></A><SPAN class=line>   83 </SPAN>    MyDialog <SPAN class=sym>*</SPAN>dlg <SPAN class=sym>=</SPAN> <SPAN class=kwa>new</SPAN> <SPAN class=kwd>MyDialog</SPAN><SPAN class=sym>();</SPAN>
+<A name=03.cpp_84></A><SPAN class=line>   84 </SPAN>    dlg<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>show</SPAN><SPAN class=sym>();</SPAN>
+<A name=03.cpp_85></A><SPAN class=line>   85 </SPAN>
+<A name=03.cpp_86></A><SPAN class=line>   86 </SPAN>    <SPAN class=kwa>return</SPAN> app<SPAN class=sym>.</SPAN><SPAN class=kwd>exec</SPAN><SPAN class=sym>();</SPAN>
+<A name=03.cpp_87></A><SPAN class=line>   87 </SPAN><SPAN class=sym>}</SPAN>
+</PRE>
+<UL>
+  <LI>(7-8) Кодек и установка кодировки. 
+  <LI>(10) Текстовая метка. Второй параметр конструктора (указатель на 
+  родительский элемент) можно опустить. 
+  <LI>(12) Однострочное поле ввода. То же самое замечание относительно параметра 
+  <CODE>this</CODE>. 
+  <LI>(14-20) Поле ввода с раскрывающимся списком. Текущим сделан второй, считая 
+  с нуля, te последний элемент списка. Вызов&nbsp;(19) разрешает вводить в поле 
+  любые строковые значения, независимо от того, имеются ли они в списке выбора. 
+  В&nbsp;(20) указано, что новые значения, введённые пользователем, будут 
+  автоматически дописываться в конец списка. 
+  <LI>(22-23) Целочисленное поле ввода с кнопками инкремента/декремента. 
+  <LI>(25-26) Независимый переключатель с двумя состояниями. 
+  <LI>(28-32)Поле для ввода вещественного значения с кнопками 
+  инкремента/декремета. В&nbsp;(29) установлено максимальное допустимое 
+  значение, в&nbsp;(30)&nbsp;-- количество десятичных цифр в дробной части, а 
+  в&nbsp;(31)&nbsp;-- величина приращения при нажатии кнопки. 
+  <LI>(34-36) Поле для ввода даты и времени. Заданы год, месяц, число, часы, 
+  минуты, секунды и миллисекунды. 
+  <LI>(38) Рамка с надписью вокруг группы элементов. 
+  <LI>(40,42,44) Три зависимых переключателя (радиокнопки) с текстовыми метками. 
+
+  <LI>(46) Установлен второй переключатель, остальные автоматически выключены. 
+  <LI>(48,50) Две кнопки. 
+  <LI>(52) Заданы минимально возможные размеры окна диалога. Если вместо 
+  <CODE>setMinimumSize</CODE> использовать метод <CODE>setFixedSize</CODE>, то 
+  пользователь не сможет изменить ни ширину, ни высоту окна. 
+  <LI>(55) Виртуальный метод, автоматически вызываемый при изменении размеров 
+  окна. 
+  <LI>(56,57) Вычисление приращения ширины и высоты окна относительно их 
+  минимально разрешённых значений. 
+  <LI>(59) Положение и размеры текстовой метки фиксированы. 
+  <LI>(60) Положение однострочного поля ввода не изменяется, а ширина 
+  увеличивается на то же значение, что и ширина всего окна. В результате правый 
+  край элемента зафиксирован относительно правой границы окна. 
+  <LI>(62-63) Ширина поля ввода со списком выбора увеличивается в два раза 
+  быстрее, чем ширина поля для ввода целого значения. 
+  <LI>(65) Позиция и размеры независимого переключателя фиксированы. 
+  <LI>(66, 68, 70) Ширина полей для ввода вещественного значения и для ввода 
+  даты/времени, а также ширина рамки вокруг группы элементов увеличивается на то 
+  же значение, что и ширина всего окна. 
+  <LI>(71-73) Ширина текстовых меток зависимых переключателей растёт одинаково, 
+  на 1/3 от прироста ширины всего окна. 
+  <LI>(75-76) Кнопки в нижней части диалога увеличиваются по ширине, а 
+  расстояние от них до нижней границы окна остаётся неизменным. </LI></UL>
+<P align=center><IMG src="Images/qt03_2.png"> <BR>Рис. Внешний вид окна и 
+элементов управления в системе Windows при запуске программы с 
+параметром<BR><CODE>-style=Windows</CODE>, <CODE>WindowsXP</CODE>, 
+<CODE>Motif</CODE>, <CODE>CDE</CODE>, <CODE>Plastique</CODE> и 
+<CODE>Cleanlooks</CODE> 
+<P>На рис. показано, как изменяется внешний вид элементов диалога, если при 
+запуске программы, текст которой приведён в листингах 8 и 9, указать в командной 
+строке параметр <CODE>-style=ИмяСтиля</CODE>. Обратите внимание, что при одних и 
+тех же размерах окна, устанавливаемых сразу после запуска программы, в режиме 
+WindowsXP текстовая метка "Один" оказалась обрезанной на последней букве, а для 
+стиля Motif высота всех полей ввода и ширина кнопок оказалась на грани 
+критической: текстовые надписи еле "влазят" в отведённые для них границы из-за 
+увеличенной толщины декоративных элементов. В системе Linux, где размер шрифта 
+по умолчанию выбирается обычно больше, чем в Windows (из-за традиционно худшего 
+качества отображения шрифтов), это различие компоновки элементов диалога для 
+различных стилей ещё более заметно. 
+<H3>Менеджеры размещения</H3>В Qt имеются классы <CODE>QHBoxLayout</CODE>, 
+<CODE>QVBoxLayout</CODE> и <CODE>QGridLayout</CODE>, которые специально 
+предназначены для управления положением и размерами элементов в окне. Первый 
+позволяет располагать элементы друг за другом по горизонтали, второй&nbsp;-- по 
+вертикали, а третий размещает виджеты в ячейках воображаемой таблицы, причём 
+каждый элемент может занимать несколько смежных ячеек по вертикали и/или 
+горизонтали. 
+<P>В листинге 10 показаны строки, которые потребуется дописать к тексту 
+конструктора диалога (см.&nbsp;листинг&nbsp;9), если мы захотим использовать 
+менеджеры размещения. Здесь все элементы располагаются в сетке 
+<CODE>QGridLayout</CODE>, а для зависимых переключателей и кнопок создаются 
+отдельные менеджеры <CODE>QHBoxLayout</CODE>. Разумеется, метод 
+<CODE>resizeEvent</CODE> теперь не нужен. 
+<P><B>Листинг 10. Менеджеры размещения (файл 
+<CODE>examples-qt/04/04.cpp</CODE>)</B> <PRE class=hl><SPAN class=line>          // Создаём менеджер размещения:</SPAN>
+<A name=04.cpp_52></A><SPAN class=line>   52 </SPAN>    QGridLayout <SPAN class=sym>*</SPAN>mainlay <SPAN class=sym>=</SPAN> <SPAN class=kwa>new</SPAN> <SPAN class=kwd>QGridLayout</SPAN><SPAN class=sym>();</SPAN>
+<SPAN class=line>          </SPAN>
+<SPAN class=line>          // Размер полей вокруг сетки элементов и</SPAN>
+<SPAN class=line>          // интервалы между ячейками сетки:</SPAN>
+<A name=04.cpp_53></A><SPAN class=line>   53 </SPAN>    mainlay<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setMargin</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>2</SPAN><SPAN class=sym>);</SPAN>
+<A name=04.cpp_54></A><SPAN class=line>   54 </SPAN>    mainlay<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setSpacing</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>3</SPAN><SPAN class=sym>);</SPAN>
+<A name=04.cpp_55></A><SPAN class=line>   55 </SPAN>
+<SPAN class=line>          // Размещаем элементы:</SPAN>
+<A name=04.cpp_56></A><SPAN class=line>   56 </SPAN>    mainlay<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>addWidget</SPAN><SPAN class=sym>(</SPAN>lb<SPAN class=sym>,</SPAN> <SPAN class=num>0</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>0</SPAN><SPAN class=sym>);</SPAN>
+<A name=04.cpp_57></A><SPAN class=line>   57 </SPAN>    mainlay<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>addWidget</SPAN><SPAN class=sym>(</SPAN>le<SPAN class=sym>,</SPAN> <SPAN class=num>0</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>1</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>1</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>2</SPAN><SPAN class=sym>);</SPAN>
+<A name=04.cpp_58></A><SPAN class=line>   58 </SPAN>
+<A name=04.cpp_59></A><SPAN class=line>   59 </SPAN>    mainlay<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>addWidget</SPAN><SPAN class=sym>(</SPAN>cb<SPAN class=sym>,</SPAN> <SPAN class=num>1</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>0</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>1</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>2</SPAN><SPAN class=sym>);</SPAN>
+<A name=04.cpp_60></A><SPAN class=line>   60 </SPAN>    mainlay<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>addWidget</SPAN><SPAN class=sym>(</SPAN>sb<SPAN class=sym>,</SPAN> <SPAN class=num>1</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>2</SPAN><SPAN class=sym>);</SPAN>
+<A name=04.cpp_61></A><SPAN class=line>   61 </SPAN>
+<A name=04.cpp_62></A><SPAN class=line>   62 </SPAN>    mainlay<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>addWidget</SPAN><SPAN class=sym>(</SPAN>chb<SPAN class=sym>,</SPAN> <SPAN class=num>2</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>0</SPAN><SPAN class=sym>);</SPAN>
+<A name=04.cpp_63></A><SPAN class=line>   63 </SPAN>    mainlay<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>addWidget</SPAN><SPAN class=sym>(</SPAN>dsb<SPAN class=sym>,</SPAN> <SPAN class=num>2</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>1</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>1</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>2</SPAN><SPAN class=sym>);</SPAN>
+<A name=04.cpp_64></A><SPAN class=line>   64 </SPAN>
+<A name=04.cpp_65></A><SPAN class=line>   65 </SPAN>    mainlay<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>addWidget</SPAN><SPAN class=sym>(</SPAN>dte<SPAN class=sym>,</SPAN> <SPAN class=num>3</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>0</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>1</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>3</SPAN><SPAN class=sym>);</SPAN>
+<A name=04.cpp_66></A><SPAN class=line>   66 </SPAN>
+<SPAN class=line>          // Менеджер размещения для радиокнопок:</SPAN>
+<A name=04.cpp_67></A><SPAN class=line>   67 </SPAN>    QHBoxLayout <SPAN class=sym>*</SPAN>hbl <SPAN class=sym>=</SPAN> <SPAN class=kwa>new</SPAN> <SPAN class=kwd>QHBoxLayout</SPAN><SPAN class=sym>();</SPAN>
+<A name=04.cpp_68></A><SPAN class=line>   68 </SPAN>    hbl<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>addWidget</SPAN><SPAN class=sym>(</SPAN>rb1<SPAN class=sym>,</SPAN> <SPAN class=num>1</SPAN><SPAN class=sym>);</SPAN>
+<A name=04.cpp_69></A><SPAN class=line>   69 </SPAN>    hbl<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>addWidget</SPAN><SPAN class=sym>(</SPAN>rb2<SPAN class=sym>,</SPAN> <SPAN class=num>1</SPAN><SPAN class=sym>);</SPAN>
+<A name=04.cpp_70></A><SPAN class=line>   70 </SPAN>    hbl<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>addWidget</SPAN><SPAN class=sym>(</SPAN>rb3<SPAN class=sym>,</SPAN> <SPAN class=num>1</SPAN><SPAN class=sym>);</SPAN>
+<A name=04.cpp_71></A><SPAN class=line>   71 </SPAN>    gb<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setLayout</SPAN><SPAN class=sym>(</SPAN>hbl<SPAN class=sym>);</SPAN>
+<A name=04.cpp_72></A><SPAN class=line>   72 </SPAN>    mainlay<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>addWidget</SPAN><SPAN class=sym>(</SPAN>gb<SPAN class=sym>,</SPAN> <SPAN class=num>4</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>0</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>1</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>3</SPAN><SPAN class=sym>);</SPAN>
+<A name=04.cpp_73></A><SPAN class=line>   73 </SPAN>
+<SPAN class=line>          // Менеджер размещения для кнопок диалога:</SPAN>
+<A name=04.cpp_74></A><SPAN class=line>   74 </SPAN>    QHBoxLayout <SPAN class=sym>*</SPAN>btns <SPAN class=sym>=</SPAN> <SPAN class=kwa>new</SPAN> <SPAN class=kwd>QHBoxLayout</SPAN><SPAN class=sym>();</SPAN>
+<A name=04.cpp_75></A><SPAN class=line>   75 </SPAN>    btns<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>addStretch</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>1</SPAN><SPAN class=sym>);</SPAN>
+<A name=04.cpp_76></A><SPAN class=line>   76 </SPAN>    btns<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>addWidget</SPAN><SPAN class=sym>(</SPAN>btn1<SPAN class=sym>,</SPAN> <SPAN class=num>2</SPAN><SPAN class=sym>);</SPAN>
+<A name=04.cpp_77></A><SPAN class=line>   77 </SPAN>    btns<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>addWidget</SPAN><SPAN class=sym>(</SPAN>btn2<SPAN class=sym>,</SPAN> <SPAN class=num>2</SPAN><SPAN class=sym>);</SPAN>
+<A name=04.cpp_78></A><SPAN class=line>   78 </SPAN>    btns<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>addStretch</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>1</SPAN><SPAN class=sym>);</SPAN>
+<A name=04.cpp_79></A><SPAN class=line>   79 </SPAN>    mainlay<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>addLayout</SPAN><SPAN class=sym>(</SPAN>btns<SPAN class=sym>,</SPAN> <SPAN class=num>6</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>0</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>1</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>3</SPAN><SPAN class=sym>);</SPAN>
+<A name=04.cpp_80></A><SPAN class=line>   80 </SPAN>
+<SPAN class=line>          // Растяжимость колонок и строк:</SPAN>
+<A name=04.cpp_81></A><SPAN class=line>   81 </SPAN>    mainlay<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setColumnStretch</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>1</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>1</SPAN><SPAN class=sym>);</SPAN>
+<A name=04.cpp_82></A><SPAN class=line>   82 </SPAN>    mainlay<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setColumnStretch</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>2</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>1</SPAN><SPAN class=sym>);</SPAN>
+<A name=04.cpp_83></A><SPAN class=line>   83 </SPAN>    mainlay<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setRowStretch</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>5</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>1</SPAN><SPAN class=sym>);</SPAN>
+<SPAN class=line>    </SPAN>
+<A name=04.cpp_84></A><SPAN class=line>   84 </SPAN>    <SPAN class=kwd>setLayout</SPAN><SPAN class=sym>(</SPAN>mainlay<SPAN class=sym>);</SPAN>
+<A name=04.cpp_85></A><SPAN class=line>   85 </SPAN><SPAN class=sym>} </SPAN>
+</PRE>
+<P>Для вставки любого виджета в нужную ячейку <CODE>QGridLayout</CODE> 
+предназначен метод <CODE>addWidget</CODE>, при вызове которого указываются номер 
+строки и столбца (нумерация начинается с нуля), а также, если требуется, 
+количество соседних строк и столбцов, которые будет занимать элемент. 
+Растяжимостью строк и столбцов сетки управляют методы <CODE>setRowStretch</CODE> 
+и <CODE>setColumnStretch</CODE>, первый параметр которых указывает номер строки 
+(столбца), а второй&nbsp;-- коэффициент растяжения. Чем он больше, тем сильнее 
+будет растягиваться/сжиматься данная строка по вертикали (или столбец по 
+горизонтали) по сравнению с остальными строками (столбцами) при изменении 
+размеров всего окна. 
+<P>Разумеется, в данном случае можно предложить и другие варианты, например, на 
+внешнем уровне использовать <CODE>QVBoxLayout</CODE> и заполнять его менеджерами 
+<CODE>QHBoxLayout</CODE>, в которые вставлять элементы каждой горизонтальной 
+строки диалога, подобно тому, как это сделано с радиокнопками в нашем примере. 
+<P>Если нас не удовлетворяет то, как ведут себя какие-либо элементы диалога при 
+изменении размеров окна, то можно попытаться вызвать для них метод 
+<CODE>setSizePolicy</CODE>, первый параметр которого задаёт политику изменения 
+ширины элемента, а второй&nbsp;-- его высоты. Каждый параметр может принимать 
+одно из значений: 
+<UL>
+  <LI><CODE>QSizePolicy::Fixed</CODE>&nbsp;-- размер элемента в данном 
+  направлении не изменяется; 
+  <LI><CODE>QSizePolicy::Minimum</CODE>&nbsp;-- "идеальным" размером элемента 
+  считается его минимальный размер. Элемент может растягиваться, но не может 
+  сжиматься; 
+  <LI><CODE>QSizePolicy::Maximum</CODE>&nbsp;-- "идеальным" размером элемента 
+  считается его максимальный размер. Элемент может сжиматься, но не может 
+  растягиваться; 
+  <LI><CODE>QSizePolicy::Preferred</CODE>&nbsp;-- элемент "старается" 
+  поддерживать некоторый предпочтительный для него размер, но при необходимости 
+  может растянуться или сжаться; 
+  <LI><CODE>QSizePolicy::Expanding</CODE>&nbsp;-- элемент "старается" принять 
+  максимально возможный доступный ему размер, но при необходимости может и 
+  сжиматься. </LI></UL>
+  <a href="qt005.htm">Назад</a> <a href="title.htm">Содержание</a> <a href="qt007.htm">Вперед</a>
+  </BODY></HTML>

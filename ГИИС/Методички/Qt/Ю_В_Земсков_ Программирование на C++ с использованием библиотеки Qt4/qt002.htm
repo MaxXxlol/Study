@@ -1,0 +1,214 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0041)http://www.mechta34.com/it/qt4/qt002.html -->
+<HTML><HEAD><TITLE>Ю.В.Земсков. Программирование на C++ с использованием библиотеки Qt4</TITLE>
+<META http-equiv=Content-Type content="text/html; charset=windows-1251"><LINK 
+href="Images/s1.css" type=text/css rel=stylesheet>
+<META content="MSHTML 6.00.2900.2180" name=GENERATOR></HEAD>
+<BODY>
+<a href="qt001.htm">Назад</a> <a href="title.htm">Содержание</a> <a href="qt003.htm">Вперед</a>
+<H2>Простейшее приложение Qt4</H2>Попробуем создать пустое окно и вывести его на 
+экран. 
+<H4>Листинг 1. Простейшее приложение Qt (файл 
+<TT>examples-qt/00/00.cpp</TT>)</H4><PRE class=hl><A name=00.cpp_1></A><SPAN class=line>    1 </SPAN><SPAN class=slc>// Простейшее приложение Qt4 (пустое окно)</SPAN>
+<A name=00.cpp_2></A><SPAN class=line>    2 </SPAN>
+<A name=00.cpp_3>    </A><A class=line href="http://www.mechta34.com/it/qt4/qt002.html#00.cpp_3_">3</A> <SPAN class=dir>#include &lt;QApplication&gt;</SPAN>
+<A name=00.cpp_4>    </A><A class=line href="http://www.mechta34.com/it/qt4/qt002.html#00.cpp_4_">4</A> <SPAN class=dir>#include &lt;QMainWindow&gt;</SPAN>
+<A name=00.cpp_5></A><SPAN class=line>    5 </SPAN>
+<A name=00.cpp_6>    </A><A class=line href="http://www.mechta34.com/it/qt4/qt002.html#00.cpp_6_">6</A> <SPAN class=kwb>int</SPAN> <SPAN class=kwd>main</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwb>int</SPAN> argc<SPAN class=sym>,</SPAN> <SPAN class=kwb>char</SPAN> <SPAN class=sym>*</SPAN>argv<SPAN class=sym>[]) {</SPAN>
+<A name=00.cpp_7></A><SPAN class=line>    7 </SPAN>
+<A name=00.cpp_8>    </A><A class=line href="http://www.mechta34.com/it/qt4/qt002.html#00.cpp_8_">8</A>     QApplication <SPAN class=kwd>app</SPAN><SPAN class=sym>(</SPAN>argc<SPAN class=sym>,</SPAN> argv<SPAN class=sym>);</SPAN>
+<A name=00.cpp_9></A><SPAN class=line>    9 </SPAN>
+<A name=00.cpp_10>   </A><A class=line href="http://www.mechta34.com/it/qt4/qt002.html#00.cpp_10_">10</A>     QMainWindow <SPAN class=sym>*</SPAN>mw <SPAN class=sym>=</SPAN> <SPAN class=kwa>new</SPAN> <SPAN class=kwd>QMainWindow</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>0</SPAN><SPAN class=sym>,</SPAN> Qt<SPAN class=sym>::</SPAN>Window<SPAN class=sym>);</SPAN>
+<A name=00.cpp_11>   </A><A class=line href="http://www.mechta34.com/it/qt4/qt002.html#00.cpp_11_">11</A>     mw<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setWindowTitle</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Hello Qt4"</SPAN><SPAN class=sym>);</SPAN>
+<A name=00.cpp_12>   </A><A class=line href="http://www.mechta34.com/it/qt4/qt002.html#00.cpp_12_">12</A>     mw<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>resize</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>400</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>300</SPAN><SPAN class=sym>);</SPAN>
+<A name=00.cpp_13>   </A><A class=line href="http://www.mechta34.com/it/qt4/qt002.html#00.cpp_13_">13</A>     mw<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>show</SPAN><SPAN class=sym>();</SPAN>
+<A name=00.cpp_14></A><SPAN class=line>   14 </SPAN>
+<A name=00.cpp_15>   </A><A class=line href="http://www.mechta34.com/it/qt4/qt002.html#00.cpp_15_">15</A>     <SPAN class=kwa>return</SPAN> app<SPAN class=sym>.</SPAN><SPAN class=kwd>exec</SPAN><SPAN class=sym>();</SPAN>
+<A name=00.cpp_16></A><SPAN class=line>   16 </SPAN><SPAN class=sym>}</SPAN>
+</PRE>Пояснения к программе: 
+<UL>
+  <LI><A href="http://www.mechta34.com/it/qt4/qt002.html#00.cpp_3">(3-4)</A><A 
+  name=00.cpp_3_></A><A name=00.cpp_4_></A> Подключили заголовочные файлы с 
+  определениями классов <CODE>QApplication</CODE> (приложение) и 
+  <CODE>QMainWindow</CODE> (главное окно). 
+  <LI><A href="http://www.mechta34.com/it/qt4/qt002.html#00.cpp_6">(6)</A><A 
+  name=00.cpp_6_></A> Обычный для C++ заголовок главной функции 
+  <CODE>main</CODE> с аргументами командной строки. 
+  <LI><A href="http://www.mechta34.com/it/qt4/qt002.html#00.cpp_8">(8)</A><A 
+  name=00.cpp_8_></A> Объявили переменную типа <CODE>QApplication</CODE> 
+  (приложение), передав конструктору параметры командной строки, которые, 
+  возможно, указаны при запуске программы (<CODE>argc</CODE> -- число 
+  параметров, <CODE>argv</CODE> -- указатель на массив строковых значений). 
+  <LI><A href="http://www.mechta34.com/it/qt4/qt002.html#00.cpp_10">(10)</A><A 
+  name=00.cpp_10_></A> Создали главное окно приложения. Первый параметр 
+  конструктора указывает на родительский элемент (в данном случае 0 -- окно не 
+  имеет родителя), а второй -- набор битовых флагов, влияющих на внешний вид 
+  окна (флаг <CODE>Qt::Windows</CODE> означает, что элемент будет выглядеть, как 
+  окно приложения, т.е. будет иметь строку заголовка с системными кнопками для 
+  сворачивания на панель задач, закрытия и т.д.). 
+  <LI><A href="http://www.mechta34.com/it/qt4/qt002.html#00.cpp_11">(11)</A><A 
+  name=00.cpp_11_></A> Задали текст заголовка окна (пока мы избегаем 
+  использовать символы кириллицы, этому вопросу будет посвящены следующие 
+  примеры). 
+  <LI><A href="http://www.mechta34.com/it/qt4/qt002.html#00.cpp_12">(12)</A><A 
+  name=00.cpp_12_></A> Определили размеры окна (ширину и высоту) в пикселах. 
+  <LI><A href="http://www.mechta34.com/it/qt4/qt002.html#00.cpp_13">(13)</A><A 
+  name=00.cpp_13_></A> Вывели окно на экран. 
+  <LI><A href="http://www.mechta34.com/it/qt4/qt002.html#00.cpp_15">(15)</A><A 
+  name=00.cpp_15_></A> Запустили цикл обработки событий, происходящих с 
+  элементами приложения. Пока в нашей программе никакие события не определены, 
+  кроме стандартных реакций на действия пользователя (изменение размеров и 
+  положения окна, нажатие кнопок в строке заголовка). </LI></UL>
+<P align=center><IMG src="Images/qt00.png" width=220> 
+<P>Перед компиляцией программы надо сначала создать проект Qt (файл с 
+расширением <TT>.pro</TT>), для этого требуется войти в тот каталог, в котором 
+находится cpp-файл с исходным текстом, и запустить утилиту <B>qmake</B> с 
+параметром <CODE>-project</CODE>. Имя cpp-файла можно не указывать. По умолчанию 
+имя файла проекта будет совпадать с названием каталога, в котором происходит 
+сборка программы. Для задания другого имени pro-файла при вызове <B>qmake</B> 
+надо указать параметр <CODE>-o</CODE>. Например, для нашего первого проекта 
+будет создан файл <B>00.pro</B> следующего содержания: <PRE>TEMPLATE = app
+TARGET = 00
+DEPENDPATH += .
+INCLUDEPATH += .
+
+# Input
+SOURCES += 00.cpp
+</PRE>После создания pro-файла можно сгенерировать make-файл, для чего 
+достаточно запустить утилиту <B>qmake</B> ещё раз, но уже без указания 
+каких-либо ключей (или задать параметр 
+<CODE>-makefile&nbsp;ФайлПроекта.pro</CODE>). Только после этого можно начинать 
+компиляцию с помощью обычной команды <B>mingw32-make</B> (в случае использования 
+компилятора MinGW), <B>nmake</B> (для Microsoft~C++), <B>make</B> (для g++ в 
+Linux) и т.п. При этом можно явно указать имя make-файла, для этого все 
+перечисленные компиляторы распознают ключ <CODE>-f</CODE>. Поскольку в процессе 
+разработки программу приходится много раз перекомпилировать, вышеописанный 
+процесс лучше всего проводить с помощью командного файла <B>build.cmd</B>. 
+Например, в системе Windows: <PRE>1  qmake -project -o 00.pro 00.cpp
+2  qmake -makefile 00.pro
+3
+4  rem mingw32-make -f Makefile.Debug
+5  mingw32-make -f Makefile.Release
+6
+7  pause
+</PRE>
+<UL>
+  <LI>(1) Создаём файл <B>00.pro</B>. 
+  <LI>(2) Создаём make-файл. 
+  <LI>(4) Выполняем компиляцию в режиме Debug, т.е. с информацией для отладчика 
+  (в данном случае строка закомментирована). 
+  <LI>(5) Повторяем компиляцию в режиме Release (без возможности отладки на 
+  уровне исходного текста программы). 
+  <LI>(7) Ждём нажатия любой клавиши (чтобы окно не закрылось раньше времени и 
+  мы успели прочитать все сообщения компилятора). </LI></UL>
+<P>Теперь, как и обещали, обсудим вопрос о символах кириллицы. Библиотека Qt 
+предлагает несколько решений для национальных алфавитов, отличных от стандартной 
+латиницы. Первый вариант -- использовать функцию 
+<CODE>QString::fromLocal8Bit</CODE>. Дело в том, что для работы со строковыми 
+значениями в Qt имеется класс <CODE>QString</CODE>, который оперирует 
+двухбайтными символами Unicode. Для преобразования обычных строк с однобайтными 
+символами к типу <CODE>QString</CODE> как раз и предназначен метод 
+<CODE>fromLocal8Bit</CODE>. При этом используется системная кодировка (в Windows 
+--- cp1251, в Linux -- обычно koi8-r). 
+<P>Недостаток данного варианта заключается в том, что если программа, например, 
+разрабатывалась в системе Windows, а затем мы захотели скомпилировать её 
+исходные тексты в Linux, где используется другая кодовая таблица для символов 
+кириллицы, то предварительно придётся осуществить перекодировку исходных 
+текстов, иначе после компиляции все русские сообщения окажутся нечитаемыми. 
+<P>Изменённый текст нашей первой программы приведён в листинге&nbsp;2, а внешний 
+вид окна в системе Linux для двух разных тем рабочего стола показан на рис. 
+<H4>Листинг 2</H4><PRE class=hl><A name=00rus.cpp_1></A><SPAN class=line>    1 </SPAN><SPAN class=slc>// Простейшее приложение Qt4 (пустой фрейм)</SPAN>
+<A name=00rus.cpp_2></A><SPAN class=line>    2 </SPAN><SPAN class=slc>// Вариант с кириллицей в заголовке</SPAN>
+<A name=00rus.cpp_3></A><SPAN class=line>    3 </SPAN>
+<A name=00rus.cpp_4></A><SPAN class=line>    4 </SPAN><SPAN class=dir>#include &lt;QApplication&gt;</SPAN>
+<A name=00rus.cpp_5></A><SPAN class=line>    5 </SPAN><SPAN class=dir>#include &lt;QMainWindow&gt;</SPAN>
+<A name=00rus.cpp_6></A><SPAN class=line>    6 </SPAN>
+<A name=00rus.cpp_7></A><SPAN class=line>    7 </SPAN><SPAN class=kwb>int</SPAN> <SPAN class=kwd>main</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwb>int</SPAN> argc<SPAN class=sym>,</SPAN> <SPAN class=kwb>char</SPAN> <SPAN class=sym>*</SPAN>argv<SPAN class=sym>[]) {</SPAN>
+<A name=00rus.cpp_8></A><SPAN class=line>    8 </SPAN>
+<A name=00rus.cpp_9></A><SPAN class=line>    9 </SPAN>    QApplication <SPAN class=kwd>app</SPAN><SPAN class=sym>(</SPAN>argc<SPAN class=sym>,</SPAN> argv<SPAN class=sym>);</SPAN>
+<A name=00rus.cpp_10></A><SPAN class=line>   10 </SPAN>
+<A name=00rus.cpp_11></A><SPAN class=line>   11 </SPAN>    QMainWindow <SPAN class=sym>*</SPAN>mw <SPAN class=sym>=</SPAN> <SPAN class=kwa>new</SPAN> <SPAN class=kwd>QMainWindow</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>0</SPAN><SPAN class=sym>,</SPAN> Qt<SPAN class=sym>::</SPAN>Window<SPAN class=sym>);</SPAN>
+<A name=00rus.cpp_12></A><SPAN class=line>   12 </SPAN>    mw<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setWindowTitle</SPAN><SPAN class=sym>(</SPAN>QString<SPAN class=sym>::</SPAN><SPAN class=kwd>fromLocal8Bit</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Пустое окно Qt4"</SPAN><SPAN class=sym>));</SPAN>
+<A name=00rus.cpp_13></A><SPAN class=line>   13 </SPAN>    mw<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>resize</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>400</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>300</SPAN><SPAN class=sym>);</SPAN>
+<A name=00rus.cpp_14></A><SPAN class=line>   14 </SPAN>    mw<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>show</SPAN><SPAN class=sym>();</SPAN>
+<A name=00rus.cpp_15></A><SPAN class=line>   15 </SPAN>
+<A name=00rus.cpp_16></A><SPAN class=line>   16 </SPAN>    <SPAN class=kwa>return</SPAN> app<SPAN class=sym>.</SPAN><SPAN class=kwd>exec</SPAN><SPAN class=sym>();</SPAN>
+<A name=00rus.cpp_17></A><SPAN class=line>   17 </SPAN><SPAN class=sym>}</SPAN>
+</PRE>
+<P align=center><IMG title="Символы кириллицы в заголовке окна" 
+src="Images/qt00rus.png" name=fig:qt00rus> 
+<P>Второй вариант работы с символами кириллицы -- явное использование 
+<B>кодеков</B> (специальных объектов для перекодировки строк). Соответствующий 
+класс <CODE>QTextCodec</CODE> определён в заголовочном файле с тем же именем 
+(без расширения! Заголовочные файлы с расширением <CODE>.h</CODE> используются 
+только в старых проектах Qt3). При создании кодека надо указать название 
+используемой кодовой таблицы, например: <PRE>QTextCodec *codec = QTextCodec::codecForName("CP1251");
+</PRE>Затем надо связать этот кодек со всеми строками C++: <PRE>QTextCodec::setCodecForCStrings(codec);
+</PRE>Поскольку при создании кодека указана конкретная кодовая таблица, то исход 
+компиляции исходных текстов не зависит от системной кодировки той платформы, на 
+которой производится сборка программы: результат будет везде одним и тем же. Но 
+файлы с исходными текстами программ в этом случае нельзя подвергать 
+перекодировке (или после перекодировки требуется изменить название кодовой 
+таблицы, заданной при создании кодека). В листинге 3 приведён новый вариант 
+нашей программы. 
+<H4>Листинг 3</H4><PRE class=hl><A name=00rus.cpp_1></A><SPAN class=line>    1 </SPAN><SPAN class=slc>// Простейшее приложение Qt4 (пустой фрейм)</SPAN>
+<A name=00rus.cpp_2></A><SPAN class=line>    2 </SPAN><SPAN class=slc>// Кодеки</SPAN>
+<A name=00rus.cpp_3></A><SPAN class=line>    3 </SPAN>
+<A name=00rus.cpp_4></A><SPAN class=line>    4 </SPAN><SPAN class=dir>#include &lt;QApplication&gt;</SPAN>
+<A name=00rus.cpp_5></A><SPAN class=line>    5 </SPAN><SPAN class=dir>#include &lt;QMainWindow&gt;</SPAN>
+<A name=00rus.cpp_6></A><SPAN class=line>    6 </SPAN><SPAN class=dir>#include &lt;QTextCodec&gt;</SPAN>
+<A name=00rus.cpp_7></A><SPAN class=line>    7 </SPAN>
+<A name=00rus.cpp_8></A><SPAN class=line>    8 </SPAN><SPAN class=kwb>int</SPAN> <SPAN class=kwd>main</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwb>int</SPAN> argc<SPAN class=sym>,</SPAN> <SPAN class=kwb>char</SPAN> <SPAN class=sym>*</SPAN>argv<SPAN class=sym>[]) {</SPAN>
+<A name=00rus.cpp_9></A><SPAN class=line>    9 </SPAN>
+<A name=00rus.cpp_10></A><SPAN class=line>   10 </SPAN>    QApplication <SPAN class=kwd>app</SPAN><SPAN class=sym>(</SPAN>argc<SPAN class=sym>,</SPAN> argv<SPAN class=sym>);</SPAN>
+<A name=00rus.cpp_11></A><SPAN class=line>   11 </SPAN>
+<A name=00rus.cpp_12></A><SPAN class=line>   12 </SPAN>    QTextCodec <SPAN class=sym>*</SPAN>codec <SPAN class=sym>=</SPAN> QTextCodec<SPAN class=sym>::</SPAN><SPAN class=kwd>codecForName</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"CP1251"</SPAN><SPAN class=sym>);</SPAN>
+<A name=00rus.cpp_13></A><SPAN class=line>   13 </SPAN>    QTextCodec<SPAN class=sym>::</SPAN><SPAN class=kwd>setCodecForCStrings</SPAN><SPAN class=sym>(</SPAN>codec<SPAN class=sym>);</SPAN>
+<A name=00rus.cpp_14></A><SPAN class=line>   14 </SPAN>
+<A name=00rus.cpp_15></A><SPAN class=line>   15 </SPAN>    QMainWindow <SPAN class=sym>*</SPAN>mw <SPAN class=sym>=</SPAN> <SPAN class=kwa>new</SPAN> <SPAN class=kwd>QMainWindow</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>0</SPAN><SPAN class=sym>,</SPAN> Qt<SPAN class=sym>::</SPAN>Window<SPAN class=sym>);</SPAN>
+<A name=00rus.cpp_16></A><SPAN class=line>   16 </SPAN>    mw<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setWindowTitle</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Пустое окно Qt4"</SPAN><SPAN class=sym>);</SPAN>
+<A name=00rus.cpp_17></A><SPAN class=line>   17 </SPAN>    mw<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>resize</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>400</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>300</SPAN><SPAN class=sym>);</SPAN>
+<A name=00rus.cpp_18></A><SPAN class=line>   18 </SPAN>    mw<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>show</SPAN><SPAN class=sym>();</SPAN>
+<A name=00rus.cpp_19></A><SPAN class=line>   19 </SPAN>
+<A name=00rus.cpp_20></A><SPAN class=line>   20 </SPAN>    <SPAN class=kwa>return</SPAN> app<SPAN class=sym>.</SPAN><SPAN class=kwd>exec</SPAN><SPAN class=sym>();</SPAN>
+<A name=00rus.cpp_21></A><SPAN class=line>   21 </SPAN><SPAN class=sym>}</SPAN>
+</PRE>Наконец, третий (наиболее предпочтительный) метод работы с символами 
+национальных алфавитов связан с использованием специальной функции перевода 
+<CODE>tr</CODE>, с помощью которой осуществляется интернационализация 
+приложений. Подробнее этот вопрос мы обсудим позже, а пока договоримся все 
+строковые константы, указанные в тексте программы, передавать в качестве 
+параметра функции <CODE>tr</CODE>. Эта статическая функция является членом всех 
+классов Qt, порождённых от базового класса <CODE>QObject</CODE>, но если, как 
+сейчас, мы собираемся вызвать её в главной программе, а не в каком-либо методе 
+класса, то приходится указывать какой-нибудь подходящий объект, например, 
+<CODE>QObject::tr</CODE>. Для указания кодировки, используемой функцией 
+перевода, надо создать соответствующий кодек и передать его в качестве аргумента 
+методу <CODE>setCodecForTr</CODE>. Окончательный вариант нашей программы показан 
+в листинге&nbsp;4. 
+<H4>Листинг 4</H4>
+<PRE class=hl><A name=00rus.cpp_1></A><SPAN class=line>    1 </SPAN><SPAN class=slc>// Простейшее приложение Qt4 (пустой фрейм)</SPAN>
+<A name=00rus.cpp_2></A><SPAN class=line>    2 </SPAN><SPAN class=slc>// Кодеки и функция tr()</SPAN>
+<A name=00rus.cpp_3></A><SPAN class=line>    3 </SPAN>
+<A name=00rus.cpp_4></A><SPAN class=line>    4 </SPAN><SPAN class=dir>#include &lt;QApplication&gt;</SPAN>
+<A name=00rus.cpp_5></A><SPAN class=line>    5 </SPAN><SPAN class=dir>#include &lt;QMainWindow&gt;</SPAN>
+<A name=00rus.cpp_6></A><SPAN class=line>    6 </SPAN><SPAN class=dir>#include &lt;QTextCodec&gt;</SPAN>
+<A name=00rus.cpp_7></A><SPAN class=line>    7 </SPAN>
+<A name=00rus.cpp_8></A><SPAN class=line>    8 </SPAN><SPAN class=kwb>int</SPAN> <SPAN class=kwd>main</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwb>int</SPAN> argc<SPAN class=sym>,</SPAN> <SPAN class=kwb>char</SPAN> <SPAN class=sym>*</SPAN>argv<SPAN class=sym>[]) {</SPAN>
+<A name=00rus.cpp_9></A><SPAN class=line>    9 </SPAN>
+<A name=00rus.cpp_10></A><SPAN class=line>   10 </SPAN>    QApplication <SPAN class=kwd>app</SPAN><SPAN class=sym>(</SPAN>argc<SPAN class=sym>,</SPAN> argv<SPAN class=sym>);</SPAN>
+<A name=00rus.cpp_11></A><SPAN class=line>   11 </SPAN>
+<A name=00rus.cpp_12></A><SPAN class=line>   12 </SPAN>    QTextCodec <SPAN class=sym>*</SPAN>codec <SPAN class=sym>=</SPAN> QTextCodec<SPAN class=sym>::</SPAN><SPAN class=kwd>codecForName</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"CP1251"</SPAN><SPAN class=sym>);</SPAN>
+<A name=00rus.cpp_13></A><SPAN class=line>   13 </SPAN>    QTextCodec<SPAN class=sym>::</SPAN><SPAN class=kwd>setCodecForTr</SPAN><SPAN class=sym>(</SPAN>codec<SPAN class=sym>);</SPAN>
+<A name=00rus.cpp_14></A><SPAN class=line>   14 </SPAN>
+<A name=00rus.cpp_15></A><SPAN class=line>   15 </SPAN>    QMainWindow <SPAN class=sym>*</SPAN>mw <SPAN class=sym>=</SPAN> <SPAN class=kwa>new</SPAN> <SPAN class=kwd>QMainWindow</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>0</SPAN><SPAN class=sym>,</SPAN> Qt<SPAN class=sym>::</SPAN>Window<SPAN class=sym>);</SPAN>
+<A name=00rus.cpp_16></A><SPAN class=line>   16 </SPAN>    mw<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setWindowTitle</SPAN><SPAN class=sym>(</SPAN>QMainWindow<SPAN class=sym>::</SPAN><SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Пустое окно Qt4"</SPAN><SPAN class=sym>));</SPAN>
+<A name=00rus.cpp_17></A><SPAN class=line>   17 </SPAN>
+<A name=00rus.cpp_18></A><SPAN class=line>   18 </SPAN>    mw<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>resize</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>400</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>300</SPAN><SPAN class=sym>);</SPAN>
+<A name=00rus.cpp_19></A><SPAN class=line>   19 </SPAN>    mw<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>show</SPAN><SPAN class=sym>();</SPAN>
+<A name=00rus.cpp_20></A><SPAN class=line>   20 </SPAN>
+<A name=00rus.cpp_21></A><SPAN class=line>   21 </SPAN>    <SPAN class=kwa>return</SPAN> app<SPAN class=sym>.</SPAN><SPAN class=kwd>exec</SPAN><SPAN class=sym>();</SPAN>
+<A name=00rus.cpp_22></A><SPAN class=line>   22 </SPAN><SPAN class=sym>}</SPAN>
+
+
+</PRE>
+<a href="qt001.htm">Назад</a> <a href="title.htm">Содержание</a> <a href="qt003.htm">Вперед</a></BODY></HTML>

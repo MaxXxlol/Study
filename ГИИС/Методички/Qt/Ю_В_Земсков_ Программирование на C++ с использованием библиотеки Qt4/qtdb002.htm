@@ -1,0 +1,154 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0043)http://www.mechta34.com/it/qt4/qtdb002.html -->
+<HTML><HEAD><TITLE>Ю.В.Земсков. Программирование на C++ с использованием библиотеки Qt4</TITLE>
+<META http-equiv=Content-Type content="text/html; charset=windows-1251"><LINK 
+href="Images/s1.css" type=text/css rel=stylesheet>
+<META content="MSHTML 6.00.2900.2180" name=GENERATOR></HEAD>
+<BODY>
+<a href="qtdb001.htm">Назад</a> <a href="title.htm">Содержание</a> <a href="qtdb003.htm">Вперед</a>
+<H2>Работа с таблицами баз данных</H2>Самый простой способ отображения 
+информации базы данных в виде таблицы заключается в использовании классов 
+<CODE>QSqlQueryModel</CODE> и <CODE>QTableView</CODE>: <PRE>QSqlQueryModel model;
+model.setQuery("select * from employee");
+
+QTableView view;
+view.setModel(&amp;model);
+view.show();
+</PRE>
+<P>Но вместо <CODE>QsqlQueryModel</CODE> можно использовать класс 
+<CODE>QSqlTableModel</CODE>, позволяющий работать с таблицами баз данных на 
+более высоком уровне, чем выполнение SQL-запросов. Тогда приведённый выше 
+фрагмент кода запишется следующим образом: <PRE>QSqlTableModel model;
+model.setTable("employee");
+model.select();
+
+QTableView view;
+view.setModel(&amp;model);
+view.show();
+</PRE>Более сложный пример: вместо выполнения SQL-запроса <PRE>SELECT * FROM employee WHERE salary &gt;= 1000 ORDER BY id DESC
+</PRE>достаточно задать фильтр и условие сортировки: <PRE>QSqlTableModel model = QSqlTableModel(parent, db);
+model.setTable("employee");          // Имя таблицы базы данных.
+model.setFilter("salary &gt;= 1000");   // Условие WHERE.
+model.setSort(0, Qt::DescendingOrder); // Сортировка по убыванию id.
+model.select();                      // Получить данные.
+</PRE>
+<P>После определения модели можно узнать значение любого поля любой записи, 
+например: <PRE>QString name = model.record(i).value("name").toString();
+</PRE>или <PRE>int salary = model.data(model.index(i, 3)).toInt();
+</PRE>
+<P>Для перебора всех записей набора данных: <PRE>for (int i = 0; i &lt; model.rowCount(); ++i) {
+    QSqlRecord record = model.record(i);
+    QString name = record.value("name").toString();
+    double salary = record.value("salary").toDouble();
+    .......
+}
+</PRE>
+<P align=center><IMG src="Images/qtdb01.png"> 
+<P>В листинге приведён пример работы с таблицей работников, созданной в 
+результате выполнения предыдущей программы, а на рис. показан внешний вид 
+таблицы в системе Windows. 
+<P><B>Листинг. Таблица базы данных (файл 
+<CODE>examples-qt/db01/db01.cpp</CODE>)</B> <PRE class=hl><A name=db01.cpp_1></A><SPAN class=line>    1 </SPAN><SPAN class=slc>// Таблица базы данных</SPAN>
+<A name=db01.cpp_2></A><SPAN class=line>    2 </SPAN>
+<A name=db01.cpp_3></A><SPAN class=line>    3 </SPAN><SPAN class=dir>#include &lt;QtGui&gt;</SPAN>
+<A name=db01.cpp_4></A><SPAN class=line>    4 </SPAN><SPAN class=dir>#include &lt;QtSql&gt;</SPAN>
+<A name=db01.cpp_5></A><SPAN class=line>    5 </SPAN>
+<A name=db01.cpp_6></A><SPAN class=line>    6 </SPAN><SPAN class=kwb>int</SPAN> <SPAN class=kwd>main</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwb>int</SPAN> argc<SPAN class=sym>,</SPAN> <SPAN class=kwb>char</SPAN> <SPAN class=sym>*</SPAN>argv<SPAN class=sym>[]) {</SPAN>
+<A name=db01.cpp_7></A><SPAN class=line>    7 </SPAN>
+<A name=db01.cpp_8></A><SPAN class=line>    8 </SPAN>    QApplication <SPAN class=kwd>app</SPAN><SPAN class=sym>(</SPAN>argc<SPAN class=sym>,</SPAN> argv<SPAN class=sym>);</SPAN>
+<A name=db01.cpp_9></A><SPAN class=line>    9 </SPAN>
+<A name=db01.cpp_10></A><SPAN class=line>   10 </SPAN>    QTextCodec <SPAN class=sym>*</SPAN>codec <SPAN class=sym>=</SPAN> QTextCodec<SPAN class=sym>::</SPAN><SPAN class=kwd>codecForName</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"CP1251"</SPAN><SPAN class=sym>);</SPAN>
+<A name=db01.cpp_11></A><SPAN class=line>   11 </SPAN>    QTextCodec<SPAN class=sym>::</SPAN><SPAN class=kwd>setCodecForTr</SPAN><SPAN class=sym>(</SPAN>codec<SPAN class=sym>);</SPAN>
+<A name=db01.cpp_12></A><SPAN class=line>   12 </SPAN>    QTextCodec<SPAN class=sym>::</SPAN><SPAN class=kwd>setCodecForCStrings</SPAN><SPAN class=sym>(</SPAN>codec<SPAN class=sym>);</SPAN>
+<A name=db01.cpp_13></A><SPAN class=line>   13 </SPAN>    QTextCodec<SPAN class=sym>::</SPAN><SPAN class=kwd>setCodecForLocale</SPAN><SPAN class=sym>(</SPAN>codec<SPAN class=sym>);</SPAN>
+<A name=db01.cpp_14></A><SPAN class=line>   14 </SPAN>
+<A name=db01.cpp_15></A><SPAN class=line>   15 </SPAN>    QSqlDatabase db <SPAN class=sym>=</SPAN> QSqlDatabase<SPAN class=sym>::</SPAN><SPAN class=kwd>addDatabase</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"QODBC"</SPAN><SPAN class=sym>);</SPAN>
+<A name=db01.cpp_16></A><SPAN class=line>   16 </SPAN>    db<SPAN class=sym>.</SPAN><SPAN class=kwd>setDatabaseName</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"mysql_db1"</SPAN><SPAN class=sym>);</SPAN>
+<A name=db01.cpp_17></A><SPAN class=line>   17 </SPAN>    db<SPAN class=sym>.</SPAN><SPAN class=kwd>setUserName</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>""</SPAN><SPAN class=sym>);</SPAN>
+<A name=db01.cpp_18></A><SPAN class=line>   18 </SPAN>    db<SPAN class=sym>.</SPAN><SPAN class=kwd>setPassword</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>""</SPAN><SPAN class=sym>);</SPAN>
+<A name=db01.cpp_19></A><SPAN class=line>   19 </SPAN>    db<SPAN class=sym>.</SPAN><SPAN class=kwd>open</SPAN><SPAN class=sym>();</SPAN>
+<A name=db01.cpp_20></A><SPAN class=line>   20 </SPAN>
+<A name=db01.cpp_21></A><SPAN class=line>   21 </SPAN>    // QSqlQuery q<SPAN class=sym>;</SPAN>
+<A name=db01.cpp_22></A><SPAN class=line>   22 </SPAN>    <SPAN class=slc>// Для корректного отображения символов кириллицы,</SPAN>
+<A name=db01.cpp_23></A><SPAN class=line>   23 </SPAN>    <SPAN class=slc>// возможно, придётся установить кодировку:</SPAN>
+<A name=db01.cpp_24></A><SPAN class=line>   24 </SPAN>    // q<SPAN class=sym>.</SPAN><SPAN class=kwd>exec</SPAN><SPAN class=sym>(</SPAN>QObject<SPAN class=sym>::</SPAN><SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"SET NAMES 'cp1251'"</SPAN><SPAN class=sym>));</SPAN>
+<A name=db01.cpp_25></A><SPAN class=line>   25 </SPAN>
+<A name=db01.cpp_26></A><SPAN class=line>   26 </SPAN>    QSqlTableModel <SPAN class=sym>*</SPAN>model <SPAN class=sym>=</SPAN> <SPAN class=kwa>new</SPAN> <SPAN class=kwd>QSqlTableModel</SPAN><SPAN class=sym>();</SPAN>
+<A name=db01.cpp_27></A><SPAN class=line>   27 </SPAN>    model<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setTable</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"employee"</SPAN><SPAN class=sym>);</SPAN>
+<A name=db01.cpp_28></A><SPAN class=line>   28 </SPAN>
+<A name=db01.cpp_29></A><SPAN class=line>   29 </SPAN>    model<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>insertRows</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>0</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>1</SPAN><SPAN class=sym>);</SPAN>
+<A name=db01.cpp_30></A><SPAN class=line>   30 </SPAN>    model<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setData</SPAN><SPAN class=sym>(</SPAN>model<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>index</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>0</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>0</SPAN><SPAN class=sym>),</SPAN> <SPAN class=num>159</SPAN><SPAN class=sym>);</SPAN>
+<A name=db01.cpp_31></A><SPAN class=line>   31 </SPAN>    model<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setData</SPAN><SPAN class=sym>(</SPAN>model<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>index</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>0</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>1</SPAN><SPAN class=sym>),</SPAN> QObject<SPAN class=sym>::</SPAN><SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Сова"</SPAN><SPAN class=sym>));</SPAN>
+<A name=db01.cpp_32></A><SPAN class=line>   32 </SPAN>    model<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setData</SPAN><SPAN class=sym>(</SPAN>model<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>index</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>0</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>2</SPAN><SPAN class=sym>),</SPAN> <SPAN class=kwd>QDate</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>1985</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>12</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>31</SPAN><SPAN class=sym>));</SPAN>
+<A name=db01.cpp_33></A><SPAN class=line>   33 </SPAN>    model<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setData</SPAN><SPAN class=sym>(</SPAN>model<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>index</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>0</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>3</SPAN><SPAN class=sym>),</SPAN> <SPAN class=num>12.34</SPAN><SPAN class=sym>);</SPAN>
+<A name=db01.cpp_34></A><SPAN class=line>   34 </SPAN>    model<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setData</SPAN><SPAN class=sym>(</SPAN>model<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>index</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>0</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>4</SPAN><SPAN class=sym>),</SPAN> <SPAN class=num>1</SPAN><SPAN class=sym>);</SPAN>
+<A name=db01.cpp_35></A><SPAN class=line>   35 </SPAN>    model<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>submitAll</SPAN><SPAN class=sym>();</SPAN>
+<A name=db01.cpp_36></A><SPAN class=line>   36 </SPAN>
+<A name=db01.cpp_37></A><SPAN class=line>   37 </SPAN>    model<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setEditStrategy</SPAN><SPAN class=sym>(</SPAN>QSqlTableModel<SPAN class=sym>::</SPAN>OnFieldChange<SPAN class=sym>);</SPAN>
+<A name=db01.cpp_38></A><SPAN class=line>   38 </SPAN>
+<A name=db01.cpp_39></A><SPAN class=line>   39 </SPAN>    model<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>select</SPAN><SPAN class=sym>();</SPAN>
+<A name=db01.cpp_40></A><SPAN class=line>   40 </SPAN>    model<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setHeaderData</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>0</SPAN><SPAN class=sym>,</SPAN> Qt<SPAN class=sym>::</SPAN>Horizontal<SPAN class=sym>,</SPAN>
+<A name=db01.cpp_41></A><SPAN class=line>   41 </SPAN>                         QObject<SPAN class=sym>::</SPAN><SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Табельн.</SPAN><SPAN class=esc>\n</SPAN><SPAN class=str>номер"</SPAN><SPAN class=sym>));</SPAN>
+<A name=db01.cpp_42></A><SPAN class=line>   42 </SPAN>    model<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setHeaderData</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>1</SPAN><SPAN class=sym>,</SPAN> Qt<SPAN class=sym>::</SPAN>Horizontal<SPAN class=sym>,</SPAN>
+<A name=db01.cpp_43></A><SPAN class=line>   43 </SPAN>                         QObject<SPAN class=sym>::</SPAN><SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Имя"</SPAN><SPAN class=sym>));</SPAN>
+<A name=db01.cpp_44></A><SPAN class=line>   44 </SPAN>    model<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setHeaderData</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>2</SPAN><SPAN class=sym>,</SPAN> Qt<SPAN class=sym>::</SPAN>Horizontal<SPAN class=sym>,</SPAN>
+<A name=db01.cpp_45></A><SPAN class=line>   45 </SPAN>                         QObject<SPAN class=sym>::</SPAN><SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"День рождения"</SPAN><SPAN class=sym>));</SPAN>
+<A name=db01.cpp_46></A><SPAN class=line>   46 </SPAN>    model<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setHeaderData</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>3</SPAN><SPAN class=sym>,</SPAN> Qt<SPAN class=sym>::</SPAN>Horizontal<SPAN class=sym>,</SPAN>
+<A name=db01.cpp_47></A><SPAN class=line>   47 </SPAN>                         QObject<SPAN class=sym>::</SPAN><SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Зарплата"</SPAN><SPAN class=sym>));</SPAN>
+<A name=db01.cpp_48></A><SPAN class=line>   48 </SPAN>    model<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setHeaderData</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>4</SPAN><SPAN class=sym>,</SPAN> Qt<SPAN class=sym>::</SPAN>Horizontal<SPAN class=sym>,</SPAN>
+<A name=db01.cpp_49></A><SPAN class=line>   49 </SPAN>                         QObject<SPAN class=sym>::</SPAN><SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Женат/</SPAN><SPAN class=esc>\n</SPAN><SPAN class=str>замужем"</SPAN><SPAN class=sym>));</SPAN>
+<A name=db01.cpp_50></A><SPAN class=line>   50 </SPAN>
+<A name=db01.cpp_51></A><SPAN class=line>   51 </SPAN>    QTableView <SPAN class=sym>*</SPAN>view <SPAN class=sym>=</SPAN> <SPAN class=kwa>new</SPAN> <SPAN class=kwd>QTableView</SPAN><SPAN class=sym>();</SPAN>
+<A name=db01.cpp_52></A><SPAN class=line>   52 </SPAN>    view<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setModel</SPAN><SPAN class=sym>(</SPAN>model<SPAN class=sym>);</SPAN>
+<A name=db01.cpp_53></A><SPAN class=line>   53 </SPAN>
+<A name=db01.cpp_54></A><SPAN class=line>   54 </SPAN>    view<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setAlternatingRowColors</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwa>true</SPAN><SPAN class=sym>);</SPAN>
+<A name=db01.cpp_55></A><SPAN class=line>   55 </SPAN>    view<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>resizeRowsToContents</SPAN><SPAN class=sym>();</SPAN>
+<A name=db01.cpp_56></A><SPAN class=line>   56 </SPAN>    view<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>resizeColumnsToContents</SPAN><SPAN class=sym>();</SPAN>
+<A name=db01.cpp_57></A><SPAN class=line>   57 </SPAN>    view<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>show</SPAN><SPAN class=sym>();</SPAN>
+<A name=db01.cpp_58></A><SPAN class=line>   58 </SPAN>
+<A name=db01.cpp_59></A><SPAN class=line>   59 </SPAN>    <SPAN class=kwa>return</SPAN> app<SPAN class=sym>.</SPAN><SPAN class=kwd>exec</SPAN><SPAN class=sym>();</SPAN>
+<A name=db01.cpp_60></A><SPAN class=line>   60 </SPAN><SPAN class=sym>}</SPAN>
+</PRE>
+<UL>
+  <LI>(15-19) Установили параметры соединения и подключились к базе данных. 
+  <LI>(21-24) При необходимости сообщили серверу кодировку строковых данных, 
+  которую использует наша программа. 
+  <LI>(26-27) Создали модель <CODE>QSqlTableModel</CODE> и задали имя таблицы 
+  БД. 
+  <LI>(29-35) Добавили к таблице новую строку, задали значения всех пяти ячеек 
+  этой строки и подтвердили запись изменений в базу данных (диагностика 
+  возможных ошибок для простоты опущена). 
+  <LI>(37) Задали режим обновления данных в БД при редактировании таблицы: 
+  параметр <CODE>QSqlTableModel::OnFieldChange</CODE> означает, что запись 
+  изменений в базу данных будет выполняться автоматически после окончания 
+  редактирования очередной ячейки. Другие возможные режимы: 
+  <CODE>QSqlTableModel::OnRowChange</CODE> (при переходе к другой строке) и 
+  <CODE>QSqlTableModel::OnManualSubmit</CODE> (при выполнении метода 
+  <CODE>submitAll</CODE>, подтверждающего все изменения, или 
+  <CODE>revertAll</CODE>, отменяющего их). 
+  <LI>(39) Выбрали данные из таблицы БД. 
+  <LI>(40-49) Определили заголовки столбцов, которые будут отображаться в окне. 
+  <LI>(51-52) Создали представление и задали для него модель. 
+  <LI>(54) Установили чередующийся цвет фона для строк таблицы. 
+  <LI>(55-56) Выполнили автоподстройку высоты строк и ширины столбцов. 
+  <LI>(57) Вывели представление таблицы на экран. </LI></UL>
+<P>Проверьте, как работает эта програма: можно изменять данные в ячейках, при 
+редактировании чисел и дат автоматически отображаются кнопки 
+инкремента/декремента. Но поскольку для элемента <CODE>QDoubleSpinBox</CODE> по 
+умолчанию задано максимальное значение <CODE>99.99</CODE>, то при попытке 
+изменить, например, величину зарплаты работника, любое значение, большее этого 
+максимального, автоматически усекается. Разумеется, попытка ввести число больше 
+допустимого, оканчивается неудачей. Кроме того, после редактирования первой же 
+ячейки таблицы, когда происходит автоматическое обновление данных, ширина 
+столбцов и высота строк изменяется, т.к. размеры ячеек по умолчанию отличаются 
+от тех, что установились в результате однократного выполнения методов 
+<CODE>resizeRowsToContents</CODE> и <CODE>resizeColumnsToContents</CODE>. 
+<P>Если мы хотим получать большую зарплату, выводить разные столбцы различным 
+цветом, отображать галочки для полей логического типа, использовать календарик 
+для ввода дат, в общем, как-то изменять заданные по умолчанию параметры 
+отображения и редактирования ячеек, то у нас имеются две возможности: 
+разрабатывать свой класс модели и/или представления таблицы или использовать 
+специальные объекты-делегаты для её ячеек. Рассмотрим оба варианта по очереди. 
+</P>
+<a href="qtdb001.htm">Назад</a> <a href="title.htm">Содержание</a> <a href="qtdb003.htm">Вперед</a>
+</BODY></HTML>

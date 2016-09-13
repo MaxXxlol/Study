@@ -1,0 +1,117 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0041)http://www.mechta34.com/it/qt4/qt004.html -->
+<HTML><HEAD><TITLE>Ю.В.Земсков. Программирование на C++ с использованием библиотеки Qt4</TITLE>
+<META http-equiv=Content-Type content="text/html; charset=windows-1251"><LINK 
+href="Images/s1.css" type=text/css rel=stylesheet>
+<META content="MSHTML 6.00.2900.2180" name=GENERATOR></HEAD>
+<BODY>
+<a href="qt003.htm">Назад</a> <a href="title.htm">Содержание</a> <a href="qt005.htm">Вперед</a>
+<H2>Обработка событий</H2>Для связывания событий, происходящий с объектами, и 
+функций, предназначенных для обработки этих событий, в библиотеке Qt 
+используется интересный механизм <B>сигналов</B> и <B>слотов</B>. Сигнал -- это 
+сообщение о том, что произошло какое-либо событие, например, нажатие на кнопку 
+или выбор пункта меню. Вся информация о событии сохраняется в полях экземпляра 
+соответствующего класса. У сигнала есть источник (например, кнопка) и приёмник 
+(объект, метод которого будет обрабатывать это событие). Слот -- это сама 
+функция-обработчик события. Связь между всеми четырьмя перечисленными элементами 
+задаётся с помощью метода <CODE>connect</CODE> (соединить): <PRE>bool QObject::connect (
+    const QObject *sender,    // Источник события.
+    const char *signal,       // Сигнал.
+    const QObject *receiver,  // Объект-приёмник сигнала.
+    const char *method,       // Функция-обработчик.
+    Qt::ConnectionType type = Qt::AutoConnection
+    ) const
+</PRE>Последний параметр определяет режим обработки: 
+<CODE>Qt::DirectConnection</CODE> -- событие обрабатывается сразу; 
+<CODE>Qt::QueuedConnection</CODE> -- событие ставится в общую очередь и будет 
+обработано только после всех сообщений, уже имеющихся в этой очереди; 
+<CODE>Qt::AutoConnection</CODE> -- если источник события находится в том же 
+потоке, что и приёмник, то будет использован режим 
+<CODE>Qt::DirectConnection</CODE>, в противном случае -- 
+<CODE>Qt::QueuedConnection</CODE>. 
+<P>Для определения сигнала и слота используются макросы <CODE>SIGNAL</CODE> и 
+<CODE>SLOT</CODE>. Например, мы хотим, чтобы текстовая метка <CODE>label</CODE> 
+(экземпляр класса <CODE>QLabel</CODE>) отображала позицию полосы прокрутки 
+<CODE>scrollBar</CODE> (экземпляр класса <CODE>QScrollBar</CODE>). В 
+документации на библиотеку Qt (открыв <CODE>doc/html/index.html</CODE> или 
+программу <B>assistant</B>) находим, что в классе <CODE>QAbstractSlider</CODE>, 
+потомком которого является <CODE>QScrollBar</CODE>, определён сигнал <PRE>void QAbstractSlider::valueChanged ( int value )
+</PRE>оповещающий об изменении положения ползунка полосы прокрутки. Далее, в 
+описании класса <CODE>QLabel</CODE> находим, что изменение текста надписи 
+производится с помощью функции <CODE>setText(строка)</CODE> или 
+<CODE>setNum(число)</CODE>. Тогда вызов метода <CODE>connect</CODE> должен 
+выглядеть следующим образом: <PRE>QObject::connect(
+    scrollBar,                 // Источник события.
+    SIGNAL(valueChanged(int)), // Сигнал.
+    label,                     // Объект-приёмник сигнала.
+    SLOT( setNum(int) ) );     // Функция-обработчик.
+</PRE>Заметим, что параметрами сигнала и слота являются типы, а не переменные. 
+<P>Количество параметров слота всегда не больше количества параметров сигнала. 
+Соответствие между ними, как обычно, позиционное: при выполнении программы 
+значением <I>i</I>-го параметра слота становится значение <I>i</I>-го параметра 
+сигнала. 
+<P>В объявлении класса методы-слоты необходимо указывать в разделе 
+<CODE>public&nbsp;slots</CODE> или <CODE>private&nbsp;slots</CODE>. Обычно в 
+программе используются стандартные сигналы, но если требуется определить 
+собственные, то их надо объявить в разделе <CODE>signals</CODE>. Например: <PRE>class MainWondow : public QMainWindow {
+    Q_OBJECT
+.............
+signals:
+    void mySignal();
+private slots:
+    void onMySignal();
+.............
+</PRE>
+<P>Сигнал может быть "соединён" с другим сигналом, например: <PRE>connect( myButton,
+         SIGNAL( clicked() ),
+         this,
+         SIGNAL( buttonClicked() ) );
+</PRE>
+<P>Один и тот же сигнал можно связать с несколькими слотами и/или другими 
+сигналами. С одним и тем же слотом можно связать несколько сигналов. Можно 
+указать несколько одинаковых "соединений": тогда одно событие вызовет генерацию 
+нескольких сигналов. 
+<P>Чтобы разорвать связь между сигналом и слотом, используется метод 
+<CODE>disconnect</CODE>: <PRE>bool QObject::disconnect ( const QObject *sender,
+                           const char *signal,
+                           const QObject *receiver,
+                           const char *method )  [static]
+</PRE>
+<P>
+<P>В листинге 5 приведён текст небольшой программы, иллюстрирующей принцип 
+обработки нажатия на кнопку (экземпляр класса <CODE>QPushButton</CODE>), а на 
+рис. показано, как выглядит окно программы в системе Windows. 
+<P align=center><IMG src="Images/qt01.png"> 
+<H4>Листинг 5 (файл <TT>examples-qt/01/01.cpp</TT>)</H4><PRE class=hl><A name=01.cpp_1></A><SPAN class=line>    1 </SPAN><SPAN class=slc>// Сигналы и слоты: кнопка в окне</SPAN>
+<A name=01.cpp_2></A><SPAN class=line>    2 </SPAN>
+<A name=01.cpp_3></A><SPAN class=line>    3 </SPAN><SPAN class=dir>#include &lt;QApplication&gt;</SPAN>
+<A name=01.cpp_4></A><SPAN class=line>    4 </SPAN><SPAN class=dir>#include &lt;QPushButton&gt;</SPAN>
+<A name=01.cpp_5></A><SPAN class=line>    5 </SPAN>
+<A name=01.cpp_6></A><SPAN class=line>    6 </SPAN><SPAN class=kwb>int</SPAN> <SPAN class=kwd>main</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwb>int</SPAN> argc<SPAN class=sym>,</SPAN> <SPAN class=kwb>char</SPAN> <SPAN class=sym>*</SPAN>argv<SPAN class=sym>[]) {</SPAN>
+<A name=01.cpp_7></A><SPAN class=line>    7 </SPAN>
+<A name=01.cpp_8></A><SPAN class=line>    8 </SPAN>    QApplication <SPAN class=kwd>app</SPAN><SPAN class=sym>(</SPAN>argc<SPAN class=sym>,</SPAN> argv<SPAN class=sym>);</SPAN>
+<A name=01.cpp_9></A><SPAN class=line>    9 </SPAN>
+<A name=01.cpp_10></A><SPAN class=line>   10 </SPAN>    QPushButton <SPAN class=sym>*</SPAN>button <SPAN class=sym>=</SPAN> <SPAN class=kwa>new</SPAN> <SPAN class=kwd>QPushButton</SPAN><SPAN class=sym>(</SPAN>
+<A name=01.cpp_11></A><SPAN class=line>   11 </SPAN>        QString<SPAN class=sym>::</SPAN><SPAN class=kwd>fromLocal8Bit</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"&amp;Выход"</SPAN><SPAN class=sym>) );</SPAN> <SPAN class=slc>// Кнопка.</SPAN>
+<A name=01.cpp_12></A><SPAN class=line>   12 </SPAN>    button<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setFont</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>QFont</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Times"</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>16</SPAN><SPAN class=sym>,</SPAN> QFont<SPAN class=sym>::</SPAN>Bold<SPAN class=sym>));</SPAN>
+<A name=01.cpp_13></A><SPAN class=line>   13 </SPAN>    QObject<SPAN class=sym>::</SPAN><SPAN class=kwd>connect</SPAN><SPAN class=sym>(</SPAN>
+<A name=01.cpp_14></A><SPAN class=line>   14 </SPAN>        button<SPAN class=sym>,</SPAN>            <SPAN class=slc>// Источник сигнала.</SPAN>
+<A name=01.cpp_15></A><SPAN class=line>   15 </SPAN>        <SPAN class=kwd>SIGNAL</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>clicked</SPAN><SPAN class=sym>()),</SPAN> <SPAN class=slc>// Сигнал о нажатии кнопки.</SPAN>
+<A name=01.cpp_16></A><SPAN class=line>   16 </SPAN>        <SPAN class=sym>&amp;</SPAN>app<SPAN class=sym>,</SPAN>              <SPAN class=slc>// Приёмник сигнала.</SPAN>
+<A name=01.cpp_17></A><SPAN class=line>   17 </SPAN>        <SPAN class=kwd>SLOT</SPAN><SPAN class=sym>(</SPAN> <SPAN class=kwd>quit</SPAN><SPAN class=sym>() ) );</SPAN>  <SPAN class=slc>// Функция-слот (обработчик события).</SPAN>
+<A name=01.cpp_18></A><SPAN class=line>   18 </SPAN>    button<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>show</SPAN><SPAN class=sym>();</SPAN>
+<A name=01.cpp_19></A><SPAN class=line>   19 </SPAN>
+<A name=01.cpp_20></A><SPAN class=line>   20 </SPAN>    <SPAN class=kwa>return</SPAN> app<SPAN class=sym>.</SPAN><SPAN class=kwd>exec</SPAN><SPAN class=sym>();</SPAN>
+<A name=01.cpp_21></A><SPAN class=line>   21 </SPAN><SPAN class=sym>}</SPAN>
+</PRE>Здесь мы разместили в окне обычную кнопку (10-11) с надписью "Выход" и 
+связали её нажатие -- сигнал <CODE>clicked</CODE> (15) -- с 
+функцией-обработчиком <CODE>quit</CODE> (17), которая завершает приложение 
+<CODE>app</CODE>. Заметим, что мы не создаём главное окно для кнопки, это будет 
+сделано автоматически (рис.). 
+<P>Символ "<CODE>&amp;</CODE>" перед буквой "В" в тексте надписи на кнопке (11) 
+позволяет активировать её не только по щелчку левой кнопкой мыши или нажатием 
+клавиши <CODE>Enter</CODE>, но также с помощью комбинации клавиш 
+<CODE>Alt+в</CODE> (к сожалению, только в режиме ввода кириллицы). </P>
+
+<a href="qt003.htm">Назад</a> <a href="title.htm">Содержание</a> <a href="qt005.htm">Вперед</a>
+</BODY></HTML>

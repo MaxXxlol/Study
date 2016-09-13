@@ -1,0 +1,999 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="ru"><head>
+
+
+
+	
+	
+	<title>Qt. Создание собственных виджетов. / Блог им. RomiX / Сообщество EasyElectronics.ru</title>
+	
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<meta name="description" content=" Наконец-то нашёл время написать следующую статью. В этот раз речь пойдёт о создании собственных виджетов из уже существующих или">
+	<meta name="keywords" content="Qt,виджет,QWidget,QPainter,QToolButton,QHBoxLayout,QVBoxLayout,QGridLayout">
+
+	<link rel="stylesheet" type="text/css" href="qt-sozdanie-sobstvennyh-vidzhetov_files/f8dc8ff5052e86884fbd16f9a93fb09f.css">
+
+
+	<link href="http://we.easyelectronics.ru/templates/skin/new-jquery/images/favicon.ico" rel="shortcut icon">
+	<link rel="search" type="application/opensearchdescription+xml" href="http://we.easyelectronics.ru/search/opensearch/" title="Сообщество EasyElectronics.ru">
+
+			<link rel="alternate" type="application/rss+xml" href="http://we.easyelectronics.ru/rss/comments/1516/" title="Qt. Создание собственных виджетов.">
+		
+		
+	<script language="JavaScript" type="text/javascript">
+	var DIR_WEB_ROOT 			= 'http://we.easyelectronics.ru';
+	var DIR_STATIC_SKIN 		= 'http://we.easyelectronics.ru/templates/skin/new-jquery';
+	var DIR_ROOT_ENGINE_LIB     = 'http://we.easyelectronics.ru/engine/lib'; 
+	var LIVESTREET_SECURITY_KEY = '84cd120d40ccb59c616c97dd3a1d8b05';
+	var SESSION_ID              = 'p75h349u6l8es8401386amaoq2'; 
+	var BLOG_USE_TINYMCE		= '';
+
+	var TINYMCE_LANG='en';
+			TINYMCE_LANG='ru';
+	
+	var aRouter = new Array();
+			aRouter['error'] = 'http://we.easyelectronics.ru/error/';
+			aRouter['registration'] = 'http://we.easyelectronics.ru/registration/';
+			aRouter['profile'] = 'http://we.easyelectronics.ru/profile/';
+			aRouter['my'] = 'http://we.easyelectronics.ru/my/';
+			aRouter['blog'] = 'http://we.easyelectronics.ru/blog/';
+			aRouter['personal_blog'] = 'http://we.easyelectronics.ru/personal_blog/';
+			aRouter['top'] = 'http://we.easyelectronics.ru/top/';
+			aRouter['index'] = 'http://we.easyelectronics.ru/index/';
+			aRouter['new'] = 'http://we.easyelectronics.ru/new/';
+			aRouter['topic'] = 'http://we.easyelectronics.ru/topic/';
+			aRouter['login'] = 'http://we.easyelectronics.ru/login/';
+			aRouter['people'] = 'http://we.easyelectronics.ru/people/';
+			aRouter['settings'] = 'http://we.easyelectronics.ru/settings/';
+			aRouter['tag'] = 'http://we.easyelectronics.ru/tag/';
+			aRouter['talk'] = 'http://we.easyelectronics.ru/talk/';
+			aRouter['comments'] = 'http://we.easyelectronics.ru/comments/';
+			aRouter['rss'] = 'http://we.easyelectronics.ru/rss/';
+			aRouter['link'] = 'http://we.easyelectronics.ru/link/';
+			aRouter['question'] = 'http://we.easyelectronics.ru/question/';
+			aRouter['blogs'] = 'http://we.easyelectronics.ru/blogs/';
+			aRouter['search'] = 'http://we.easyelectronics.ru/search/';
+			aRouter['admin'] = 'http://we.easyelectronics.ru/admin/';
+			aRouter['ajax'] = 'http://we.easyelectronics.ru/ajax/';
+			aRouter['feed'] = 'http://we.easyelectronics.ru/feed/';
+			aRouter['stream'] = 'http://we.easyelectronics.ru/stream/';
+			aRouter['photoset'] = 'http://we.easyelectronics.ru/photoset/';
+			aRouter['language'] = 'http://we.easyelectronics.ru/language/';
+			aRouter['attachments'] = 'http://we.easyelectronics.ru/attachments/';
+			aRouter['cleaner_settings'] = 'http://we.easyelectronics.ru/cleaner_settings/';
+			aRouter['ish-socbookmarks'] = 'http://we.easyelectronics.ru/ish-socbookmarks/';
+			aRouter['openid_login'] = 'http://we.easyelectronics.ru/openid_login/';
+			aRouter['openid_settings'] = 'http://we.easyelectronics.ru/openid_settings/';
+			aRouter['page'] = 'http://we.easyelectronics.ru/page/';
+		</script>
+
+	<script type="text/javascript" src="qt-sozdanie-sobstvennyh-vidzhetov_files/d334fdf7017831cab7dacd7536bca92e.js"></script>
+
+    
+	<script language="JavaScript" type="text/javascript">
+		var tinyMCE=false;
+		ls.lang.load({"blog_join":"\u0432\u0441\u0442\u0443\u043f\u0438\u0442\u044c \u0432 \u0431\u043b\u043e\u0433","blog_leave":"\u043f\u043e\u043a\u0438\u043d\u0443\u0442\u044c \u0431\u043b\u043e\u0433"});
+	</script>
+	
+	
+<script type="text/javascript" src="qt-sozdanie-sobstvennyh-vidzhetov_files/share.js" charset="windows-1251"></script>
+
+
+<script src="qt-sozdanie-sobstvennyh-vidzhetov_files/share_002.js" type="text/javascript"></script>
+
+
+<script type="text/javascript" src="qt-sozdanie-sobstvennyh-vidzhetov_files/plusone.js">
+  {lang: 'ru'}
+</script>
+
+
+</head><body onload="prettyPrint()">
+	
+	<div id="header">
+			<div class="auth">
+			<a href="http://we.easyelectronics.ru/login/" id="login_form_show" class="login-link">Войти</a> или 
+			<a href="http://we.easyelectronics.ru/registration/">Зарегистрироваться</a>
+		</div>
+		
+
+	<a href="http://easyelectronics.ru/" class="logo">
+		<img alt="EasyElectronics.ru" src="qt-sozdanie-sobstvennyh-vidzhetov_files/logo.jpg" align="middle" border="0" height="160" hspace="0" vspace="0" width="160">
+		</a>
+		<a class="logo" href="http://we.easyelectronics.ru/"><span>Сообщество EasyElectronics.ru</span></a>
+		
+	
+	
+	<ul class="pages">
+		<li class="active"><a href="http://we.easyelectronics.ru/">Топики</a></li>
+		<li><a href="http://we.easyelectronics.ru/blogs/">Блоги</a></li>
+		<li><a href="http://we.easyelectronics.ru/people/">Люди</a></li>
+		<li> <a href="http://forum.easyelectronics.ru/">Форум</a></li>
+		<li> <a href="http://shop.easyelectronics.ru/">Магазин</a></li>
+								
+			<li><a href="http://we.easyelectronics.ru/page/Konkurs/">Конкурс</a></li>
+	<li><a href="http://we.easyelectronics.ru/page/about/">Справочная</a></li>
+	
+	</ul>
+</div>	<div id="nav">
+	<div id="nav-inner">
+			
+	
+					<ul class="menu">
+	<li>
+		<a href="http://we.easyelectronics.ru/">Все</a> <a href="http://we.easyelectronics.ru/new/" class="new">+3</a>			</li>
+
+	<li>
+		<a href="http://we.easyelectronics.ru/blog/">Коллективные</a> <a href="http://we.easyelectronics.ru/blog/new/" class="new">+2</a>			</li>
+
+	<li class="active">
+		<a href="http://we.easyelectronics.ru/personal_blog/">Персональные</a> <a href="http://we.easyelectronics.ru/personal_blog/new/" class="new">+1</a>					<ul class="sub-menu">
+				<li><a href="http://we.easyelectronics.ru/personal_blog/">Хорошие</a></li>
+				<li><a href="http://we.easyelectronics.ru/personal_blog/new/">Новые</a> +1</li>				<li><a href="http://we.easyelectronics.ru/personal_blog/bad/">Плохие</a></li>
+				
+			</ul>
+			</li>
+	
+		
+	<li>
+		<a href="http://we.easyelectronics.ru/top/">TOP</a>
+			</li>
+
+	
+</ul>				
+		
+		<form action="http://we.easyelectronics.ru/search/topics/" method="GET" class="search">
+			<input class="text" onblur="if (!value) value=defaultValue" onclick="if (value==defaultValue) value=''" value="Поиск" name="q" type="text">
+			<input class="search-submit" value="" type="submit">
+		</form>
+	</div>
+</div>
+
+	<div id="container">
+		<div id="wrapper" class=" ">
+			<div id="content">
+				<div id="content-inner">
+						<div class="login-form jqmWindow" id="login_form">
+		<a href="#" class="close jqmClose"></a>
+		
+		<form action="http://we.easyelectronics.ru/login/" method="POST">
+			<h3>Авторизация</h3>
+
+			<a href="http://we.easyelectronics.ru/login/openid/" title="Войти через OpenID, GMail, ВКонтакте, Facebook, Twitter, Yandex, Rambler"><img src="qt-sozdanie-sobstvennyh-vidzhetov_files/openid.png" alt="OpenID" style="margin-bottom: 10px;"></a><br>
+
+
+			<p><label>Логин или эл. почта:<br>
+			<input class="input-text" name="login" id="login-input" type="text"></label></p>
+			
+			<p><label>Пароль:<br>
+			<input name="password" class="input-text" type="password"></label></p>
+			
+			<label class="label-remember"><input name="remember" class="checkbox" checked="checked" type="checkbox">Запомнить меня</label>
+
+			
+
+			<input name="submit_login" class="button" value="Войти" type="submit"><br><br>
+			
+			<a href="http://we.easyelectronics.ru/login/reminder/">Напомнить пароль</a><br>
+			<a href="http://we.easyelectronics.ru/registration/">Регистрация</a>
+		</form>
+	</div>
+						
+
+						
+					
+
+
+<div class="topic">
+	<h1 class="title">
+							Qt. Создание собственных виджетов.
+			</h1>
+	
+	<a href="#" onclick="return ls.favourite.toggle(1516,this,'topic');" class="favourite "></a>
+
+	
+	<div class="info-top">
+		<a href="http://we.easyelectronics.ru/my/RomiX/" class="title-blog">Блог им. RomiX</a>
+	
+		<span class="actions">                                                                   
+								</span>
+	</div>
+
+
+	<div class="content">
+		
+
+    
+    <!-- ������.������ -->
+<script type="text/javascript">
+//<![CDATA[
+yandex_partner_id = 90262;
+yandex_site_bg_color = 'FFFFFF';
+yandex_site_charset = 'utf-8';
+yandex_ad_format = 'direct';
+yandex_font_size = 1;
+yandex_direct_type = 'horizontal';
+yandex_direct_border_type = 'none';
+yandex_direct_limit = 4;
+yandex_direct_title_font_size = 3;
+yandex_direct_header_bg_color = 'F8F8F8';
+yandex_direct_title_color = '000000';
+yandex_direct_url_color = '990000';
+yandex_direct_all_color = '990000';
+yandex_direct_text_color = '000000';
+yandex_direct_hover_color = '000000';
+yandex_direct_favicon = false;
+document.write('<sc'+'ript type="text/javascript" src="http://an.yandex.ru/system/context.js"></sc'+'ript>');
+//]]>
+</script>
+    
+    
+
+			 <img src="qt-sozdanie-sobstvennyh-vidzhetov_files/86762753fd.jpg" align="left">Наконец-то
+ нашёл время написать следующую статью. В этот раз речь пойдёт о 
+создании собственных виджетов из уже существующих или с ручной 
+прорисовкой.<br>
+Сделать виджет из других очень просто — в designer'e создаёте виджет, 
+перетаскиваете на форму нужные виджеты и в коде пишите как они должны 
+взаимодействовать.<br>
+Если виджет не очень сложный, то можно обойтись и без designer'a, 
+создаёте наследника (можно и этого не делать, как показано ниже) от 
+QWidget и компонуете виджеты вручную. Вот пример из документации 
+(компоновка по горизонтали):<br>
+<br>
+<pre class="prettyprint"><code>QWidget *window = new QWidget;
+QPushButton *button1 = new QPushButton("One");
+QPushButton *button2 = new QPushButton("Two");
+QPushButton *button3 = new QPushButton("Three");
+QPushButton *button4 = new QPushButton("Four");
+QPushButton *button5 = new QPushButton("Five");
+
+QHBoxLayout *layout = new QHBoxLayout;
+layout-&gt;addWidget(button1);
+layout-&gt;addWidget(button2);
+layout-&gt;addWidget(button3);
+layout-&gt;addWidget(button4);
+layout-&gt;addWidget(button5);
+
+window-&gt;setLayout(layout);
+window-&gt;show();</code></pre><br>
+Получится следующее:<br>
+<img src="qt-sozdanie-sobstvennyh-vidzhetov_files/1a84e9ee6a.png"><br>
+<br>
+Компоновка по вертикали:<br>
+<pre class="prettyprint"><code>QWidget *window = new QWidget;
+QPushButton *button1 = new QPushButton("One");
+QPushButton *button2 = new QPushButton("Two");
+QPushButton *button3 = new QPushButton("Three");
+QPushButton *button4 = new QPushButton("Four");
+QPushButton *button5 = new QPushButton("Five");
+
+QVBoxLayout *layout = new QVBoxLayout;
+layout-&gt;addWidget(button1);
+layout-&gt;addWidget(button2);
+layout-&gt;addWidget(button3);
+layout-&gt;addWidget(button4);
+layout-&gt;addWidget(button5);
+
+window-&gt;setLayout(layout);
+window-&gt;show();</code></pre><br>
+<br>
+Получится так:<br>
+<img src="qt-sozdanie-sobstvennyh-vidzhetov_files/c1134d2733.png"><br>
+<br>
+Также есть компоновка по сетке:<br>
+<pre class="prettyprint"><code>QWidget *window = new QWidget;
+QPushButton *button1 = new QPushButton("One");
+QPushButton *button2 = new QPushButton("Two");
+QPushButton *button3 = new QPushButton("Three");
+QPushButton *button4 = new QPushButton("Four");
+QPushButton *button5 = new QPushButton("Five");
+
+QGridLayout *layout = new QGridLayout;
+layout-&gt;addWidget(button1, 0, 0);
+layout-&gt;addWidget(button2, 0, 1);
+layout-&gt;addWidget(button3, 1, 0);
+layout-&gt;addWidget(button4, 1, 1);
+layout-&gt;addWidget(button5, 2, 0, 1, 2);
+
+window-&gt;setLayout(layout);
+window-&gt;show();</code></pre><br>
+Результат:<br>
+<img src="qt-sozdanie-sobstvennyh-vidzhetov_files/6f2fee.jpg"><br>
+<br>
+Также можно создать наследника от любого другого существующего виджета и изменить его поведение.<br>
+<br>
+Это всё не так интересно, гораздо интересней рисовать виджет вручную. 
+Для этого нужно переопределить функцию paintEvent() у виджета и в ней 
+рисовать, добавляем в объявление класса:<br>
+<pre class="prettyprint"><code>protected:
+void paintEvent(QPaintEvent *);</code></pre><br>
+<br>
+И в определение:<br>
+<pre class="prettyprint"><code>void MyWidget::paintEvent(QPaintEvent *)
+{
+
+}</code></pre><br>
+Всё, теперь можно рисовать (вот только мне этого не дано, так что не 
+ругайте), для этого используется QPainter, который может рисовать 
+большое количество геометрических примитив. Пишем в paintEvent:<br>
+<pre class="prettyprint"><code>QPainter p(this);</code></pre><br>
+Вне paintEvent рисовать по виджету запрещено, если это всё-же 
+необходимо, то нужно рисовать по QPixmap или QImage а в paintEvent 
+только рисовать эту картинку.<br>
+<br>
+Также не помешает знать текущие размеры виджета:<br>
+<pre class="prettyprint"><code>QSize sz = size();
+sz.width(); // ширина
+sz.height(); // высота</code></pre><br>
+Чтобы установить цвет краёв какой-либо фигуры используется 
+QPainter::setPen(Qt::color), и для фона QPainter::setBrush(Qt::color). 
+Также в качестве фона можно использовать градиент либо картинку либо 
+множество других стилей (устанавливаются с помощью 
+setStyle(Qt::BrushStyle)), например:<br>
+<pre class="prettyprint"><code>QRadialGradient gradient(50, 50, 50, 50, 50);
+gradient.setColorAt(0, QColor::fromRgbF(0, 1, 0, 1));
+gradient.setColorAt(1, QColor::fromRgbF(0, 0, 0, 0));
+
+QBrush brush(gradient);</code></pre><br>
+Вот все стили:<br>
+<img src="qt-sozdanie-sobstvennyh-vidzhetov_files/351bd5b8ca.png"><br>
+<br>
+Подробнее <a href="http://doc.qt.nokia.com/latest/qbrush.html" rel="nofollow">здесь</a> и <a href="http://doc.qt.nokia.com/latest/qpen.html" rel="nofollow">здесь</a>.<br>
+<br>
+Устанавливаем красный цвет краёв размером 5 пикселей и зеленый фон:<br>
+<pre class="prettyprint"><code>QPen pen;
+pen.setColor(Qt::red);
+pen.setWidth(5);
+p.setPen(pen);
+p.setBrush(Qt::green);</code></pre><br>
+<br>
+И рисуем прямоугольник размером с виджет:<br>
+<img src="qt-sozdanie-sobstvennyh-vidzhetov_files/ad881e.jpg"><br>
+<i>(просто адская красота:)))</i><br>
+<br>
+Вот ещё некоторые функции:<br>
+<pre class="prettyprint"><code>void 	drawArc ( int x, int y, int width, int height, int startAngle, int spanAngle ) // дуга
+ void 	drawChord ( int x, int y, int width, int height, int startAngle, int spanAngle ) // хорда
+ void 	drawEllipse ( int x, int y, int width, int height ) // эллипс
+ void 	drawImage ( const QPoint &amp; point, const QImage &amp; image ) // картинка
+ void 	drawLine ( int x1, int y1, int x2, int y2 ) // линия
+ void 	drawPicture ( int x, int y, const QPicture &amp; picture ) // картинка
+ void 	drawPie ( int x, int y, int width, int height, int startAngle, int spanAngle ) // круговой сегмент
+ void 	drawPixmap ( int x, int y, const QPixmap &amp; pixmap ) // картинка
+ void 	drawPoint ( int x, int y ) // точка
+ void 	drawRect ( int x, int y, int width, int height ) // прямоугольник
+ void 	drawText ( int x, int y, const QString &amp; text ) // текст
+</code></pre><br>
+Если на виджете необходимо разместить кнопку то для этого можно воспользоваться <a href="http://developer.qt.nokia.com/doc/qt-4.8/qtoolbutton.html" rel="nofollow">QToolButton</a>.
+ А для того чтобы она всегда оставалась в заранее определенном месте, 
+необходимо также отслеживать изменение размеров виджета. Пишем:<br>
+<pre class="prettyprint"><code>protected:
+void resizeEvent(QResizeEvent *);</code></pre><br>
+Кнопку создаём например так:<br>
+<pre class="prettyprint"><code>const QString buttonStyle = "QToolButton { background-color:#000000; color:#666; } "
+            "QToolButton:hover { color:#CCC; }"; // на чёрном фоне смотрится довольно неплохо
+
+    someButton = new QToolButton(this);
+    someButton-&gt;setText(tr("save"));
+    someButton-&gt;setStyleSheet(buttonStyle);
+</code></pre><br>
+А перемещаем так:<br>
+<pre class="prettyprint"><code>void PhotoFrameWidget::resizeEvent(QResizeEvent *)
+{
+    QSize sz = size();
+    int xPos = sz.width() - 35;
+    int yPos = sz.height() - 20;
+    someButton-&gt;move(xPos, yPos);
+}</code></pre><br>
+<br>
+Пока всё. В следующий раз чтобы не писать про то о чём уже написано на 
+многих сайтах, буду выкладывать различные виджеты (уже почти готов 
+виджет резистора, также имеются бегущая строка, диаграмма, гистограмма, 
+график и др...), возможно стили (с этим как-то не очень, существует 
+всего несколько сторонних стилей). Также планирую создать базу 
+компонентов, чтобы наконец-то разобрать бардак))<br>
+<br>
+P.S. Если кому интересно как работать с джойстиком через DirectInput 
+(например для управления роботом), можете почитать мои прошлые <a href="http://romix-lab.ru/tag/Direct%20Input/" rel="nofollow">статьи</a>.
+			</div> 
+
+
+
+	<ul class="tags">
+					<li><a href="http://we.easyelectronics.ru/tag/Qt/">Qt</a>, </li>
+					<li><a href="http://we.easyelectronics.ru/tag/%D0%B2%D0%B8%D0%B4%D0%B6%D0%B5%D1%82/">виджет</a>, </li>
+					<li><a href="http://we.easyelectronics.ru/tag/QWidget/">QWidget</a>, </li>
+					<li><a href="http://we.easyelectronics.ru/tag/QPainter/">QPainter</a>, </li>
+					<li><a href="http://we.easyelectronics.ru/tag/QToolButton/">QToolButton</a>, </li>
+					<li><a href="http://we.easyelectronics.ru/tag/QHBoxLayout/">QHBoxLayout</a>, </li>
+					<li><a href="http://we.easyelectronics.ru/tag/QVBoxLayout/">QVBoxLayout</a>, </li>
+					<li><a href="http://we.easyelectronics.ru/tag/QGridLayout/">QGridLayout</a></li>
+		                                                             
+	</ul>
+
+
+
+	<ul class="info">
+		<li id="vote_area_topic_1516" class="voting positive guest">
+			<a href="#" class="plus" onclick="return ls.vote.vote(1516,this,1,'topic');"></a>
+			<span id="vote_total_topic_1516" class="total" title="всего проголосовало: 7"> +4 </span>
+			<a href="#" class="minus" onclick="return ls.vote.vote(1516,this,-1,'topic');"></a>
+		</li>
+		<li class="date">23 декабря 2011, 16:07</li>
+		<li class="username"><a href="http://we.easyelectronics.ru/profile/RomiX/">RomiX</a></li>
+				
+    
+	</ul>
+			              <div id="ish-socbookmarks">
+  		<div id="vkontakte">
+	
+		<script type="text/javascript"><!--  
+		document.write(VK.Share.button(false,{type: "round", text: "Вконтакте"})); 
+		--></script>
+	
+	</div>
+			<div id="facebook">
+    
+    <script type="text/javascript"><!--
+		document.write('<iframe src="http://www.facebook.com/plugins/like.php?href='+escape(document.location.href)+'&layout=button_count&show_faces=false&width=100&action=like&font=arial&colorscheme=light&height=20" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:20px;" allowTransparency="true"></iframe>');
+    --></script>
+    
+	</div>
+			<div id="moimir">
+    
+    <script type="text/javascript"><!--
+    document.write('<a class="mrc__share" type="button_count" href="http://connect.mail.ru/share?share_url='+escape(document.location.href)+'">МойМир</a>');
+    --></script>
+    
+	</div>
+			<div id="tweetme">
+	
+		<script type="text/javascript">
+		tweetmeme_style = 'compact';
+		</script>
+		<script type="text/javascript" src="qt-sozdanie-sobstvennyh-vidzhetov_files/button.js"></script>
+	
+	</div>
+	    
+  	<div id="google_plusone">
+    <g:plusone></g:plusone>
+	</div>
+	      </div>
+	</div>	
+<div class="comments-header">
+	<h3>Комментарии (<span id="count-comments">4</span>)</h3>
+		<a href="http://we.easyelectronics.ru/rss/comments/1516/" class="rss">RSS</a>
+		<a href="#" onclick="ls.comments.collapseCommentAll(); return false;" onfocus="blur();">свернуть</a> /
+	<a href="#" onclick="ls.comments.expandCommentAll(); return false;" onfocus="blur();">развернуть</a>
+</div>
+
+<a name="comments"></a>
+	
+	
+<div class="comments" id="comments">
+						
+				
+		 
+				
+		<div class="comment-wrapper" id="comment_wrapper_id_37490">
+		
+		
+<div id="comment_id_37490" class="comment not-admin ">
+	<a name="comment37490"></a>
+	
+	
+	<div class="folding"></div>
+	
+	
+	<div id="comment_content_id_37490" class="content">
+			
+			Спасибо, как раз в тему. От себя могу добавить, что функция scaled и img.setPixel<br>
+для drawImage позволяет получить вывод 2-х мерного массива в удобном 
+виде. А еще у меня вопрос — каким образом можно изменять внешний вид, 
+стили объектов?
+			</div>
+	
+	
+							
+		<div id="vote_area_comment_37490" class="voting  guest     ">
+			<a href="#" class="plus" onclick="return ls.vote.vote(37490,this,1,'comment');"></a>
+			<span id="vote_total_comment_37490" class="total">0</span>
+			<a href="#" class="minus" onclick="return ls.vote.vote(37490,this,-1,'comment');"></a>
+		</div>
+		
+	
+	<ul class="info">
+		<li class="avatar"><a href="http://we.easyelectronics.ru/profile/KT3012/"><img src="qt-sozdanie-sobstvennyh-vidzhetov_files/avatar_24x24_002.png" alt="avatar"></a></li>
+		<li class="username"><a href="http://we.easyelectronics.ru/profile/KT3012/">KT3012</a></li>
+		<li class="date">24 декабря 2011, 03:13</li>
+				<li><a href="#comment37490" class="comment-link"></a></li>	
+				<li class="goto-comment-child"><a href="#" title="Обратно к ответу">↓</a></li>
+								
+	</ul>
+	
+</div>		
+									
+				
+		 
+				
+		<div class="comment-wrapper" id="comment_wrapper_id_37496">
+		
+		
+<div id="comment_id_37496" class="comment not-admin ">
+	<a name="comment37496"></a>
+	
+	
+	<div class="folding"></div>
+	
+	
+	<div id="comment_content_id_37496" class="content">
+			
+			с помощью CSS — <a href="http://doc.qt.nokia.com/4.7/stylesheet.html" rel="nofollow">doc.qt.nokia.com/4.7/stylesheet.html</a><br>
+только особо никто этим не занимается, видел всего пару стилей в нете(( сам не сильно дружу с дизайном
+			</div>
+	
+	
+							
+		<div id="vote_area_comment_37496" class="voting  guest     ">
+			<a href="#" class="plus" onclick="return ls.vote.vote(37496,this,1,'comment');"></a>
+			<span id="vote_total_comment_37496" class="total">0</span>
+			<a href="#" class="minus" onclick="return ls.vote.vote(37496,this,-1,'comment');"></a>
+		</div>
+		
+	
+	<ul class="info">
+		<li class="avatar"><a href="http://we.easyelectronics.ru/profile/RomiX/"><img src="qt-sozdanie-sobstvennyh-vidzhetov_files/avatar_24x24.jpg" alt="avatar"></a></li>
+		<li class="username"><a href="http://we.easyelectronics.ru/profile/RomiX/">RomiX</a></li>
+		<li class="date">24 декабря 2011, 09:20</li>
+				<li><a href="#comment37496" class="comment-link"></a></li>	
+					<li class="goto-comment-parent"><a href="#" onclick="ls.comments.goToParentComment(37496,37490); return false;" title="Ответ на">↑</a></li>
+				<li class="goto-comment-child"><a href="#" title="Обратно к ответу">↓</a></li>
+								
+	</ul>
+	
+</div>		
+									
+				
+		 
+				
+		<div class="comment-wrapper" id="comment_wrapper_id_37732">
+		
+		
+<div id="comment_id_37732" class="comment not-admin ">
+	<a name="comment37732"></a>
+	
+	
+	<div class="folding"></div>
+	
+	
+	<div id="comment_content_id_37732" class="content">
+			
+			можно еще <i>drawPrimitive</i> переопределить и уже рисовать объект с помощью <i>painter</i>
+			</div>
+	
+	
+							
+		<div id="vote_area_comment_37732" class="voting  guest     ">
+			<a href="#" class="plus" onclick="return ls.vote.vote(37732,this,1,'comment');"></a>
+			<span id="vote_total_comment_37732" class="total">0</span>
+			<a href="#" class="minus" onclick="return ls.vote.vote(37732,this,-1,'comment');"></a>
+		</div>
+		
+	
+	<ul class="info">
+		<li class="avatar"><a href="http://we.easyelectronics.ru/profile/Legath/"><img src="qt-sozdanie-sobstvennyh-vidzhetov_files/avatar_24x24.jpg" alt="avatar"></a></li>
+		<li class="username"><a href="http://we.easyelectronics.ru/profile/Legath/">Legath</a></li>
+		<li class="date">26 декабря 2011, 14:42</li>
+				<li><a href="#comment37732" class="comment-link"></a></li>	
+					<li class="goto-comment-parent"><a href="#" onclick="ls.comments.goToParentComment(37732,37496); return false;" title="Ответ на">↑</a></li>
+				<li class="goto-comment-child"><a href="#" title="Обратно к ответу">↓</a></li>
+								
+	</ul>
+	
+</div>		
+									
+				
+		    	
+			</div></div></div>				
+		<div class="comment-wrapper" id="comment_wrapper_id_39473">
+		
+		
+<div id="comment_id_39473" class="comment not-admin ">
+	<a name="comment39473"></a>
+	
+	
+	<div class="folding"></div>
+	
+	
+	<div id="comment_content_id_39473" class="content">
+			
+			Сакральный вопрос, а зачем книжки переписывать от своего имени?
+			</div>
+	
+	
+							
+		<div id="vote_area_comment_39473" class="voting  guest     ">
+			<a href="#" class="plus" onclick="return ls.vote.vote(39473,this,1,'comment');"></a>
+			<span id="vote_total_comment_39473" class="total">0</span>
+			<a href="#" class="minus" onclick="return ls.vote.vote(39473,this,-1,'comment');"></a>
+		</div>
+		
+	
+	<ul class="info">
+		<li class="avatar"><a href="http://we.easyelectronics.ru/profile/Urvin/"><img src="qt-sozdanie-sobstvennyh-vidzhetov_files/avatar_24x24.png" alt="avatar"></a></li>
+		<li class="username"><a href="http://we.easyelectronics.ru/profile/Urvin/">Urvin</a></li>
+		<li class="date">11 января 2012, 11:33</li>
+				<li><a href="#comment39473" class="comment-link"></a></li>	
+				<li class="goto-comment-child"><a href="#" title="Обратно к ответу">↓</a></li>
+								
+	</ul>
+	
+</div>		
+							</div>    
+			</div>				
+	
+
+			Только зарегистрированные и авторизованные пользователи могут оставлять комментарии.
+		
+
+
+	
+
+
+			
+			</div><!-- /content-inner -->
+		</div><!-- /content -->
+
+					<div id="sidebar">
+										<div class="block stream" id="block_stream">
+	<h2>Прямой эфир</h2>
+	
+	
+	<ul class="switcher">						
+		<li id="block_stream_item_comment" class="active">Комментарии</li>
+		<li id="block_stream_item_topic">Публикации</li>
+		
+		
+	</ul>					
+	
+	
+	<div class="block-content" id="block_stream_content">
+		<ul class="list">
+									
+		<li class="even">
+			<a href="http://we.easyelectronics.ru/profile/MrYuran/" class="user">MrYuran</a> →
+			<span class="stream-comment-icon"></span>
+			<a href="http://we.easyelectronics.ru/msp430/virtualnaya-mashina-i-skriptovoy-dvizhok-v-msp430g2553-prosche-parenoy-repy-4e4th-ti-launchpad.html#comment85931" class="topic-title">Виртуальная машина и скриптовой движок в MSP430G2553 - проще пареной репы.  4e4th + TI Launchpad</a>
+			<span>73</span> →
+			<a href="http://we.easyelectronics.ru/blog/msp430/" class="blog-title">MSP430</a>
+		</li>
+									
+		<li>
+			<a href="http://we.easyelectronics.ru/profile/kalobyte-ya/" class="user">kalobyte-ya</a> →
+			<span class="stream-comment-icon"></span>
+			<a href="http://we.easyelectronics.ru/shluzzzoid/impulsnyy-blok-pitaniya-dlya-mikrokontrollera-na-ka1h0165r.html#comment85927" class="topic-title">Импульсный блок питания для микроконтроллера на ka1h0165r</a>
+			<span>32</span> →
+			<a href="http://we.easyelectronics.ru/my/shluzzzoid/" class="blog-title">Блог им. shluzzzoid</a>
+		</li>
+									
+		<li class="even">
+			<a href="http://we.easyelectronics.ru/profile/kalobyte-ya/" class="user">kalobyte-ya</a> →
+			<span class="stream-comment-icon"></span>
+			<a href="http://we.easyelectronics.ru/part/organayzer-dlya-smd-s-aliexpress.html#comment85926" class="topic-title">Органайзер для SMD с Aliexpress</a>
+			<span>52</span> →
+			<a href="http://we.easyelectronics.ru/blog/part/" class="blog-title">Деталька</a>
+		</li>
+									
+		<li>
+			<a href="http://we.easyelectronics.ru/profile/coocos/" class="user">coocos</a> →
+			<span class="stream-comment-icon"></span>
+			<a href="http://we.easyelectronics.ru/Soft/funkcii-kalendarya-i-vremeni-na-odnom-registre.html#comment85924" class="topic-title">Функции календаря и времени на одном регистре</a>
+			<span>22</span> →
+			<a href="http://we.easyelectronics.ru/blog/Soft/" class="blog-title">Алгоритмы и программные решения</a>
+		</li>
+									
+		<li class="even">
+			<a href="http://we.easyelectronics.ru/profile/Lifelover/" class="user">Lifelover</a> →
+			<span class="stream-comment-icon"></span>
+			<a href="http://we.easyelectronics.ru/tixer_ru/o-magazine-tixerru.html#comment85920" class="topic-title">О магазине TIXER.RU</a>
+			<span>97</span> →
+			<a href="http://we.easyelectronics.ru/my/tixer_ru/" class="blog-title">Блог им. tixer_ru</a>
+		</li>
+									
+		<li>
+			<a href="http://we.easyelectronics.ru/profile/tarasik/" class="user">tarasik</a> →
+			<span class="stream-comment-icon"></span>
+			<a href="http://we.easyelectronics.ru/electro-and-pc/podklyuchenie-mikrokontrollera-k-lokalnoy-seti-udp-klient.html#comment85917" class="topic-title">Подключение микроконтроллера к локальной сети: UDP-клиент</a>
+			<span>23</span> →
+			<a href="http://we.easyelectronics.ru/blog/electro-and-pc/" class="blog-title">Связь железа с компьютером.</a>
+		</li>
+									
+		<li class="even">
+			<a href="http://we.easyelectronics.ru/profile/LINKS_234/" class="user">LINKS_234</a> →
+			<span class="stream-comment-icon"></span>
+			<a href="http://we.easyelectronics.ru/serge962/codevision-avr-ili-kak-nachinayuschemu-potoptatsya-na-grablyah.html#comment85899" class="topic-title">Codevision Avr. Или как начинающему потоптаться на граблях</a>
+			<span>16</span> →
+			<a href="http://we.easyelectronics.ru/my/serge962/" class="blog-title">Блог им. serge962</a>
+		</li>
+									
+		<li>
+			<a href="http://we.easyelectronics.ru/profile/Vga/" class="user">Vga</a> →
+			<span class="stream-comment-icon"></span>
+			<a href="http://we.easyelectronics.ru/NBS/namotka-transformatora-dlya-impulsnogo-istochnika-pitaniya.html#comment85898" class="topic-title">Намотка трансформатора для импульсного источника питания</a>
+			<span>49</span> →
+			<a href="http://we.easyelectronics.ru/my/NBS/" class="blog-title">Блог им. NBS</a>
+		</li>
+									
+		<li class="even">
+			<a href="http://we.easyelectronics.ru/profile/sasha85ru/" class="user">sasha85ru</a> →
+			<span class="stream-comment-icon"></span>
+			<a href="http://we.easyelectronics.ru/part/ultrazvukovaya-pezopompa-ot-murata.html#comment85895" class="topic-title">Ультразвуковая пьезопомпа от Murata</a>
+			<span>45</span> →
+			<a href="http://we.easyelectronics.ru/blog/part/" class="blog-title">Деталька</a>
+		</li>
+									
+		<li>
+			<a href="http://we.easyelectronics.ru/profile/Zyx_ua/" class="user">Zyx_ua</a> →
+			<span class="stream-comment-icon"></span>
+			<a href="http://we.easyelectronics.ru/part/rabota-s-bluetooth-modulem-hc05.html#comment85894" class="topic-title">Работа с Bluetooth модулем HC05</a>
+			<span>102</span> →
+			<a href="http://we.easyelectronics.ru/blog/part/" class="blog-title">Деталька</a>
+		</li>
+									
+		<li class="even">
+			<a href="http://we.easyelectronics.ru/profile/podkassetnik/" class="user">podkassetnik</a> →
+			<span class="stream-comment-icon"></span>
+			<a href="http://we.easyelectronics.ru/Theory/zazor-mezhdu-provodnikami-na-pechatnoy-plate-vs-maksimalno-dopustimoe-napryazhenie.html#comment85869" class="topic-title">Зазор между проводниками на печатной плате vs Максимально допустимое напряжение</a>
+			<span>26</span> →
+			<a href="http://we.easyelectronics.ru/blog/Theory/" class="blog-title">Теория, измерения и расчеты</a>
+		</li>
+									
+		<li>
+			<a href="http://we.easyelectronics.ru/profile/Boris_B/" class="user">Boris_B</a> →
+			<span class="stream-comment-icon"></span>
+			<a href="http://we.easyelectronics.ru/Soft/bystroe-preobrazovanie-fure-java_2.html#comment85861" class="topic-title">Быстрое Преобразование Фурье, java</a>
+			<span>15</span> →
+			<a href="http://we.easyelectronics.ru/blog/Soft/" class="blog-title">Алгоритмы и программные решения</a>
+		</li>
+									
+		<li class="even">
+			<a href="http://we.easyelectronics.ru/profile/BarsMonster/" class="user">BarsMonster</a> →
+			<span class="stream-comment-icon"></span>
+			<a href="http://we.easyelectronics.ru/Tools/programmator-tl866cs-minipro.html#comment85852" class="topic-title">Программатор TL866CS MiniPro</a>
+			<span>28</span> →
+			<a href="http://we.easyelectronics.ru/blog/Tools/" class="blog-title">Инструмент</a>
+		</li>
+									
+		<li>
+			<a href="http://we.easyelectronics.ru/profile/MrYuran/" class="user">MrYuran</a> →
+			<span class="stream-comment-icon"></span>
+			<a href="http://we.easyelectronics.ru/forth/4e4th-ti-launchpad-v-nachale-bylo-slovo.html#comment85808" class="topic-title">4E4th + TI LaunchPad. В начале было Слово.</a>
+			<span>6</span> →
+			<a href="http://we.easyelectronics.ru/blog/forth/" class="blog-title">Forth</a>
+		</li>
+									
+		<li class="even">
+			<a href="http://we.easyelectronics.ru/profile/mamonth/" class="user">mamonth</a> →
+			<span class="stream-comment-icon"></span>
+			<a href="http://we.easyelectronics.ru/electro-and-pc/preobrazovatel-interfeysov-perehodnik-usbrs485-pi-5.html#comment85778" class="topic-title">Преобразователь интерфейсов (переходник) USB&lt;=&gt;RS485 (ПИ-5)</a>
+			<span>45</span> →
+			<a href="http://we.easyelectronics.ru/blog/electro-and-pc/" class="blog-title">Связь железа с компьютером.</a>
+		</li>
+									
+		<li>
+			<a href="http://we.easyelectronics.ru/profile/Vga/" class="user">Vga</a> →
+			<span class="stream-comment-icon"></span>
+			<a href="http://we.easyelectronics.ru/madmazy/stm32f3-ocherednoy-otzhig-stmicroelectronics-ili-est-chem-poschupat-analogovye-signaly.html#comment85737" class="topic-title">STM32F3 - очередной отжиг STMicroelectronics, или есть, чем пощупать аналоговые сигналы.</a>
+			<span>31</span> →
+			<a href="http://we.easyelectronics.ru/my/madmazy/" class="blog-title">Блог им. madmazy</a>
+		</li>
+									
+		<li class="even">
+			<a href="http://we.easyelectronics.ru/profile/evsi/" class="user">evsi</a> →
+			<span class="stream-comment-icon"></span>
+			<a href="http://we.easyelectronics.ru/HomeTech/metallorezist-rebyata.html#comment85692" class="topic-title">Металлорезист ребята.</a>
+			<span>23</span> →
+			<a href="http://we.easyelectronics.ru/blog/HomeTech/" class="blog-title">Технологии</a>
+		</li>
+									
+		<li>
+			<a href="http://we.easyelectronics.ru/profile/cahbtexhuk/" class="user">cahbtexhuk</a> →
+			<span class="stream-comment-icon"></span>
+			<a href="http://we.easyelectronics.ru/dipspb/mips-prodan-imagination-technologies-.html#comment85687" class="topic-title">MIPS продан Imagination Technologies ?</a>
+			<span>20</span> →
+			<a href="http://we.easyelectronics.ru/my/dipspb/" class="blog-title">Блог им. dipspb</a>
+		</li>
+									
+		<li class="even">
+			<a href="http://we.easyelectronics.ru/profile/bdpcvit/" class="user">bdpcvit</a> →
+			<span class="stream-comment-icon"></span>
+			<a href="http://we.easyelectronics.ru/grand1987/novaya-tinyka-i-drugie-novosti.html#comment85679" class="topic-title">Новая Tiny'ка и другие новости</a>
+			<span>26</span> →
+			<a href="http://we.easyelectronics.ru/my/grand1987/" class="blog-title">Блог им. grand1987</a>
+		</li>
+									
+		<li>
+			<a href="http://we.easyelectronics.ru/profile/Vga/" class="user">Vga</a> →
+			<span class="stream-comment-icon"></span>
+			<a href="http://we.easyelectronics.ru/msp430/4e4th-ti-launchpad-osnovy-yazyka-forth.html#comment85673" class="topic-title">4E4th + TI LaunchPad. Основы языка Forth</a>
+			<span>60</span> →
+			<a href="http://we.easyelectronics.ru/blog/msp430/" class="blog-title">MSP430</a>
+		</li>
+	</ul>
+
+
+<div class="bottom">
+	<a href="http://we.easyelectronics.ru/comments/">Весь эфир</a> | <a href="http://we.easyelectronics.ru/rss/allcomments/">RSS</a>
+</div>
+	</div>
+</div>
+
+
+															<div class="block tags">
+	<ul class="cloud">						
+					<li><a class="w1" rel="tag" href="http://we.easyelectronics.ru/tag/1-Wire/">1-Wire</a></li>	
+					<li><a class="w1" rel="tag" href="http://we.easyelectronics.ru/tag/Altera/">Altera</a></li>	
+					<li><a class="w3" rel="tag" href="http://we.easyelectronics.ru/tag/arduino/">arduino</a></li>	
+					<li><a class="w4" rel="tag" href="http://we.easyelectronics.ru/tag/ARM/">ARM</a></li>	
+					<li><a class="w10" rel="tag" href="http://we.easyelectronics.ru/tag/AVR/">AVR</a></li>	
+					<li><a class="w2" rel="tag" href="http://we.easyelectronics.ru/tag/avr-gcc/">avr-gcc</a></li>	
+					<li><a class="w1" rel="tag" href="http://we.easyelectronics.ru/tag/C%2B%2B/">C++</a></li>	
+					<li><a class="w1" rel="tag" href="http://we.easyelectronics.ru/tag/CodeRed/">CodeRed</a></li>	
+					<li><a class="w2" rel="tag" href="http://we.easyelectronics.ru/tag/Cortex-M3/">Cortex-M3</a></li>	
+					<li><a class="w2" rel="tag" href="http://we.easyelectronics.ru/tag/DIY/">DIY</a></li>	
+					<li><a class="w1" rel="tag" href="http://we.easyelectronics.ru/tag/DX/">DX</a></li>	
+					<li><a class="w2" rel="tag" href="http://we.easyelectronics.ru/tag/enc28j60/">enc28j60</a></li>	
+					<li><a class="w2" rel="tag" href="http://we.easyelectronics.ru/tag/ethernet/">ethernet</a></li>	
+					<li><a class="w2" rel="tag" href="http://we.easyelectronics.ru/tag/gcc/">gcc</a></li>	
+					<li><a class="w3" rel="tag" href="http://we.easyelectronics.ru/tag/I2C/">I2C</a></li>	
+					<li><a class="w2" rel="tag" href="http://we.easyelectronics.ru/tag/IAR/">IAR</a></li>	
+					<li><a class="w1" rel="tag" href="http://we.easyelectronics.ru/tag/LaunchPad/">LaunchPad</a></li>	
+					<li><a class="w5" rel="tag" href="http://we.easyelectronics.ru/tag/LCD/">LCD</a></li>	
+					<li><a class="w3" rel="tag" href="http://we.easyelectronics.ru/tag/led/">led</a></li>	
+					<li><a class="w1" rel="tag" href="http://we.easyelectronics.ru/tag/linux/">linux</a></li>	
+					<li><a class="w2" rel="tag" href="http://we.easyelectronics.ru/tag/LPC1343/">LPC1343</a></li>	
+					<li><a class="w3" rel="tag" href="http://we.easyelectronics.ru/tag/LPCXpresso/">LPCXpresso</a></li>	
+					<li><a class="w5" rel="tag" href="http://we.easyelectronics.ru/tag/MSP430/">MSP430</a></li>	
+					<li><a class="w3" rel="tag" href="http://we.easyelectronics.ru/tag/nxp/">nxp</a></li>	
+					<li><a class="w1" rel="tag" href="http://we.easyelectronics.ru/tag/PCB/">PCB</a></li>	
+					<li><a class="w4" rel="tag" href="http://we.easyelectronics.ru/tag/PIC/">PIC</a></li>	
+					<li><a class="w2" rel="tag" href="http://we.easyelectronics.ru/tag/pinboard2/">pinboard2</a></li>	
+					<li><a class="w2" rel="tag" href="http://we.easyelectronics.ru/tag/RS-485/">RS-485</a></li>	
+					<li><a class="w2" rel="tag" href="http://we.easyelectronics.ru/tag/RTOS/">RTOS</a></li>	
+					<li><a class="w10" rel="tag" href="http://we.easyelectronics.ru/tag/STM32/">STM32</a></li>	
+					<li><a class="w6" rel="tag" href="http://we.easyelectronics.ru/tag/STM8/">STM8</a></li>	
+					<li><a class="w2" rel="tag" href="http://we.easyelectronics.ru/tag/STM8L/">STM8L</a></li>	
+					<li><a class="w3" rel="tag" href="http://we.easyelectronics.ru/tag/TI/">TI</a></li>	
+					<li><a class="w5" rel="tag" href="http://we.easyelectronics.ru/tag/UART/">UART</a></li>	
+					<li><a class="w5" rel="tag" href="http://we.easyelectronics.ru/tag/USB/">USB</a></li>	
+					<li><a class="w1" rel="tag" href="http://we.easyelectronics.ru/tag/VHDL/">VHDL</a></li>	
+					<li><a class="w1" rel="tag" href="http://we.easyelectronics.ru/tag/%D0%B0%D0%BB%D0%B3%D0%BE%D1%80%D0%B8%D1%82%D0%BC/">алгоритм</a></li>	
+					<li><a class="w2" rel="tag" href="http://we.easyelectronics.ru/tag/%D0%B0%D1%81%D1%81%D0%B5%D0%BC%D0%B1%D0%BB%D0%B5%D1%80/">ассемблер</a></li>	
+					<li><a class="w1" rel="tag" href="http://we.easyelectronics.ru/tag/%D0%90%D0%A6%D0%9F/">АЦП</a></li>	
+					<li><a class="w2" rel="tag" href="http://we.easyelectronics.ru/tag/%D0%B2%D0%BE%D0%BF%D1%80%D0%BE%D1%81/">вопрос</a></li>	
+					<li><a class="w2" rel="tag" href="http://we.easyelectronics.ru/tag/%D0%B4%D0%B5%D1%82%D0%B0%D0%BB%D1%8C%D0%BA%D0%B0/">деталька</a></li>	
+					<li><a class="w2" rel="tag" href="http://we.easyelectronics.ru/tag/%D0%B8%D0%B4%D0%B5%D1%8F/">идея</a></li>	
+					<li><a class="w6" rel="tag" href="http://we.easyelectronics.ru/tag/%D0%B8%D0%BD%D1%81%D1%82%D1%80%D1%83%D0%BC%D0%B5%D0%BD%D1%82/">инструмент</a></li>	
+					<li><a class="w8" rel="tag" href="http://we.easyelectronics.ru/tag/%D0%BA%D0%BE%D0%BD%D0%BA%D1%83%D1%80%D1%81/">конкурс</a></li>	
+					<li><a class="w3" rel="tag" href="http://we.easyelectronics.ru/tag/%D0%BA%D0%BE%D0%BD%D0%BA%D1%83%D1%80%D1%812/">конкурс2</a></li>	
+					<li><a class="w2" rel="tag" href="http://we.easyelectronics.ru/tag/%D0%9B%D0%A3%D0%A2/">ЛУТ</a></li>	
+					<li><a class="w1" rel="tag" href="http://we.easyelectronics.ru/tag/%D0%BC%D0%B0%D0%B3%D0%B0%D0%B7%D0%B8%D0%BD%D1%8B/">магазины</a></li>	
+					<li><a class="w3" rel="tag" href="http://we.easyelectronics.ru/tag/%D0%BC%D0%B8%D0%BA%D1%80%D0%BE%D0%BA%D0%BE%D0%BD%D1%82%D1%80%D0%BE%D0%BB%D0%BB%D0%B5%D1%80%D1%8B/">микроконтроллеры</a></li>	
+					<li><a class="w5" rel="tag" href="http://we.easyelectronics.ru/tag/%D0%BD%D0%B0%D1%87%D0%B8%D0%BD%D0%B0%D1%8E%D1%89%D0%B8%D0%BC/">начинающим</a></li>	
+					<li><a class="w2" rel="tag" href="http://we.easyelectronics.ru/tag/%D0%9E%D1%82%D0%BB%D0%B0%D0%B4%D0%BE%D1%87%D0%BD%D0%B0%D1%8F%20%D0%BF%D0%BB%D0%B0%D1%82%D0%B0/">Отладочная плата</a></li>	
+					<li><a class="w1" rel="tag" href="http://we.easyelectronics.ru/tag/%D0%BF%D0%B0%D1%8F%D0%BB%D1%8C%D0%BD%D0%B8%D0%BA/">паяльник</a></li>	
+					<li><a class="w2" rel="tag" href="http://we.easyelectronics.ru/tag/%D0%BF%D0%B5%D1%87%D0%B0%D1%82%D0%BD%D0%B0%D1%8F%20%D0%BF%D0%BB%D0%B0%D1%82%D0%B0/">печатная плата</a></li>	
+					<li><a class="w3" rel="tag" href="http://we.easyelectronics.ru/tag/%D0%BF%D0%BB%D0%B0%D1%82%D0%B0/">плата</a></li>	
+					<li><a class="w5" rel="tag" href="http://we.easyelectronics.ru/tag/%D0%9F%D0%9B%D0%98%D0%A1/">ПЛИС</a></li>	
+					<li><a class="w2" rel="tag" href="http://we.easyelectronics.ru/tag/%D0%BF%D0%BE%D0%B4%D0%B5%D0%BB%D0%BA%D0%B8/">поделки</a></li>	
+					<li><a class="w1" rel="tag" href="http://we.easyelectronics.ru/tag/%D0%BF%D0%BE%D0%BA%D1%83%D0%BF%D0%BA%D0%B8/">покупки</a></li>	
+					<li><a class="w4" rel="tag" href="http://we.easyelectronics.ru/tag/%D0%BF%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D0%B0%D1%82%D0%BE%D1%80/">программатор</a></li>	
+					<li><a class="w3" rel="tag" href="http://we.easyelectronics.ru/tag/%D0%BF%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5/">программирование</a></li>	
+					<li><a class="w2" rel="tag" href="http://we.easyelectronics.ru/tag/%D1%80%D0%BE%D0%B1%D0%BE%D1%82/">робот</a></li>	
+					<li><a class="w1" rel="tag" href="http://we.easyelectronics.ru/tag/%D1%81%D0%B2%D0%B5%D1%82%D0%BE%D0%B4%D0%B8%D0%BE%D0%B4/">светодиод</a></li>	
+					<li><a class="w1" rel="tag" href="http://we.easyelectronics.ru/tag/%D1%81%D0%B5%D0%BC%D0%BF%D0%BB%D1%8B/">семплы</a></li>	
+					<li><a class="w1" rel="tag" href="http://we.easyelectronics.ru/tag/%D1%81%D0%B5%D1%80%D0%B2%D0%BE%D0%BC%D0%B0%D1%88%D0%B8%D0%BD%D0%BA%D0%B0/">сервомашинка</a></li>	
+					<li><a class="w2" rel="tag" href="http://we.easyelectronics.ru/tag/%D1%81%D0%BE%D1%84%D1%82/">софт</a></li>	
+					<li><a class="w1" rel="tag" href="http://we.easyelectronics.ru/tag/%D1%81%D1%85%D0%B5%D0%BC%D0%B0/">схема</a></li>	
+					<li><a class="w2" rel="tag" href="http://we.easyelectronics.ru/tag/%D1%81%D1%85%D0%B5%D0%BC%D0%BE%D1%82%D0%B5%D1%85%D0%BD%D0%B8%D0%BA%D0%B0/">схемотехника</a></li>	
+					<li><a class="w4" rel="tag" href="http://we.easyelectronics.ru/tag/%D0%A2%D0%B5%D1%85%D0%BD%D0%BE%D0%BB%D0%BE%D0%B3%D0%B8%D0%B8/">Технологии</a></li>	
+					<li><a class="w1" rel="tag" href="http://we.easyelectronics.ru/tag/%D1%83%D0%BC%D0%BD%D1%8B%D0%B9%20%D0%B4%D0%BE%D0%BC/">умный дом</a></li>	
+					<li><a class="w6" rel="tag" href="http://we.easyelectronics.ru/tag/%D1%85%D0%B0%D0%BB%D1%8F%D0%B2%D0%B0/">халява</a></li>	
+					<li><a class="w3" rel="tag" href="http://we.easyelectronics.ru/tag/%D1%85%D1%80%D0%B5%D0%BD%D1%8C/">хрень</a></li>	
+					<li><a class="w3" rel="tag" href="http://we.easyelectronics.ru/tag/%D1%8E%D0%BC%D0%BE%D1%80/">юмор</a></li>	
+			</ul>
+</div>
+															<div class="block blogs" id="block_blogs">
+	<h2>Блоги</h2>
+	
+	
+	<ul class="switcher">
+		<li id="block_blogs_item_top" class="active">Топ</li>
+			</ul>
+	
+	
+	<div class="block-content" id="block_blogs_content">
+		<ul class="list">
+			<li>
+			<span class="rating">37.70</span>
+			<a href="http://we.easyelectronics.ru/blog/STM8/">STM8</a> 
+					</li>
+			<li>
+			<span class="rating">29.14</span>
+			<a href="http://we.easyelectronics.ru/blog/AVR/">AVR</a> 
+					</li>
+			<li>
+			<span class="rating">26.82</span>
+			<a href="http://we.easyelectronics.ru/blog/JunkBox/">Мусоровоз</a> 
+			<img src="qt-sozdanie-sobstvennyh-vidzhetov_files/lock.png" alt="[x]" title="Закрытый блог">		</li>
+			<li>
+			<span class="rating">20.57</span>
+			<a href="http://we.easyelectronics.ru/blog/STM32/">STM32</a> 
+					</li>
+			<li>
+			<span class="rating">17.50</span>
+			<a href="http://we.easyelectronics.ru/blog/electro-and-pc/">Связь железа с компьютером.</a> 
+					</li>
+			<li>
+			<span class="rating">14.68</span>
+			<a href="http://we.easyelectronics.ru/blog/smarthouse/">Умный дом</a> 
+					</li>
+			<li>
+			<span class="rating">14.13</span>
+			<a href="http://we.easyelectronics.ru/blog/part/">Деталька</a> 
+					</li>
+			<li>
+			<span class="rating">13.69</span>
+			<a href="http://we.easyelectronics.ru/blog/Shematech/">Схемотехника</a> 
+					</li>
+			<li>
+			<span class="rating">12.61</span>
+			<a href="http://we.easyelectronics.ru/blog/msp430/">MSP430</a> 
+					</li>
+			<li>
+			<span class="rating">12.53</span>
+			<a href="http://we.easyelectronics.ru/blog/LPC/">LPC1xxx</a> 
+					</li>
+	</ul>				
+	</div>
+
+	
+	<div class="bottom">
+		<a href="http://we.easyelectronics.ru/blogs/">Все блоги</a>
+	</div>
+</div>
+
+									</div>			</div><!-- /wrapper -->
+
+	<div id="footer">
+		<div id="footer-inner">
+			<div class="right">© Powered by <a href="http://livestreetcms.ru/">LiveStreet CMS</a></div>
+			Design by — <a href="http://www.xeoart.com/">Студия XeoArt</a>
+			<img src="qt-sozdanie-sobstvennyh-vidzhetov_files/xeoart.gif" border="0">
+						
+		</div>
+	</div>
+
+</div><!-- /container -->
+
+
+
+
+<!-- Yandex.Metrika counter -->
+<div style="display: none;"><script type="text/javascript">
+(function(w, c) {
+    (w[c] = w[c] || []).push(function() {
+        try {
+            w.yaCounter4558804 = new Ya.Metrika({id:4558804,
+                    clickmap:true,
+                    trackLinks:true});
+        }
+        catch(e) { }
+    });
+})(window, "yandex_metrika_callbacks");
+</script></div>
+<script src="qt-sozdanie-sobstvennyh-vidzhetov_files/watch.js" type="text/javascript" defer="defer"></script>
+<noscript><div><img src="qt-sozdanie-sobstvennyh-vidzhetov_files/4558804.gif" style="position: absolute; left: -9999px;" alt=""></div></noscript>
+<!-- /Yandex.Metrika counter -->
+
+</body></html>

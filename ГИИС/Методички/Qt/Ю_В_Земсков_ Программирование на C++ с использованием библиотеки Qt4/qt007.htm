@@ -1,0 +1,328 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0041)http://www.mechta34.com/it/qt4/qt007.html -->
+<HTML><HEAD><TITLE>Ю.В.Земсков. Программирование на C++ с использованием библиотеки Qt4</TITLE>
+<META http-equiv=Content-Type content="text/html; charset=windows-1251"><LINK 
+href="Images/s1.css" type=text/css rel=stylesheet>
+<META content="MSHTML 6.00.2900.2180" name=GENERATOR></HEAD>
+<BODY>
+<a href="qt006.htm">Назад</a> <a href="title.htm">Содержание</a> <a href="qtdb000.htm">Вперед</a>
+<H2>Создание диалогов с помощью Qt&nbsp;Designer</H2>Для разработки интерфейса 
+программы в Qt имеется специальный инструмент&nbsp;-- Qt&nbsp;Designer. Он 
+используется либо как самостоятельное приложение, либо как компонент, встроенный 
+в интегрированную среду Microsoft Visual Studio. Во втором случае доступ к его 
+функциям производится с помощью пункта меню <B>Qt</B>. Покажем, как пользоваться 
+дизайнером на примере нашего диалога (см.&nbsp;рис.). 
+<P>Откроем Qt&nbsp;Designer и (если диалог создания новой формы не появится 
+автоматически) выполним команду меню <B>File</B>&nbsp;| <B>New&nbsp;Form</B>. Из 
+представленных вариантов заготовок (диалоги с горизонтальным или вертикальным 
+размещением кнопок, главное окно приложения или произвольный виджет) выберем 
+первый и нажмём кнопку <B>Create</B> (<B>Создать</B>). В левом окне дизайнера 
+<B>Widget Box</B> в группе <B>Display Widget</B> найдём элемент <B>Label</B> 
+(рис.) и с помощью левой кнопки мыши перетащим его на форму. В правой части 
+дизайнера, в окне <B>Property Editor</B> (<B>Редактор свойств</B>) укажем 
+идентификатор элемента (значение свойства <B>objectName</B>), например, 
+<CODE>lb</CODE>, и текст надписи (свойство <B>text</B>). 
+<P>Аналогично разместим на форме однострочное поле ввода <CODE>Line Edit</CODE> 
+(идентификатор <CODE>le</CODE>), поле со списком <CODE>Combo Box</CODE> 
+(идентификатор <CODE>cb</CODE>), поле для ввода целого числа с кнопками 
+инкремента/декремента <CODE>Spin Box</CODE> (идентификатор <CODE>sb</CODE>), 
+независимый переключатель <CODE>Check Box</CODE> (идентификатор 
+<CODE>chb</CODE>), поле для ввода вещественного числа с кнопками 
+инкремента/декремента <CODE>Double Spin Box</CODE> (идентификатор 
+<CODE>dsb</CODE>), поле для выбора даты/времени <CODE>Date/Time Edit</CODE> 
+(идентификатор <CODE>dte</CODE>), контейнер <CODE>Group Box</CODE> 
+(идентификатор <CODE>groupBox</CODE>) с тремя зависимыми переключателями 
+<CODE>Radio Button</CODE> (идентификаторы <CODE>rb1</CODE>, <CODE>rb2</CODE> и 
+<CODE>rb3</CODE>), как показано на рис. 
+<P>Пока не следует сильно заботиться о красивом размещении элементов друг 
+относительно друга и об их точных размерах. Для первой радиокнопки зададим 
+значение свойства <CODE>checked=true</CODE>. Между рамкой с зависимыми 
+переключателями и кнопками диалога вставим элемент <CODE>Vertical Spacer</CODE> 
+(вертикальный промежуток, он находится в группе <CODE>Spacers</CODE>). Для 
+элемента <CODE>Button Box</CODE> проверим значение свойства 
+<CODE>standardButtons</CODE>: галочки должны быть установлены только для кнопок 
+<CODE>Cancel</CODE> и <CODE>Save</CODE>. 
+<P>Теперь выделим мышкой первые два элемента (<CODE>Label</CODE> и <CODE>Line 
+Edit</CODE>), находящиеся в первой горизонтальной строке диалога. Для выделения 
+нескольких элементов можно использовать клавишу <KBD>Shift</KBD>. Щёлкнем по 
+выделенной группе правой кнопкой мыши и в появившемся контекстном меню выберем 
+команду <B>Lay out</B>&nbsp;| <B>Lay Out Horizontally</B> (расположить по 
+горизонтали). В результате автоматически будет создан менеджер размещения 
+<CODE>QHBoxLayout</CODE> и оба выделенных виджета окажутся внутри него. 
+Останется только задать единичное значение параметра 
+<CODE>horizontalStretch</CODE> (растяжение по горизонтали) из раздела 
+<CODE>sizePolicy</CODE> для однострочного поля ввода. 
+<P align=center><IMG src="Images/qtdesigner001.png"> <BR>Рис. Внешний вид 
+окна Qt&nbsp;Designer 
+<P>Аналогично создадим два горизонтальных менеджера размещения для двух 
+следующих строк нашего диалога. Поле для ввода даты/времени пропустим, т.к. оно 
+единственное в своей строке. Далее выделим три зависимых переключателя и 
+создадим для них всё тот же горизонтальный менеджер размещения. Для самой рамки 
+<CODE>Group&nbsp;Box</CODE>, внутри которой расположены три зависимых 
+переключателя, также создадим свой <CODE>QHBoxLayout</CODE> (хотя эта рамка и 
+единственная в своей строке, но она является контейнером для других элементов и 
+без менеджера размещения её высота не может быть вычислена правильно). 
+<P>Кнопки диалога трогать не будем, потому что при создании формы мастер уже 
+разместил их в элементе <CODE>Button Box</CODE>, который является аналогом 
+менеджера размещения, только используется специально для кнопок. Можно изменить 
+состав кнопок с помощью свойства <CODE>standardButtons</CODE> и их выравнивание 
+по горизонтали (свойство <CODE>centerButtons=true</CODE>). 
+<P>Наконец, нажмём правой кнопкой мышки по пустому фону диалога и в появившемся 
+контекстном меню выберем команду <B>Lay Out Vertically</B> (расположить по 
+вертикали). В результате будет создан вертикальный менеджер 
+<CODE>QVBoxLayout</CODE> и внутри него будут размещены все имеющиеся на форме 
+строки <CODE>QHBoxLayout</CODE> вместе с полем ввода даты/времени и вертикальным 
+промежутком (для которых мы так и не создали горизонтального менеджера 
+размещения). 
+<P>Можно проверить, как будет выглядеть наш диалог при различном оформлении 
+(команда меню <B>Form</B>&nbsp;| <B>Preview&nbsp;in</B>). 
+<P align=center><IMG src="Images/qtdesigner002.png"> <BR>Рис. Порядок 
+обхода элементов 
+<P>Теперь надо задать порядок обхода элементов при нажатии клавиши 
+<KBD>Tab</KBD>. Для этого выполним команду меню <B>Edit</B>&nbsp;| <B>Edit Tab 
+Order</B>. На редактируемой форме появятся квадратики с числами (рис.). Будем 
+щёлкать по ним левой кнопкой мыши в нужном порядке. После этого можно опять 
+войти в режим предпросмотра <B>Preview&nbsp;in</B> и с помощью клавиши 
+<KBD>Tab</KBD> убедиться, что порядок обхода элементов задан правильно. 
+<P>Допустим, нам требуется сделать недоступным поле ввода вещественного числа 
+<CODE>dsb</CODE> при сбросе переключателя <CODE>chb</CODE>. Другими словами, 
+надо связать сигнал <CODE>toggled(bool)</CODE> элемента <CODE>chb</CODE> и слот 
+<CODE>enabled(bool)</CODE> элемента <CODE>dsb</CODE>. Если в нижнем правом углу 
+окна Qt&nbsp;Designer вы не видите панель <B>Signal/Slot Editor</B>, то 
+выполните пункт меню <B>Tools</B>&nbsp;<B>| Signal/Slot Editor</B>. Для 
+добавления нового соединения нажмите кнопку "<B>+</B>", после чего 
+последовательно укажите все четыре параметра соединения (рис.). После этого в 
+свойствах элемента <CODE>chb</CODE> надо задать начальное значение 
+<CODE>checked=false</CODE>, а для элемента <CODE>dsb</CODE> -- значение 
+<CODE>enabled=false</CODE>. Теперь можно в режиме предварительного просмотра 
+проверить, как изменяется доступность поля ввода числа при изменении состояния 
+переключателя. 
+<P align=center><IMG src="Images/qtdesigner003.png"> 
+<P>Аналогично определим ещё два соединения, соответствующие нажатию кнопок 
+"Сохранить" и "Отмена" (см. рис.). Стандартные для модального диалога слоты 
+<CODE>accept</CODE> и <CODE>reject</CODE> закрывают диалог и запоминают 
+результат <CODE>Accepted</CODE> (принят) или <CODE>Rejected</CODE> (отклонён), 
+который затем может быть прочитан с помощью метода <CODE>result()</CODE>. 
+<P>Теперь предположим, что при изменении числа в поле <CODE>sb</CODE> необходимо 
+тут же выводить это же значение в поле <CODE>le</CODE>. Воспользуемся вторым 
+способом определения соединений. Войдём в режим визуального редактирования 
+сигналов и слотов, выполнив пункт меню <B>Edit&nbsp;| Edit Signals/Slots</B> или 
+просто нажав клавишу <KBD>F4</KBD>. С помощью левой кнопки мыши "зацепим" поле 
+<CODE>sb</CODE> -- источник сигнала и "бросим" его на элемент <CODE>le</CODE> -- 
+приёмник сигнала (рис.). 
+<P align=center><IMG src="Images/qtdesigner004.png"> 
+<P>В открывшемся диалоге (рис.) поставим галочку <B>Show all signals and 
+slots</B> (показывать все сигналы и слоты), в левом окне выберем сигнал 
+<CODE>valueChanged(QString)</CODE>, а в правом -- слот 
+<CODE>setText(QString)</CODE>. Нажмём <B>Ok</B>. После этого можно снова 
+проверить, как всё работает (<B>Form&nbsp;| Preview</B>). 
+<P align=center><IMG src="Images/qtdesigner005.png"> 
+<P>Разумеется, для реализации более сложных действий (например, изменение 
+доступности одних элементов диалога в зависимости от значений, вводимых 
+пользователем в другие элементы) без настоящего программирования обойтись не 
+получится. 
+<P>Сохраним описание диалога под любым именем (например, <CODE>dialog</CODE>) и 
+с расширением <CODE>ui</CODE>. 
+<P>В листинге 11 приведён фрагмент получившегося в результате файла. Как видим, 
+описание диалога хранится в формате&nbsp;XML. 
+<P><B>Листинг 11. Файл <CODE>*.ui</CODE></B> <PRE>&lt;ui version="4.0" &gt;
+ &lt;class&gt;Dialog&lt;/class&gt;
+ &lt;widget class="QDialog" name="Dialog" &gt;
+  &lt;property name="geometry" &gt;
+   &lt;rect&gt;
+    &lt;x&gt;0&lt;/x&gt;
+    &lt;y&gt;0&lt;/y&gt;
+    &lt;width&gt;274&lt;/width&gt;
+    &lt;height&gt;259&lt;/height&gt;
+   &lt;/rect&gt;
+  &lt;/property&gt;
+  .......
+&lt;/ui&gt;
+</PRE>
+<P>В листинге 12 показано, как использовать в программе диалог, разработанный с 
+помощью Qt&nbsp;Designer. 
+<P><B>Листинг 12. Загрузка <CODE>ui</CODE>-ресурса 
+(<CODE>examples-qt/05/05.cpp</CODE>)</B> <PRE>#include &lt;QApplication&gt;
+#include &lt;QDialog&gt;
+
+#include "ui_dialog.h"
+
+int main(int argc, char *argv[]) {
+    QApplication app(argc, argv);
+    Ui::Dialog ui;
+    QDialog *dialog = new QDialog;
+    ui.setupUi(dialog);
+    dialog-&gt;show();
+    return app.exec();
+}</PRE>
+<P>Мы подключили заголовочный файл, имя которого начинается префиксом 
+<CODE>ui_</CODE>, после которого записывается имя файла, созданного в дизайнере. 
+Откуда берётся <CODE>ui_dialog.h</CODE>? Этот файл формируется с помощью утилиты 
+<CODE>uic</CODE>, которая автоматически вызывается при компиляции программы. 
+<P>Затем объявили экземпляр класса <CODE>Ui::Dialog</CODE> (этот класс описан в 
+заголовочном файле) и экземпляр стандартного класса <CODE>QDialog</CODE>, после 
+чего для первого вызвали метод <CODE>setupUi</CODE>, указав второй в качестве 
+параметра. 
+<P>Компиляция программы проводится обычным порядком: сначала команда 
+<CODE>qmake&nbsp;-project</CODE>, затем просто <CODE>qmake</CODE> и, наконец, 
+<CODE>mingw32-make</CODE> или <CODE>nmake</CODE>. 
+<P>Можете запустить программу на выполнение: на экран выводится окно диалога, 
+доступность поля ввода вещественного числа зависит от состояния переключателя, 
+изменяемое значение <CODE>sb</CODE> тут же отображается в однострочном поле 
+ввода <CODE>le</CODE>, а при нажатии любой из двух кнопок диалог закрывается. 
+<P>Для выполнения более сложных действий придётся описать новый класс, например, 
+<CODE>MyDialog</CODE>, указав в качестве базового стандартный класс 
+<CODE>QDialog</CODE>. При этом относительно разработанного в дизайнере класса 
+<CODE>Ui::Dialog</CODE> имеется две возможности: либо определить экземпляр этого 
+класса внутри <CODE>MyDialog</CODE>, либо сделать класс <CODE>Ui::Dialog</CODE> 
+вторым родителем класса <CODE>MyDialog</CODE>. 
+<P>Первый вариант (с одним базовым классом) приведён в листинге 13. 
+<P><B>Листинг 13. Работа с <CODE>ui</CODE>-ресурсом</B> <PRE>// В заголовочном файле *.h:
+#include &lt;QDialog&gt;
+#include "ui_dialog.h"
+
+class MyDialog : public QDialog {
+    Q_OBJECT
+public:
+    MyDialog(QWidget *parent = 0);
+private:
+     Ui::Dialog ui;
+};
+
+// В файле *.cpp:
+MyDialog::MyDialog(QWidget *parent)
+        : QDialog(parent) {
+        
+    ui.setupUi(this);
+    
+    ui.cb-&gt;addItem(tr("Первый"));
+    ui.cb-&gt;addItem(tr("Второй"));
+    ui.cb-&gt;addItem(tr("Третий"));
+    ui.cb-&gt;setCurrentIndex(2);
+    
+    // .......
+}
+</PRE>Второй вариант (с двумя базовыми классами) показан в листинге 14. 
+<P><B>Листинг 14. Работа с <CODE>ui</CODE>-ресурсом (файлы 
+<CODE>examples-qt/06/06.h</CODE> и <CODE>06.cpp</CODE>)</B> <PRE>// В заголовочном файле *.h:
+#include &lt;QDialog&gt;
+#include "ui_dialog.h"
+
+class MyDialog : public QDialog, private Ui::Dialog {
+    Q_OBJECT
+public:
+    MyDialog(QWidget *parent=0);
+};
+
+// В файле *.cpp:
+MyDialog::MyDialog(QWidget *parent)
+        : QDialog(parent) {
+
+    setupUi(this);
+
+    cb-&gt;addItem(tr("Первый"));
+    cb-&gt;addItem(tr("Второй"));
+    cb-&gt;addItem(tr("Третий"));
+    cb-&gt;setCurrentIndex(2);
+
+    // ........
+}
+
+int main(int argc, char *argv[]) {
+    QApplication app(argc, argv);
+    QTextCodec *codec = QTextCodec::codecForName("CP1251");
+    QTextCodec::setCodecForTr(codec);
+
+    MyDialog *dlg = new MyDialog();
+    dlg-&gt;show();
+    return app.exec();
+}
+</PRE>
+<P>Как видим, к элементам диалога можно обращаться по тем именам, которые были 
+указаны для них в Qt&nbsp;Designer. 
+<P>Соединения между сигналами и слотами для класса <CODE>MyDialog</CODE> можно 
+определять как обычно, с помощью метода <CODE>connect</CODE> (например, в 
+конструкторе класса <CODE>MyDialog</CODE>), при этом пользовательские слоты 
+должны быть перечислены в объявлении класса или унаследованы от базовых классов. 
+Но можно воспользоваться особым правилом именования слотов: <PRE>private slots:
+    on_ИмяВиджета_ИмяСигнала(ПараметрыСигнала);
+</PRE>В этом случае соединение между сигналом и слотом будет выполнено 
+автоматически (в методе <CODE>setupUi()</CODE>, который генерируется утилитой 
+<CODE>uic</CODE>). Например: <PRE>// В заголовочном файле *.h:
+#include &lt;QDialog&gt;
+#include "ui_dialog.h"
+
+class MyDialog : public QDialog, public Ui::Dialog {
+    Q_OBJECT
+public:
+    MyDialog(QWidget *parent=0);
+private slots:
+    void on_rb3_toggled(bool s);
+}; 
+
+// В файле *.cpp:
+void MyDialog::on_rb3_toggled(bool s) {
+    dte-&gt;setHidden(s);
+}
+</PRE>В результате при выборе радиокнопки <CODE>rb3</CODE> поле ввода 
+даты/времени будет спрятано, а при выборе любой другой радиокнопки -- снова 
+показано. 
+<P>Оба описанных варианта компоновки внешнего ресурса с основной программой 
+являются <I>статическими</I>: после компиляции программы <CODE>ui</CODE>-файл 
+можно удалить. Существует и вариант динамической загрузки во время выполнения 
+программы (листинг&nbsp;15). Здесь используется класс <CODE>QUiLoader</CODE>. 
+При этом требуется подключить заголовочный файл <CODE>QtUiTools</CODE>, а в 
+файле проекта <CODE>*.pro</CODE>&nbsp;-- добавить строку <PRE>CONFIG += uitools
+</PRE>
+<P>После редактирования <CODE>pro</CODE>-файла не следует выполнять 
+<CODE>qmake</CODE> с параметром <CODE>-project</CODE>, иначе все изменения в нём 
+будут потеряны. 
+<P><B>Листинг 15. Динамическая загрузка <CODE>ui</CODE>-ресурса 
+(<CODE>examples-qt/07/07.cpp</CODE>)</B> <PRE>#include &lt;QtGui&gt;
+#include &lt;QtUiTools&gt;
+
+int main(int argc, char *argv[]) {
+    QApplication app(argc, argv);
+    QTextCodec *codec = QTextCodec::codecForName("CP1251");
+    QTextCodec::setCodecForTr(codec);
+
+    QUiLoader uiLoader;
+    QFile file("dialog.ui");
+    file.open(QFile::ReadOnly);
+    QWidget *dlg = uiLoader.load(&amp;file);
+    file.close();
+    if (dlg) {
+        QComboBox *cb = dlg-&gt;findChild&lt;QComboBox*&gt;("cb");
+        cb-&gt;addItem(QObject::tr("Первый"));
+        cb-&gt;addItem(QObject::tr("Второй"));
+        cb-&gt;addItem(QObject::tr("Третий"));
+        cb-&gt;setCurrentIndex(2);
+        cb-&gt;setEditable(true);
+        cb-&gt;setInsertPolicy(QComboBox::InsertAtBottom);
+
+        QSpinBox *sb = dlg-&gt;findChild&lt;QSpinBox*&gt;("sb");
+        sb-&gt;setValue(5);
+
+        dlg-&gt;findChild&lt;QCheckBox*&gt;("chb")-&gt;setCheckState(Qt::Checked);
+
+        // .......
+
+        dlg-&gt;findChild&lt;QRadioButton*&gt;("rb2")-&gt;setChecked(true);
+
+        dlg-&gt;show();
+        return app.exec();
+    }
+    else
+        return 1;
+}
+</PRE>
+<P>Для обращения к элементам диалога при динамической загрузке используется 
+метод <PRE>parent-&gt;findChild&lt;Тип *&gt;("ИмяЭлемента")
+</PRE>или функция <PRE>qFindChild&lt;Тип *&gt;(parent, "ИмяЭлемента")
+</PRE>
+<p>Второй вариант предназначен для компиляторов, которые не поддерживают 
+шаблоны методов (как, например, Microsoft Visual&nbsp;C++&nbsp;6.0).</p>
+<p></p>
+<div align="left"><a href="qt006.htm">Назад</a> <a href="title.htm">Содержание</a> <a href="qtdb000.htm">Вперед</a>
+</div>
+</BODY></HTML>

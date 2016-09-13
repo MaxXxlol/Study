@@ -1,0 +1,368 @@
+<!DOCTYPE HTML>
+<html dir="ltr" lang="en-US"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+
+<meta charset="UTF-8">
+<title>How to create custom widgets with Qt | Serene Thinking</title>
+<link rel="profile" href="http://gmpg.org/xfn/11">
+<link rel="stylesheet" type="text/css" media="all" href="How%20to%20create%20custom%20widgets%20with%20Qt%20_%20Serene%20Thinking_files/style.css">
+<link rel="pingback" href="http://www.serenethinking.com/xmlrpc.php">
+<link rel="alternate" type="application/rss+xml" title="Serene Thinking » Feed" href="http://www.serenethinking.com/feed/">
+<link rel="alternate" type="application/rss+xml" title="Serene Thinking » Comments Feed" href="http://www.serenethinking.com/comments/feed/">
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://www.serenethinking.com/xmlrpc.php?rsd">
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://www.serenethinking.com/wp-includes/wlwmanifest.xml"> 
+<link rel="prev" title="Squares and cubes" href="http://www.serenethinking.com/2010/08/squares-and-cubes/">
+<link rel="next" title="How to integrate custom widgets in Qt Designer" href="http://www.serenethinking.com/2010/08/how-to-integrate-custom-widgets-in-qt-designer/">
+<meta name="generator" content="WordPress 3.4.2">
+<link rel="canonical" href="http://www.serenethinking.com/2010/08/how-to-create-custom-widgets-with-qt/">
+<link rel="shortlink" href="http://www.serenethinking.com/?p=86">
+	<link type="text/css" rel="stylesheet" href="How%20to%20create%20custom%20widgets%20with%20Qt%20_%20Serene%20Thinking_files/shCore.css">
+	<link type="text/css" rel="stylesheet" href="How%20to%20create%20custom%20widgets%20with%20Qt%20_%20Serene%20Thinking_files/shThemeDefault.css">
+	<script type="text/javascript" src="How%20to%20create%20custom%20widgets%20with%20Qt%20_%20Serene%20Thinking_files/shCore.js"></script>
+	<script type="text/javascript" src="How%20to%20create%20custom%20widgets%20with%20Qt%20_%20Serene%20Thinking_files/shBrushBash.js"></script>
+	<script type="text/javascript" src="How%20to%20create%20custom%20widgets%20with%20Qt%20_%20Serene%20Thinking_files/shBrushCpp.js"></script>
+	<script type="text/javascript" src="How%20to%20create%20custom%20widgets%20with%20Qt%20_%20Serene%20Thinking_files/shBrushCSharp.js"></script>
+	<script type="text/javascript" src="How%20to%20create%20custom%20widgets%20with%20Qt%20_%20Serene%20Thinking_files/shBrushCss.js"></script>
+	<script type="text/javascript" src="How%20to%20create%20custom%20widgets%20with%20Qt%20_%20Serene%20Thinking_files/shBrushDelphi.js"></script>
+	<script type="text/javascript" src="How%20to%20create%20custom%20widgets%20with%20Qt%20_%20Serene%20Thinking_files/shBrushDiff.js"></script>
+	<script type="text/javascript" src="How%20to%20create%20custom%20widgets%20with%20Qt%20_%20Serene%20Thinking_files/shBrushGroovy.js"></script>
+	<script type="text/javascript" src="How%20to%20create%20custom%20widgets%20with%20Qt%20_%20Serene%20Thinking_files/shBrushJava.js"></script>
+	<script type="text/javascript" src="How%20to%20create%20custom%20widgets%20with%20Qt%20_%20Serene%20Thinking_files/shBrushJScript.js"></script>
+	<script type="text/javascript" src="How%20to%20create%20custom%20widgets%20with%20Qt%20_%20Serene%20Thinking_files/shBrushPerl.js"></script>
+	<script type="text/javascript" src="How%20to%20create%20custom%20widgets%20with%20Qt%20_%20Serene%20Thinking_files/shBrushPhp.js"></script>
+	<script type="text/javascript" src="How%20to%20create%20custom%20widgets%20with%20Qt%20_%20Serene%20Thinking_files/shBrushPlain.js"></script>
+	<script type="text/javascript" src="How%20to%20create%20custom%20widgets%20with%20Qt%20_%20Serene%20Thinking_files/shBrushPython.js"></script>
+	<script type="text/javascript" src="How%20to%20create%20custom%20widgets%20with%20Qt%20_%20Serene%20Thinking_files/shBrushRuby.js"></script>
+	<script type="text/javascript" src="How%20to%20create%20custom%20widgets%20with%20Qt%20_%20Serene%20Thinking_files/shBrushScala.js"></script>
+	<script type="text/javascript" src="How%20to%20create%20custom%20widgets%20with%20Qt%20_%20Serene%20Thinking_files/shBrushSql.js"></script>
+	<script type="text/javascript" src="How%20to%20create%20custom%20widgets%20with%20Qt%20_%20Serene%20Thinking_files/shBrushVb.js"></script>
+	<script type="text/javascript" src="How%20to%20create%20custom%20widgets%20with%20Qt%20_%20Serene%20Thinking_files/shBrushXml.js"></script>
+	<script type="text/javascript">		
+		SyntaxHighlighter.config.clipboardSwf = 'http://www.serenethinking.com/wp-content/plugins/syntax-highlighter-and-code-prettifier/scripts/clipboard.swf';
+		SyntaxHighlighter.all();
+	</script>
+	<style type="text/css">
+/* <![CDATA[ */
+img.latex { vertical-align: middle; border: none; }
+/* ]]> */
+</style>
+<style type="text/css" id="custom-background-css">
+body.custom-background { background-color: #ffffff; }
+</style>
+<script type="text/javascript" src="How%20to%20create%20custom%20widgets%20with%20Qt%20_%20Serene%20Thinking_files/edd4ftu.txt"></script>
+<script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+</head><body class="single single-post postid-86 single-format-standard custom-background">
+<div id="wrapper" class="hfeed">
+	<div id="header">
+		<div id="masthead">
+
+			<!--<div id="branding-img"><img src="/wp-content/themes/serenethinking/images/logo.jpg" alt="Logo"/></div>-->
+
+			<div id="branding" role="banner">
+								<!--<div id="site-description">Hi, I&#039;m Wolfgang Plaschg. I blog about programming and other interesting topics I want to share with you.</div>-->
+				<div id="site-title">
+					<span>
+						<a href="http://www.serenethinking.com/" title="Serene Thinking" rel="home">Serene Thinking</a>
+					</span>
+				</div>
+
+				
+								</div><!-- #branding -->
+
+			<!--<div id="access" role="navigation">
+			  				<div class="skip-link screen-reader-text"><a href="#content" title="Skip to content">Skip to content</a></div>
+								<div class="menu"><ul><li ><a href="http://www.serenethinking.com/" title="Home">Home</a></li><li class="page_item page-item-2"><a href="http://www.serenethinking.com/about/">About me</a></li><li class="page_item page-item-310"><a href="http://www.serenethinking.com/solution-to-the-set-puzzle/">Solution to the &#8220;Set&#8221; puzzle</a></li></ul></div>
+			</div>--><!-- #access -->
+		</div><!-- #masthead -->
+	</div><!-- #header -->
+
+	<div id="main">
+
+		<div id="container">
+			<div id="content" role="main">
+
+
+				<div id="nav-above" class="navigation">
+					<div class="nav-previous"><a href="http://www.serenethinking.com/2010/08/squares-and-cubes/" rel="prev"><span class="meta-nav">←</span> Squares and cubes</a></div>
+					<div class="nav-next"><a href="http://www.serenethinking.com/2010/08/how-to-integrate-custom-widgets-in-qt-designer/" rel="next">How to integrate custom widgets in Qt Designer <span class="meta-nav">→</span></a></div>
+				</div><!-- #nav-above -->
+
+				<div id="post-86" class="post-86 post type-post status-publish format-standard hentry category-qt category-tutorial">
+					<h1 class="entry-title">How to create custom widgets with Qt</h1>
+
+				<div class="entry-meta">
+					<span class="entry-date">August 19, 2010</span>											<span class="cat-links">
+							<a href="http://www.serenethinking.com/category/qt/" title="View all posts in Qt" rel="category tag">Qt</a>&nbsp;&nbsp;<a href="http://www.serenethinking.com/category/tutorial/" title="View all posts in Tutorial" rel="category tag">Tutorial</a>						</span>
+									</div><!-- .entry-meta -->
+
+					<div class="entry-content">
+						<p>Implementing your own custom widgets is the most fun part of 
+GUI development. It’s hard work, though, to create shiny, appealing 
+custom widgets, but it’s also very rewarding and satisfying. In this 
+tutorial I show you how to make a custom widget, which we also want to 
+integrate into Qt Designer. The focus of this tutorial lies on the 
+integration in Qt Designer, so the widget itself will be very simple. 
+This is the first part where we implement the widget.</p>
+<p>Our widget will be a text label that can be rendered either “Plain” 
+or with a effect. When you make your own widgets, you usally subclass an
+ existing widget that comes closest to your creation. We will inherit 
+our widget from <code>QLabel</code> and extend its properties with a text effect. You can choose between a “Plain”, “Sunken” or “Raised” rendering of the text. </p>
+<p><a href="http://www.serenethinking.com/wp-content/uploads/2010/08/screenshot1.png"><img src="How%20to%20create%20custom%20widgets%20with%20Qt%20_%20Serene%20Thinking_files/screenshot1.png" alt="" title="screenshot" class="aligncenter size-full wp-image-122" height="133" width="474"></a><br>
+Let’s start with the widget definition:</p>
+<pre class="brush:cpp">/**
+ * EffectLabel.h
+ */
+#ifndef EFFECTLABEL_H
+#define EFFECTLABEL_H
+
+#include &lt;QLabel&gt;
+#include &lt;QPaintEvent&gt;
+#include &lt;QPainter&gt;
+#include &lt;QPoint&gt;
+
+class EffectLabel : public QLabel
+{
+	Q_OBJECT
+
+public:
+
+	enum Effect {
+	    Plain = 0,
+		Sunken,
+		Raised
+	};
+
+	EffectLabel(QWidget* parent = 0);
+
+    /* The action takes place here. */
+	void paintEvent(QPaintEvent *event); 
+
+    /* Getter and setter for the effect property. */
+	Effect effect() const
+	{ return effect_; }
+ 
+    /* After setting the property we have to repaint the widget. */
+	void setEffect(Effect effect)
+	{ effect_ = effect; repaint(); }
+
+private:
+
+    /* Helper method. */
+    void drawTextEffect(QPainter* painter, QPoint offset);
+
+	Effect effect_;
+};
+#endif
+</pre>
+<p>The widget adds one property <code>effect</code>. It’s an enum that 
+can have the values “Plain”, “Sunken” or “Raised”. The getter and setter
+ methods for our property are defined inline, since they’re trivial. 
+Note that you have to repaint the widget after changing a property that 
+affects its visual appearance by calling <code>repaint()</code>.</p>
+<p>The action itself takes place in the method <code>paintEvent()</code> and uses a helper method <code>drawTextEffect()</code>. This is where the widget gets drawn. The method takes one argument of type <code>QPaintEvent</code>,
+ which mainly stores information about which area of the widget needs to
+ be repainted. We won’t use this information in our example. Let’s look 
+at the implementation:</p>
+<pre class="brush:cpp">/**
+ * EffectLabel.cpp
+ */
+#include &lt;QPen&gt;
+#include "EffectLabel.h"
+
+EffectLabel::EffectLabel(QWidget* parent) :
+	QLabel(parent),
+	effect_(Plain)
+{ }
+
+void EffectLabel::drawTextEffect(QPainter *painter, 
+                                 QPoint offset)
+{
+	Q_ASSERT(painter != 0); 
+
+	// Draw shadow.
+	painter-&gt;setPen(QPen(Qt::black));
+	painter-&gt;drawText(rect().translated(offset),
+	                  alignment(), text());
+	// Draw text.
+	painter-&gt;setPen(QPen(Qt::gray));
+	painter-&gt;drawText(rect(), alignment(), text());
+}
+
+void EffectLabel::paintEvent(QPaintEvent *event)
+{
+	QPainter painter(this);
+	painter.setFont(font());
+	if (effect_ == Plain)
+		QLabel::paintEvent(event);
+	else if (effect_ == Sunken) 
+	    // Shadow above the text.
+	    drawTextEffect(&amp;painter, QPoint(0, -1));
+	else if (effect_ == Raised) 
+	    // Shadow below the text.
+	    drawTextEffect(&amp;painter, QPoint(0, 1));
+}
+</pre>
+<p>The area of the widget is the painting ground for <code>QPainter</code>.
+ This class provides a wide range of methods to draw all sorts of 
+primitives, like lines, rectangles, circles, and images. If the effect 
+is set to “Plain”, the text will be rendered by the <code>paintEvent</code> of <code>QLabel</code>. Otherwise <code>drawTextEffect()</code>
+ will draw the widget by first drawing a shadow 1 pixel above or below 
+the label text in black and then the label itself in gray.</p>
+<p><b>Note:</b> Obviously this widget is not aware of your general 
+application style. This means it will look the same on Windows, Mac OS X
+ and Linux. Styling is a whole different story and i hope i can cover 
+this topic in a future tutorial.</p>
+<h2>Using the widget</h2>
+<p>Using the widget is pretty straightforward:</p>
+<pre class="brush:cpp">/* ... code omitted ... */
+MainWindow::MainWindow(QWidget *parent) :
+    QMainWindow(parent)
+{
+	label = new EffectLabel(this);
+	label-&gt;setEffect(EffectLabel::Raised);
+	label-&gt;setText("Hello world!");
+    label-&gt;move(QPoint(10, 10));
+}
+</pre>
+<h2>Summary</h2>
+<ul>
+<li>Creating your own widgets (that are unaware of the application’s 
+style!) is mostly done by subclassing an existing widget or directly 
+from <code>QWidget</code> and reimplementing <code>paintEvent()</code>.</li>
+<li>In the paint event you use an instance of <code>QPainter</code> to draw the widget out of simple drawing primitives.</li>
+<li>You can add behaviour by reimplementing mouse or keyboard events (such as <code>mousePressEvent</code>, <code>mouseReleaseEvent</code>, etc.) and add signals to your widget.</li>
+</ul>
+<p>In the second part of this tutorial I’ll show you how to integrate this widget into Qt Designer.</p>
+<h2>Wanna try out this code by yourself?</h2>
+<p><a href="http://www.serenethinking.com/wp-content/uploads/2010/08/github-e1282176432347.png"><img src="How%20to%20create%20custom%20widgets%20with%20Qt%20_%20Serene%20Thinking_files/github-e1282176432347.png" alt="" title="github" class="alignleft size-full wp-image-114" style="position: relative; top: -10px;" height="64" width="64"></a>Fork the project on GitHub:<br><a href="http://github.com/wplaschg/EffectLabel-Part1">http://github.com/wplaschg/EffectLabel-Part1</a><br>
+<br><a href="http://www.serenethinking.com/wp-content/uploads/2010/08/zip_64.png"><img src="How%20to%20create%20custom%20widgets%20with%20Qt%20_%20Serene%20Thinking_files/zip_64.png" alt="" title="zip_64" style="clear: both; position: relative; left: 7px; top: -5px;" class="alignleft size-full wp-image-138" height="64" width="64"></a>Or download the source as a zip file:<br><a href="http://github.com/wplaschg/EffectLabel-Part1/zipball/master">http://github.com/wplaschg/EffectLabel-Part1/zipball/master</a></p>
+											</div><!-- .entry-content -->
+
+
+					<div class="entry-utility">
+						This entry was posted in <a href="http://www.serenethinking.com/category/qt/" title="View all posts in Qt" rel="category tag">Qt</a>, <a href="http://www.serenethinking.com/category/tutorial/" title="View all posts in Tutorial" rel="category tag">Tutorial</a>. Bookmark the <a href="http://www.serenethinking.com/2010/08/how-to-create-custom-widgets-with-qt/" title="Permalink to How to create custom widgets with Qt" rel="bookmark">permalink</a>.											</div><!-- .entry-utility -->
+				</div><!-- #post-## -->
+
+				<div id="nav-below" class="navigation">
+					<div class="nav-previous"><a href="http://www.serenethinking.com/2010/08/squares-and-cubes/" rel="prev"><span class="meta-nav">←</span> Squares and cubes</a></div>
+					<div class="nav-next"><a href="http://www.serenethinking.com/2010/08/how-to-integrate-custom-widgets-in-qt-designer/" rel="next">How to integrate custom widgets in Qt Designer <span class="meta-nav">→</span></a></div>
+				</div><!-- #nav-below -->
+
+				
+			<div id="comments">
+
+
+	<p class="nocomments">Comments are closed.</p>
+
+
+								
+</div><!-- #comments -->
+
+
+			</div><!-- #content -->
+		</div><!-- #container -->
+
+
+		<div id="primary" class="widget-area" role="complementary">
+			<ul class="xoxo">
+
+			<li class="widget-container">
+			<img src="How%20to%20create%20custom%20widgets%20with%20Qt%20_%20Serene%20Thinking_files/me2.jpg" alt="That's me" height="276" width="200">
+
+			<div class="sidebar-info">
+<br>Hi, I'm Wolfgang Plaschg. I&nbsp;blog about programming and other interesting topics I&nbsp;want to share with you.<br>
+			<a href="http://www.serenethinking.com/about">More about me.</a>
+			</div>
+			</li>
+
+<li id="search-2" class="widget-container widget_search"><form role="search" method="get" id="searchform" action="http://www.serenethinking.com/">
+	<div><label class="screen-reader-text" for="s">Search for:</label>
+	<input name="s" id="s" type="text">
+	<input id="searchsubmit" value="Search" type="submit">
+	</div>
+	</form></li><li id="linkcat-2" class="widget-container widget_links"><h3 class="widget-title">My Projects</h3>
+	<ul class="xoxo blogroll">
+<li><a href="http://www.serenethinking.com/bibwiki"><img src="How%20to%20create%20custom%20widgets%20with%20Qt%20_%20Serene%20Thinking_files/bibwiki-icon.png" alt="Bibwiki"> Bibwiki</a></li>
+<li><a href="http://www.serenethinking.com/bitlift"><img src="How%20to%20create%20custom%20widgets%20with%20Qt%20_%20Serene%20Thinking_files/bitlift-icon.png" alt="BitLift"> BitLift</a></li>
+
+	</ul>
+</li>
+		<li id="recent-posts-2" class="widget-container widget_recent_entries">		<h3 class="widget-title">Recent Posts</h3>		<ul>
+				<li><a href="http://www.serenethinking.com/2011/10/lazy-evaluation-and-streams-in-erlang/" title="Lazy Evaluation and infinite streams in Erlang">Lazy Evaluation and infinite streams in Erlang</a></li>
+				<li><a href="http://www.serenethinking.com/2011/06/wellness-music/" title="Wellness Music">Wellness Music</a></li>
+				<li><a href="http://www.serenethinking.com/2011/04/announcing-bitlift/" title="Announcing BitLift">Announcing BitLift</a></li>
+				<li><a href="http://www.serenethinking.com/2011/04/my-self-made-edition-of-nietzsches-works/" title="My self made edition of Nietzsche’s works">My self made edition of Nietzsche’s works</a></li>
+				<li><a href="http://www.serenethinking.com/2010/11/a-map-of-my-interests/" title="A map of my interests">A map of my interests</a></li>
+				</ul>
+		</li><li id="categories-2" class="widget-container widget_categories"><h3 class="widget-title">Categories</h3>		<ul>
+	<li class="cat-item cat-item-5"><a href="http://www.serenethinking.com/category/c/" title="View all posts filed under C++">C++</a>
+</li>
+	<li class="cat-item cat-item-14"><a href="http://www.serenethinking.com/category/erlang/" title="View all posts filed under Erlang">Erlang</a>
+</li>
+	<li class="cat-item cat-item-7"><a href="http://www.serenethinking.com/category/math/" title="View all posts filed under Math">Math</a>
+</li>
+	<li class="cat-item cat-item-12"><a href="http://www.serenethinking.com/category/meta/" title="View all posts filed under Meta">Meta</a>
+</li>
+	<li class="cat-item cat-item-13"><a href="http://www.serenethinking.com/category/other-work/" title="View all posts filed under Other work">Other work</a>
+</li>
+	<li class="cat-item cat-item-11"><a href="http://www.serenethinking.com/category/productivity/" title="View all posts filed under Productivity">Productivity</a>
+</li>
+	<li class="cat-item cat-item-3"><a href="http://www.serenethinking.com/category/programming/" title="View all posts filed under Programming">Programming</a>
+</li>
+	<li class="cat-item cat-item-10"><a href="http://www.serenethinking.com/category/puzzle/" title="View all posts filed under Puzzle">Puzzle</a>
+</li>
+	<li class="cat-item cat-item-6"><a href="http://www.serenethinking.com/category/qt/" title="View all posts filed under Qt">Qt</a>
+</li>
+	<li class="cat-item cat-item-9"><a href="http://www.serenethinking.com/category/sociology/" title="View all posts filed under Sociology">Sociology</a>
+</li>
+	<li class="cat-item cat-item-8"><a href="http://www.serenethinking.com/category/tutorial/" title="View all posts filed under Tutorial">Tutorial</a>
+</li>
+	<li class="cat-item cat-item-4"><a href="http://www.serenethinking.com/category/ui/" title="View all posts filed under Ui">Ui</a>
+</li>
+		</ul>
+</li>			</ul>
+
+			<div id="widget-twitter">
+			<img style="margin-right: 10px;" src="How%20to%20create%20custom%20widgets%20with%20Qt%20_%20Serene%20Thinking_files/twitter_16_bw.png" alt="Twitter" height="16" width="16"><a href="http://www.twitter.com/wplaschg">twitter.com/wplaschg</a><br>
+			<img style="margin-right: 10px;" src="How%20to%20create%20custom%20widgets%20with%20Qt%20_%20Serene%20Thinking_files/flickr_16.png" alt="Flickr" height="16" width="16"><a href="http://www.flickr.com/photos/wplaschg">flickr.com/wplaschg</a><br>
+			<img style="margin-right: 10px;" src="How%20to%20create%20custom%20widgets%20with%20Qt%20_%20Serene%20Thinking_files/github_16_bw.png" alt="GitHub" height="16" width="16"><a href="http://github.com/wplaschg">github.com/wplaschg</a><br>
+			<img style="margin-right: 10px;" src="How%20to%20create%20custom%20widgets%20with%20Qt%20_%20Serene%20Thinking_files/stackoverflow_16_bw.png" alt="Stackoverflow" height="16" width="16"><a href="http://stackoverflow.com/users/94526/wolfgang-plaschg">stackoverflow.com/wplaschg</a><br>
+			<img style="margin-right: 10px;" src="How%20to%20create%20custom%20widgets%20with%20Qt%20_%20Serene%20Thinking_files/xing_16_bw.png" alt="Xing" height="16" width="16"><a href="http://www.xing.com/profile/Wolfgang_Plaschg">www.xing.com</a><br>
+			<img style="margin-right: 10px;" src="How%20to%20create%20custom%20widgets%20with%20Qt%20_%20Serene%20Thinking_files/lastfm_16.png" alt="Last.fm" height="16" width="16"><a href="http://www.lastfm.com/user/wplaschg">www.last.fm/wplaschg</a>
+			</div><!-- #widget-twitter -->
+
+		</div><!-- #primary .widget-area -->
+
+	</div><!-- #main -->
+
+	<div id="footer" role="contentinfo">
+		<div id="colophon">
+
+
+
+
+		</div><!-- #colophon -->
+		<div id="footer-copyright">
+		© Wolfgang Plaschg<br>
+		Theme based on <a href="http://www.tumblr.com/themes/by/dylanrw" target="_new">dylanrw</a>'s Akari theme.<br>
+		Powered by <a href="http://www.wordpress.org/">Wordpress</a>.
+		</div>
+	</div><!-- #footer -->
+
+</div><!-- #wrapper -->
+<script type="text/javascript">
+     SyntaxHighlighter.defaults["gutter"] = false;
+</script>
+<script type="text/javascript" src="How%20to%20create%20custom%20widgets%20with%20Qt%20_%20Serene%20Thinking_files/widgets.js"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try{
+var pageTracker = _gat._getTracker("UA-17265042-1");
+pageTracker._trackPageview();
+} catch(err) {}
+</script>
+</body></html>

@@ -1,0 +1,308 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0041)http://www.mechta34.com/it/qt4/qt005.html -->
+<HTML><HEAD><TITLE>Ю.В.Земсков. Программирование на C++ с использованием библиотеки Qt4</TITLE>
+<META http-equiv=Content-Type content="text/html; charset=windows-1251"><LINK 
+href="Images/s1.css" type=text/css rel=stylesheet>
+<META content="MSHTML 6.00.2900.2180" name=GENERATOR></HEAD>
+<BODY>
+<a href="qt004.htm">Назад</a> <a href="title.htm">Содержание</a> <a href="qt006.htm">Вперед</a>
+<H2>Меню и строка состояния</H2>
+<H3>Строка состояния</H3>Строка состояния <CODE>QStatusBar</CODE> создаётся 
+автоматически в нижней части главного окна приложения, если в программе хоть раз 
+вызвается метод <CODE>MainWindow::statusBar</CODE>. При наведении указателя мыши 
+на кнопку панели инструментов или пункт меню в строке состояния на время 
+появляется текст подсказки, если этот текст определён для данной кнопки или 
+данного пункта. 
+<P>Указатель на экземпляр <CODE>QStatusBar</CODE> можно получить с помощью 
+метода <CODE>QMainWindow::statusBar()</CODE>. Чтобы вывести в строке состояния 
+произвольный текст (и затереть предыдущий), используется функция 
+<CODE>showMessage</CODE>: <PRE>void QStatusBar::showMessage(
+    const QString &amp;message,  // Выводимая строка.
+    int timeout = 0 )        // Кол-во миллисекунд.
+</PRE>Если <CODE>timeout&gt;0</CODE>, то сообщение автоматически исчезает через 
+указанный промежуток времени, а на его место возвращается текст предыдущей 
+надписи. 
+<P>По умолчанию строка состояния представляется в виде одной панели, 
+располагаемой по всей ширине родительского окна. Но её можно разбить по ширине 
+на отдельные поля, если вставить в неё другие элементы, например, 
+<CODE>QLabel</CODE>. Для этого предназначены методы <CODE>addWidget</CODE>, 
+<CODE>addPermanentWidget</CODE> и <CODE>insertWidget</CODE>: <PRE>void QStatusBar::addWidget (
+    QWidget *widget,  // Вставляемый элемент.
+    int stretch = 0 ) // Коэффициент растяжимости.
+
+void QStatusBar::addPermanentWidget (
+    QWidget *widget,
+    int stretch = 0 )
+
+int QStatusBar::insertWidget (
+    int index,        // Позиция.
+    QWidget *widget,  // Вставляемый элемент.
+    int stretch = 0 ) // Коэффициент растяжимости.
+</PRE>
+<P>Элементы, добавляемые с помощью метода <CODE>addPermanentWidget</CODE>, 
+располагаются в правой части строки состояния и не затираются сообщениями, 
+выводимыми с помощью <CODE>showMessage</CODE>. 
+<P>В нижней правой части строки состояния по умолчанию отображается специальный 
+маркер, который можно "зацепить" указателем мыши для изменения размеров окна. 
+Его показ можно запретить, вызвав 
+<CODE>QStatusBar::setSizeGripEnabled(false)</CODE>. При этом возможность 
+изменять размеры окна по-прежнему остаётся. 
+<H3>Действия</H3>Пользователь может влиять на процесс выполнения программы с 
+помощью указателя и кнопок мыши, выбирая нужный пункт меню или кнопку на панели 
+инструментов. Кроме того, в его распоряжении имеются клавиши со стрелками, а 
+также различные клавиатурные комбинации. Все эти события объединены в библиотеке 
+Qt под общим названием <B>действие</B> (<I>action</I>). 
+<P>При создании действия указывается родительский элемент и, при необходимости, 
+пиктограмма и/или текстовая метка: <PRE>QAction::QAction(QObject *parent)
+QAction::QAction(const QString&amp; text, QObject *parent)
+QAction::QAction(const QIcon&amp; icon, const QString&amp; text, QObject *parent)
+</PRE>
+<P>Метод <CODE>QAction::setStatusTip(текст)</CODE> определяет текст подсказки по 
+данному действию, выводимую в строке состояния, а 
+<CODE>QAction::setShortcut(QKeySequence&amp; shortcut)</CODE> -- привязывает к 
+действию некоторую комбинацию клавиш. 
+<P>С каждым действием связывается функция-обработчик, для этого используется всё 
+тот же метод <CODE>connect</CODE>, например: <PRE>QAction *exitAction = new QAction(tr("В&amp;ыход"), this);
+exitAction-&gt;setStatusTip(tr("Выход из программы"));
+exitAction-&gt;setShortcut(tr("Ctrl+Q"));
+connect(exitAction, SIGNAL(triggered()), this, SLOT(close()));
+</PRE>
+<H3>Меню</H3>Горизонтальная панель меню <CODE>QMenuBar</CODE> создаётся 
+автоматически, если мы обращаемся к ней для добавления хотя бы одного 
+вертикального меню <CODE>QMenu</CODE>. Например: <PRE>// Определяем действия:
+QAction *aboutAction = new QAction(tr("&amp;О программе"), this);
+QAction *exitAction = new QAction(tr("В&amp;ыход"), this);
+
+// Создаём вертикальное меню и добавляем
+// его на автоматически созданную панель QMenuBar:
+QMenu *fileMenu = menuBar()-&gt;addMenu(tr("&amp;Файл"));
+fileMenu-&gt;addAction(aboutAction); // Добавили действие 'О программе'.
+fileMenu-&gt;addSeparator();         // Разделитель пунктов меню.
+fileMenu-&gt;addAction(exitAction);  // Добавили действие 'Выход'.
+</PRE>Здесь мы создали меню "Файл" с двумя пунктами "О&nbsp;программе" и "Выход" 
+и горизонтальной полосой-разделителем между ними. 
+<H3>Обработка событий с помощью виртуальных методов</H3>Кроме механизма сигналов 
+и слотов, в Qt используется также старый метод виртуальных функций. Так, 
+например, базовый класс <CODE>QWidget</CODE> (элемент интерфейса, <I>виджет</I>) 
+и все его многочисленные потомки имеют виртуальный метод 
+<CODE>mouseMoveEvent</CODE> <PRE>void QWidget::mouseMoveEvent ( QMouseEvent * event )
+</PRE>который вызывается при перемещении указателя мыши над данным элементом. 
+Если требуется определить какую-либо реакцию на это событие, то достаточно в 
+собственном классе переопределить метод <CODE>mouseMoveEvent</CODE>. Текущие 
+координаты мыши в системе отсчёта данного виджета можно узнать с помощью методов 
+<CODE>QMouseEvent::x()</CODE> и <CODE>QMouseEvent::y()</CODE>. Следует иметь в 
+виду, что по умолчанию метод <CODE>mouseMoveEvent</CODE> вызывается, только если 
+при перемещении указателя мыши удерживается любая из её кнопок. Чтобы это 
+происходило независимо от состояния кнопок, надо для данного виджета вызвать 
+метод <CODE>setMouseTracking(true)</CODE>. 
+<P>Аналогично можно обрабатывать событие изменения размеров любого элемента, 
+только в этом случае для него придётся переопределить метод 
+<CODE>resizeEvent</CODE>. 
+<H3>Наследники класса <CODE>QObject</CODE> и метакомпилятор</H3>Любые 
+пользовательские классы, разрабатываемые программистом, обычно являются 
+наследниками базового класса <CODE>QObject</CODE> (или какого-нибудь из его 
+потомков). Только в этом случае для них можно использовать механизм сигналов и 
+слотов, а также некоторые другие возможности, реализованные в библиотеке Qt (в 
+частности, информацию о типах во время выполнения программы и динамические 
+свойства объектов). При этом необходимо соблюдать следующие правила: 
+<UL>
+  <LI>в секции <CODE>private</CODE> при объявлении класса необходимо указать 
+  макрос <CODE>Q_OBJECT</CODE> 
+  <LI>объявления классов, содержащих макрос <CODE>Q_OBJECT</CODE>, обязательно 
+  должны располагаться в заголовочном файле <CODE>*.h</CODE>, а не в самой 
+  программе <CODE>*.cpp</CODE>. </LI></UL>
+<P>Утилита <CODE>qmake</CODE> просматривает заголовочные файлы проекта, и если в 
+описании какого-нибудь класса встречается макрос <CODE>Q_OBJECT</CODE>, то в 
+<CODE>make</CODE>-файл вставляется вызов так называемого <B>компилятора 
+метаобъектов</B> <CODE>moc</CODE>, который автоматически формирует на языке C++ 
+необходимый код (в папке проекта после компиляции можно найти файл 
+<CODE>moc_*.cpp</CODE>). 
+<H3>Пример приложения с меню и строкой состояния</H3>В листингах 6 и 7 приведён 
+текст небольшой программы, в которой иллюстрируются все описанные в данном 
+разделе элементы: меню, строка состояния с несколькими текстовыми полями, 
+обработка перемещения указателя мыши и изменения размеров окна с помощью 
+виртуальных функций, а также определение собственного класса на основе 
+<CODE>QObject</CODE>. На рис. показано, как выглядит окно программы в Windows и 
+Linux. 
+<P align=center><IMG src="Images/qt02.png"> <BR>Рис. Меню и строка 
+состояния: внешний вид окна программы в системе Windows (верхний скриншот) и 
+Linux (для двух различных тем рабочего стола). В строке состояния отображаются 
+размеры окна и координаты указателя мыши 
+<P><B>Листинг 6. Меню и строка состояния (файл 
+<CODE>examples-qt/02/02.h</CODE>)</B> <PRE class=hl><A name=02.h_1></A><SPAN class=line>    1 </SPAN><SPAN class=dir>#include &lt;QtGui&gt;</SPAN>
+<A name=02.h_2></A><SPAN class=line>    2 </SPAN>
+<A name=02.h_3></A><SPAN class=line>    3 </SPAN><SPAN class=kwc>class</SPAN> MainWindow <SPAN class=sym>:</SPAN> <SPAN class=kwc>public</SPAN> QMainWindow <SPAN class=sym>{</SPAN>
+<A name=02.h_4></A><SPAN class=line>    4 </SPAN>    Q_OBJECT
+<A name=02.h_5></A><SPAN class=line>    5 </SPAN>
+<A name=02.h_6></A><SPAN class=line>    6 </SPAN><SPAN class=kwc>public</SPAN><SPAN class=sym>:</SPAN>
+<A name=02.h_7></A><SPAN class=line>    7 </SPAN>    <SPAN class=kwd>MainWindow</SPAN><SPAN class=sym>();</SPAN>
+<A name=02.h_8></A><SPAN class=line>    8 </SPAN>
+<A name=02.h_9></A><SPAN class=line>    9 </SPAN><SPAN class=kwc>protected</SPAN><SPAN class=sym>:</SPAN>
+<A name=02.h_10></A><SPAN class=line>   10 </SPAN>    <SPAN class=kwc>virtual</SPAN> <SPAN class=kwb>void</SPAN> <SPAN class=kwd>resizeEvent</SPAN><SPAN class=sym>(</SPAN>QResizeEvent <SPAN class=sym>*</SPAN>event<SPAN class=sym>);</SPAN>
+<A name=02.h_11></A><SPAN class=line>   11 </SPAN>    <SPAN class=kwc>virtual</SPAN> <SPAN class=kwb>void</SPAN> <SPAN class=kwd>mouseMoveEvent</SPAN><SPAN class=sym>(</SPAN>QMouseEvent <SPAN class=sym>*</SPAN>event<SPAN class=sym>);</SPAN>
+<A name=02.h_12></A><SPAN class=line>   12 </SPAN>    <SPAN class=kwc>virtual</SPAN> <SPAN class=kwb>void</SPAN> <SPAN class=kwd>closeEvent</SPAN><SPAN class=sym>(</SPAN>QCloseEvent <SPAN class=sym>*</SPAN>event<SPAN class=sym>);</SPAN>
+<A name=02.h_13></A><SPAN class=line>   13 </SPAN>
+<A name=02.h_14></A><SPAN class=line>   14 </SPAN><SPAN class=kwc>private</SPAN> slots<SPAN class=sym>:</SPAN>
+<A name=02.h_15></A><SPAN class=line>   15 </SPAN>    <SPAN class=kwb>void</SPAN> <SPAN class=kwd>about</SPAN><SPAN class=sym>();</SPAN>
+<A name=02.h_16></A><SPAN class=line>   16 </SPAN>
+<A name=02.h_17></A><SPAN class=line>   17 </SPAN><SPAN class=kwc>private</SPAN><SPAN class=sym>:</SPAN>
+<A name=02.h_18></A><SPAN class=line>   18 </SPAN>    QAction <SPAN class=sym>*</SPAN>aboutAction<SPAN class=sym>;</SPAN>
+<A name=02.h_19></A><SPAN class=line>   19 </SPAN>    QAction <SPAN class=sym>*</SPAN>exitAction<SPAN class=sym>;</SPAN>
+<A name=02.h_20></A><SPAN class=line>   20 </SPAN>    QMenu <SPAN class=sym>*</SPAN>fileMenu<SPAN class=sym>;</SPAN>
+<A name=02.h_21></A><SPAN class=line>   21 </SPAN>    QLabel <SPAN class=sym>*</SPAN>sb1<SPAN class=sym>;</SPAN>
+<A name=02.h_22></A><SPAN class=line>   22 </SPAN>    QLabel <SPAN class=sym>*</SPAN>sb2<SPAN class=sym>;</SPAN>
+<A name=02.h_23></A><SPAN class=line>   23 </SPAN>    QLabel <SPAN class=sym>*</SPAN>sb3<SPAN class=sym>;</SPAN>
+<A name=02.h_24></A><SPAN class=line>   24 </SPAN>
+<A name=02.h_25></A><SPAN class=line>   25 </SPAN>    <SPAN class=kwb>bool</SPAN> <SPAN class=kwd>askOnClose</SPAN><SPAN class=sym>();</SPAN>
+<A name=02.h_26></A><SPAN class=line>   26 </SPAN><SPAN class=sym>};</SPAN>
+</PRE>
+<UL>
+  <LI>(1) Подключили заголовочный файл <CODE>QtGui</CODE>, в котором описаны все 
+  объекты, относящиеся к элементам графического интерфейса. Это проще, чем 
+  отдельно подключать <CODE>QMainWindow</CODE>, <CODE>QLabel</CODE>, 
+  <CODE>QMenu</CODE> и т.д. 
+  <LI>(3) Объявили новый класс <CODE>MainWindow</CODE>, использовав в качестве 
+  базового класс <CODE>QMainWindow</CODE> (наследника <CODE>QObject</CODE>). 
+  <LI>(4) Не забыли про обязательный макрос <CODE>Q_OBJECT</CODE>. 
+  <LI>(7) Конструктор без параметров. 
+  <LI>(10-12) Виртуальные методы, вызываемые автоматически при изменении 
+  размеров окна, при перемещении указателя мыши и при закрытии окна. 
+  <LI>(14-15) Описание слотов (функций-обработчиков). В данном случае здесь 
+  упомянута только функция, вызываемая при выборе пункта меню "О&nbsp;программе" 
+  (т.к. все остальные обработчики -- это виртуальные функции или уже 
+  определённые методы базового класса). 
+  <LI>(17-23) Переменные-члены класса: два действия для пунктов меню, само меню 
+  и три текстовые метки для строки состояния. 
+  <LI>(25) Служебная функция, вызываемая при закрытии окна (просит подтверждения 
+  у пользователя). </LI></UL><B>Листинг 7. Меню и строка состояния (файл 
+<CODE>examples-qt/02/02.cpp</CODE>)</B> <PRE class=hl><A name=02.cpp_1></A><SPAN class=line>    1 </SPAN><SPAN class=dir>#include &lt;QtGui&gt;</SPAN>
+<A name=02.cpp_2></A><SPAN class=line>    2 </SPAN><SPAN class=dir>#include</SPAN> <SPAN class=dstr>"02.h"</SPAN><SPAN class=dir></SPAN>
+<A name=02.cpp_3></A><SPAN class=line>    3 </SPAN>
+<A name=02.cpp_4></A><SPAN class=line>    4 </SPAN>MainWindow<SPAN class=sym>::</SPAN><SPAN class=kwd>MainWindow</SPAN><SPAN class=sym>() {</SPAN>
+<A name=02.cpp_5></A><SPAN class=line>    5 </SPAN>
+<A name=02.cpp_6></A><SPAN class=line>    6 </SPAN>    QTextCodec <SPAN class=sym>*</SPAN>codec <SPAN class=sym>=</SPAN> QTextCodec<SPAN class=sym>::</SPAN><SPAN class=kwd>codecForName</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"CP1251"</SPAN><SPAN class=sym>);</SPAN>
+<A name=02.cpp_7></A><SPAN class=line>    7 </SPAN>    QTextCodec<SPAN class=sym>::</SPAN><SPAN class=kwd>setCodecForTr</SPAN><SPAN class=sym>(</SPAN>codec<SPAN class=sym>);</SPAN>
+<A name=02.cpp_8></A><SPAN class=line>    8 </SPAN>
+<A name=02.cpp_9></A><SPAN class=line>    9 </SPAN>    aboutAction <SPAN class=sym>=</SPAN> <SPAN class=kwa>new</SPAN> <SPAN class=kwd>QAction</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"&amp;О программе"</SPAN><SPAN class=sym>),</SPAN> <SPAN class=kwa>this</SPAN><SPAN class=sym>);</SPAN>
+<A name=02.cpp_10></A><SPAN class=line>   10 </SPAN>    aboutAction<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setStatusTip</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Сведения о программе"</SPAN><SPAN class=sym>));</SPAN>
+<A name=02.cpp_11></A><SPAN class=line>   11 </SPAN>    <SPAN class=kwd>connect</SPAN><SPAN class=sym>(</SPAN>aboutAction<SPAN class=sym>,</SPAN> <SPAN class=kwd>SIGNAL</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>triggered</SPAN><SPAN class=sym>()),</SPAN> <SPAN class=kwa>this</SPAN><SPAN class=sym>,</SPAN> <SPAN class=kwd>SLOT</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>about</SPAN><SPAN class=sym>()));</SPAN>
+<A name=02.cpp_12></A><SPAN class=line>   12 </SPAN>
+<A name=02.cpp_13></A><SPAN class=line>   13 </SPAN>    exitAction <SPAN class=sym>=</SPAN> <SPAN class=kwa>new</SPAN> <SPAN class=kwd>QAction</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"В&amp;ыход"</SPAN><SPAN class=sym>),</SPAN> <SPAN class=kwa>this</SPAN><SPAN class=sym>);</SPAN>
+<A name=02.cpp_14></A><SPAN class=line>   14 </SPAN>    exitAction<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setStatusTip</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Выход из программы"</SPAN><SPAN class=sym>));</SPAN>
+<A name=02.cpp_15></A><SPAN class=line>   15 </SPAN>    exitAction<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setShortcut</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Ctrl+Q"</SPAN><SPAN class=sym>));</SPAN>
+<A name=02.cpp_16></A><SPAN class=line>   16 </SPAN>    <SPAN class=kwd>connect</SPAN><SPAN class=sym>(</SPAN>exitAction<SPAN class=sym>,</SPAN> <SPAN class=kwd>SIGNAL</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>triggered</SPAN><SPAN class=sym>()),</SPAN> <SPAN class=kwa>this</SPAN><SPAN class=sym>,</SPAN> <SPAN class=kwd>SLOT</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>close</SPAN><SPAN class=sym>()));</SPAN>
+<A name=02.cpp_17></A><SPAN class=line>   17 </SPAN>
+<A name=02.cpp_18></A><SPAN class=line>   18 </SPAN>    fileMenu <SPAN class=sym>=</SPAN> <SPAN class=kwd>menuBar</SPAN><SPAN class=sym>()-&gt;</SPAN><SPAN class=kwd>addMenu</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"&amp;Файл"</SPAN><SPAN class=sym>));</SPAN>
+<A name=02.cpp_19></A><SPAN class=line>   19 </SPAN>    fileMenu<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>addAction</SPAN><SPAN class=sym>(</SPAN>aboutAction<SPAN class=sym>);</SPAN>
+<A name=02.cpp_20></A><SPAN class=line>   20 </SPAN>    fileMenu<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>addSeparator</SPAN><SPAN class=sym>();</SPAN>
+<A name=02.cpp_21></A><SPAN class=line>   21 </SPAN>    fileMenu<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>addAction</SPAN><SPAN class=sym>(</SPAN>exitAction<SPAN class=sym>);</SPAN>
+<A name=02.cpp_22></A><SPAN class=line>   22 </SPAN>
+<A name=02.cpp_23></A><SPAN class=line>   23 </SPAN>    sb1 <SPAN class=sym>=</SPAN> <SPAN class=kwa>new</SPAN> <SPAN class=kwd>QLabel</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>statusBar</SPAN><SPAN class=sym>());</SPAN>
+<A name=02.cpp_24></A><SPAN class=line>   24 </SPAN>    sb2 <SPAN class=sym>=</SPAN> <SPAN class=kwa>new</SPAN> <SPAN class=kwd>QLabel</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>statusBar</SPAN><SPAN class=sym>());</SPAN>
+<A name=02.cpp_25></A><SPAN class=line>   25 </SPAN>    sb3 <SPAN class=sym>=</SPAN> <SPAN class=kwa>new</SPAN> <SPAN class=kwd>QLabel</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>statusBar</SPAN><SPAN class=sym>());</SPAN>
+<A name=02.cpp_26></A><SPAN class=line>   26 </SPAN>
+<A name=02.cpp_27></A><SPAN class=line>   27 </SPAN>    <SPAN class=kwd>statusBar</SPAN><SPAN class=sym>()-&gt;</SPAN><SPAN class=kwd>setSizeGripEnabled</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwa>false</SPAN><SPAN class=sym>);</SPAN>
+<A name=02.cpp_28></A><SPAN class=line>   28 </SPAN>    <SPAN class=kwd>statusBar</SPAN><SPAN class=sym>()-&gt;</SPAN><SPAN class=kwd>addWidget</SPAN><SPAN class=sym>(</SPAN>sb1<SPAN class=sym>,</SPAN> <SPAN class=num>2</SPAN><SPAN class=sym>);</SPAN>
+<A name=02.cpp_29></A><SPAN class=line>   29 </SPAN>    <SPAN class=kwd>statusBar</SPAN><SPAN class=sym>()-&gt;</SPAN><SPAN class=kwd>addWidget</SPAN><SPAN class=sym>(</SPAN>sb2<SPAN class=sym>,</SPAN> <SPAN class=num>1</SPAN><SPAN class=sym>);</SPAN>
+<A name=02.cpp_30></A><SPAN class=line>   30 </SPAN>    <SPAN class=kwd>statusBar</SPAN><SPAN class=sym>()-&gt;</SPAN><SPAN class=kwd>addWidget</SPAN><SPAN class=sym>(</SPAN>sb3<SPAN class=sym>,</SPAN> <SPAN class=num>1</SPAN><SPAN class=sym>);</SPAN>
+<A name=02.cpp_31></A><SPAN class=line>   31 </SPAN>
+<A name=02.cpp_32></A><SPAN class=line>   32 </SPAN>    sb1<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setText</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Привет!"</SPAN><SPAN class=sym>));</SPAN>
+<A name=02.cpp_33></A><SPAN class=line>   33 </SPAN>
+<A name=02.cpp_34></A><SPAN class=line>   34 </SPAN>    <SPAN class=kwd>setMouseTracking</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwa>true</SPAN><SPAN class=sym>);</SPAN>
+<A name=02.cpp_35></A><SPAN class=line>   35 </SPAN><SPAN class=sym>}</SPAN>
+<A name=02.cpp_36></A><SPAN class=line>   36 </SPAN>
+<A name=02.cpp_37></A><SPAN class=line>   37 </SPAN>
+<A name=02.cpp_38></A><SPAN class=line>   38 </SPAN><SPAN class=kwb>void</SPAN> MainWindow<SPAN class=sym>::</SPAN><SPAN class=kwd>resizeEvent</SPAN><SPAN class=sym>(</SPAN>QResizeEvent <SPAN class=sym>*</SPAN>event<SPAN class=sym>) {</SPAN>
+<A name=02.cpp_39></A><SPAN class=line>   39 </SPAN>    QSize sz <SPAN class=sym>=</SPAN> event<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>size</SPAN><SPAN class=sym>();</SPAN>
+<A name=02.cpp_40></A><SPAN class=line>   40 </SPAN>    sb2<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setText</SPAN><SPAN class=sym>(</SPAN>
+<A name=02.cpp_41></A><SPAN class=line>   41 </SPAN>        <SPAN class=kwd>QString</SPAN><SPAN class=sym>(</SPAN> <SPAN class=str>"(%1, %2)"</SPAN> <SPAN class=sym>).</SPAN><SPAN class=kwd>arg</SPAN><SPAN class=sym>(</SPAN> sz<SPAN class=sym>.</SPAN><SPAN class=kwd>width</SPAN><SPAN class=sym>() ).</SPAN><SPAN class=kwd>arg</SPAN><SPAN class=sym>(</SPAN> sz<SPAN class=sym>.</SPAN><SPAN class=kwd>height</SPAN><SPAN class=sym>() ) );</SPAN>
+<A name=02.cpp_42></A><SPAN class=line>   42 </SPAN><SPAN class=sym>}</SPAN>
+<A name=02.cpp_43></A><SPAN class=line>   43 </SPAN>
+<A name=02.cpp_44></A><SPAN class=line>   44 </SPAN><SPAN class=kwb>void</SPAN> MainWindow<SPAN class=sym>::</SPAN><SPAN class=kwd>mouseMoveEvent</SPAN><SPAN class=sym>(</SPAN>QMouseEvent <SPAN class=sym>*</SPAN>event<SPAN class=sym>) {</SPAN>
+<A name=02.cpp_45></A><SPAN class=line>   45 </SPAN>    QPoint pos <SPAN class=sym>=</SPAN> event<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>pos</SPAN><SPAN class=sym>();</SPAN>
+<A name=02.cpp_46></A><SPAN class=line>   46 </SPAN>    sb3<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setText</SPAN><SPAN class=sym>(</SPAN>
+<A name=02.cpp_47></A><SPAN class=line>   47 </SPAN>        <SPAN class=kwd>QString</SPAN><SPAN class=sym>(</SPAN> <SPAN class=str>"%1, %2"</SPAN> <SPAN class=sym>).</SPAN><SPAN class=kwd>arg</SPAN><SPAN class=sym>(</SPAN> pos<SPAN class=sym>.</SPAN><SPAN class=kwd>x</SPAN><SPAN class=sym>() ).</SPAN><SPAN class=kwd>arg</SPAN><SPAN class=sym>(</SPAN> pos<SPAN class=sym>.</SPAN><SPAN class=kwd>y</SPAN><SPAN class=sym>() ) );</SPAN>
+<A name=02.cpp_48></A><SPAN class=line>   48 </SPAN><SPAN class=sym>}</SPAN>
+<A name=02.cpp_49></A><SPAN class=line>   49 </SPAN>
+<A name=02.cpp_50></A><SPAN class=line>   50 </SPAN><SPAN class=kwb>void</SPAN> MainWindow<SPAN class=sym>::</SPAN><SPAN class=kwd>about</SPAN><SPAN class=sym>() {</SPAN>
+<A name=02.cpp_51></A><SPAN class=line>   51 </SPAN>    QMessageBox<SPAN class=sym>::</SPAN><SPAN class=kwd>about</SPAN><SPAN class=sym>(</SPAN>
+<A name=02.cpp_52></A><SPAN class=line>   52 </SPAN>        <SPAN class=kwa>this</SPAN><SPAN class=sym>,</SPAN> <SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"О программе"</SPAN><SPAN class=sym>),</SPAN>
+<A name=02.cpp_53></A><SPAN class=line>   53 </SPAN>        <SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"&lt;h2&gt;Простое приложение Qt4&lt;/h2&gt;"</SPAN>
+<A name=02.cpp_54></A><SPAN class=line>   54 </SPAN>           <SPAN class=str>"&lt;p&gt;Окно с меню и строкой состояния"</SPAN><SPAN class=sym>));</SPAN>
+<A name=02.cpp_55></A><SPAN class=line>   55 </SPAN><SPAN class=sym>}</SPAN>
+<A name=02.cpp_56></A><SPAN class=line>   56 </SPAN>
+<A name=02.cpp_57></A><SPAN class=line>   57 </SPAN><SPAN class=kwb>bool</SPAN> MainWindow<SPAN class=sym>::</SPAN><SPAN class=kwd>askOnClose</SPAN><SPAN class=sym>() {</SPAN>
+<A name=02.cpp_58></A><SPAN class=line>   58 </SPAN>    <SPAN class=kwb>int</SPAN> r <SPAN class=sym>=</SPAN> QMessageBox<SPAN class=sym>::</SPAN><SPAN class=kwd>question</SPAN><SPAN class=sym>(</SPAN>
+<A name=02.cpp_59></A><SPAN class=line>   59 </SPAN>        <SPAN class=kwa>this</SPAN><SPAN class=sym>,</SPAN> <SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Подтвердите"</SPAN><SPAN class=sym>),</SPAN>
+<A name=02.cpp_60></A><SPAN class=line>   60 </SPAN>        <SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Выйти из программы?"</SPAN><SPAN class=sym>),</SPAN>
+<A name=02.cpp_61></A><SPAN class=line>   61 </SPAN>        QMessageBox<SPAN class=sym>::</SPAN>Yes <SPAN class=sym>|</SPAN> QMessageBox<SPAN class=sym>::</SPAN>No<SPAN class=sym>,</SPAN>
+<A name=02.cpp_62></A><SPAN class=line>   62 </SPAN>        QMessageBox<SPAN class=sym>::</SPAN>Yes<SPAN class=sym>,</SPAN>
+<A name=02.cpp_63></A><SPAN class=line>   63 </SPAN>        QMessageBox<SPAN class=sym>::</SPAN>Cancel <SPAN class=sym>|</SPAN> QMessageBox<SPAN class=sym>::</SPAN>Escape<SPAN class=sym>);</SPAN>
+<A name=02.cpp_64></A><SPAN class=line>   64 </SPAN>    <SPAN class=kwa>return</SPAN> <SPAN class=sym>(</SPAN>r <SPAN class=sym>==</SPAN> QMessageBox<SPAN class=sym>::</SPAN>Yes<SPAN class=sym>);</SPAN>
+<A name=02.cpp_65></A><SPAN class=line>   65 </SPAN><SPAN class=sym>}</SPAN>
+<A name=02.cpp_66></A><SPAN class=line>   66 </SPAN>
+<A name=02.cpp_67></A><SPAN class=line>   67 </SPAN><SPAN class=kwb>void</SPAN> MainWindow<SPAN class=sym>::</SPAN><SPAN class=kwd>closeEvent</SPAN><SPAN class=sym>(</SPAN>QCloseEvent <SPAN class=sym>*</SPAN>event<SPAN class=sym>) {</SPAN>
+<A name=02.cpp_68></A><SPAN class=line>   68 </SPAN>    <SPAN class=kwa>if</SPAN> <SPAN class=sym>(</SPAN><SPAN class=kwd>askOnClose</SPAN><SPAN class=sym>()) {</SPAN>
+<A name=02.cpp_69></A><SPAN class=line>   69 </SPAN>        event<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>accept</SPAN><SPAN class=sym>();</SPAN>
+<A name=02.cpp_70></A><SPAN class=line>   70 </SPAN>    <SPAN class=sym>}</SPAN> <SPAN class=kwa>else</SPAN> <SPAN class=sym>{</SPAN>
+<A name=02.cpp_71></A><SPAN class=line>   71 </SPAN>        event<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>ignore</SPAN><SPAN class=sym>();</SPAN>
+<A name=02.cpp_72></A><SPAN class=line>   72 </SPAN>    <SPAN class=sym>}</SPAN>
+<A name=02.cpp_73></A><SPAN class=line>   73 </SPAN><SPAN class=sym>}</SPAN>
+<A name=02.cpp_74></A><SPAN class=line>   74 </SPAN>
+<A name=02.cpp_75></A><SPAN class=line>   75 </SPAN><SPAN class=kwb>int</SPAN> <SPAN class=kwd>main</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwb>int</SPAN> argc<SPAN class=sym>,</SPAN> <SPAN class=kwb>char</SPAN> <SPAN class=sym>*</SPAN>argv<SPAN class=sym>[]) {</SPAN>
+<A name=02.cpp_76></A><SPAN class=line>   76 </SPAN>    QApplication <SPAN class=kwd>app</SPAN><SPAN class=sym>(</SPAN>argc<SPAN class=sym>,</SPAN> argv<SPAN class=sym>);</SPAN>
+<A name=02.cpp_77></A><SPAN class=line>   77 </SPAN>    MainWindow mainWin<SPAN class=sym>;</SPAN>
+<A name=02.cpp_78></A><SPAN class=line>   78 </SPAN>    mainWin<SPAN class=sym>.</SPAN><SPAN class=kwd>show</SPAN><SPAN class=sym>();</SPAN>
+<A name=02.cpp_79></A><SPAN class=line>   79 </SPAN>    <SPAN class=kwa>return</SPAN> app<SPAN class=sym>.</SPAN><SPAN class=kwd>exec</SPAN><SPAN class=sym>();</SPAN>
+<A name=02.cpp_80></A><SPAN class=line>   80 </SPAN><SPAN class=sym>}</SPAN>
+</PRE>
+<UL>
+  <LI>(1-2) Подключили модуль <CODE>QtGui</CODE> и свой заголовочный файл. 
+  <LI>(4-35) Конструктор главного окна. 
+  <LI>(6-7) Определили кодек. 
+  <LI>(9-11) Создали действие "<CODE>О&nbsp;программе</CODE>", задали для него 
+  текст подсказки и связали с функцией <CODE>about</CODE>, реализованной ниже. 
+  <LI>(13-16) Создали действие "<CODE>Выход</CODE>", задали для него текст 
+  подсказки и клавиатурное сокращение, связали его с функцией 
+  <CODE>close</CODE>, выполняющей закрытие окна (эта функция определена в 
+  базовом классе). 
+  <LI>(18-21) Создали меню "<CODE>Файл</CODE>", состоящее из двух пунктов, с 
+  разделителем между ними. 
+  <LI>(23-25) Создали три текстовые метки, в качестве родительского элемента 
+  указали строку состояния. 
+  <LI>(27-30) Убрали из строки состояния маркер для изменения размеров окна 
+  (иначе правая текстовая метка не доходит до правого края окна, что выглядит не 
+  слишком эстетично) и разместили в строке три текстовые метки. Указали для 
+  первой коэффициент растяжимости, в два раза больший, чем для остальных. 
+  <LI>(32) Вывели в первое поле строки состояния приветствие. 
+  <LI>(34)Указали, что метод <CODE>mouseMoveEvent</CODE> будет вызываться при 
+  движении указателя мыши, даже если её кнопки не нажаты. 
+  <LI>(38-42) Виртуальный метод, выполняемый при изменении размеров окна. Узнаём 
+  новые размеры с помощью функции <CODE>QResizeEvent::size()</CODE> и выводим их 
+  во второе поле строки состояния. Для преобразования целых значений к типу 
+  <CODE>QString</CODE> используем метасимволы <CODE>%1</CODE> и <CODE>%2</CODE> 
+  в строке шаблона (41), а также функцию <CODE>QString::arg</CODE>, которая 
+  замещает их строковым представлением своего аргумента и возвращает результат 
+  типа <CODE>QString</CODE>. 
+  <LI>(44-48) Виртуальный метод, вызываемый при перемещении указателя мыши. 
+  Новые координаты указателя возвращает функция 
+  <CODE>QMouseeEvent::pos()</CODE>. Мы выводим их в третье поле строки 
+  состояния. 
+  <LI>(50-55) Функция <CODE>about</CODE> выполняется при выборе пункта меню 
+  <CODE>Файл</CODE>&nbsp;| <CODE>О&nbsp;программе</CODE>. Для вывода на экран 
+  информации используется метод <CODE>about</CODE>, определённый для класса 
+  <CODE>QMessageBox</CODE>. Обратите внимание, что для форматирования текста 
+  используется язык разметки HTML. 
+  <LI>(57-73) При закрытии окна программы (по команде меню <CODE>Выход</CODE>, 
+  нажатием комбинации клавиш <KBD>Alt+F4</KBD> или с помощью крестика в верхнем 
+  правом углу окна) исполняется виртуальный метод <CODE>closeEvent</CODE> (67), 
+  в котором мы вызываем функцию <CODE>askOnClose</CODE> (57). Последняя выводит 
+  на экран запрос на подтверждение, используя метод <CODE>question</CODE> класса 
+  <CODE>QMessageBox</CODE>. Если пользователь отвечает утвердительно, то окно 
+  зарывается (69), иначе действие отменяется (71) и выполнение программы 
+  продолжается. </LI></UL>
+<P>Чуть позже мы узнаем, как использовать программу <B>Qt&nbsp;Designer</B> для 
+определения действий, создания меню и других элементов интерфейса. 
+</P>
+<a href="qt004.htm">Назад</a> <a href="title.htm">Содержание</a> <a href="qt006.htm">Вперед</a>
+</BODY></HTML>

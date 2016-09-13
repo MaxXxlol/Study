@@ -1,0 +1,72 @@
+P {
+	MARGIN-TOP: 12px; MARGIN-BOTTOM: 8px; TEXT-INDENT: 8mm
+}
+BODY.hl {
+	BACKGROUND-COLOR: #ffffff
+}
+.toc1 {
+	WHITE-SPACE: nowrap
+}
+PRE.hl {
+	FONT-SIZE: 10pt; COLOR: #000000; FONT-FAMILY: Courier New; BACKGROUND-COLOR: #ffffff
+}
+.num {
+	FONT-WEIGHT: bold; COLOR: #800080
+}
+.esc {
+	FONT-WEIGHT: bold; COLOR: #ff00ff
+}
+.str {
+	COLOR: #a68500
+}
+.dstr {
+	COLOR: #0000ff
+}
+.slc {
+	COLOR: #f27900
+}
+.com {
+	COLOR: #ff8000
+}
+.dir {
+	FONT-WEIGHT: bold; COLOR: #0080c0
+}
+.sym {
+	FONT-WEIGHT: bold; COLOR: #ff0080
+}
+.line {
+	COLOR: #803030
+}
+.kwa {
+	FONT-WEIGHT: bold; COLOR: #bb7977
+}
+.kwb {
+	FONT-WEIGHT: bold; COLOR: #8080c0
+}
+.kwc {
+	COLOR: #0080c0
+}
+.kwd {
+	COLOR: #004466
+}
+CODE {
+	MARGIN-TOP: 3px; MARGIN-BOTTOM: 3px; COLOR: #802020
+}
+PRE {
+	MARGIN-TOP: 8px; MARGIN-BOTTOM: 8px; COLOR: #802020; BACKGROUND-COLOR: #e8f0ff
+}
+UL {
+	MARGIN-TOP: 5px; MARGIN-BOTTOM: 5px
+}
+LI {
+	MARGIN-TOP: 5px; MARGIN-BOTTOM: 5px
+}
+H1 {
+	MARGIN-TOP: 40px; MARGIN-BOTTOM: 24px
+}
+H2 {
+	MARGIN-TOP: 32px; MARGIN-BOTTOM: 18px
+}
+H3 {
+	MARGIN-TOP: 24px; MARGIN-BOTTOM: 10px
+}

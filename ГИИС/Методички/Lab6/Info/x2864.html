@@ -1,0 +1,495 @@
+<html><head>
+
+
+<meta http-equiv="Content-Type" content="text/html; charset=KOI8-R">
+  <meta name="generator" content="HTML Tidy for Linux/x86 (vers 1st October 2003), see www.w3.org">
+        
+
+  <title>Интеграция виджета в Qt Designer.</title>
+  <meta name="GENERATOR" content="Modular DocBook HTML Stylesheet Version 1.7">
+  <link rel="HOME" title="Разработка графического интерфейса с помощью библиотеки Qt3" href="http://www.opennet.ru/docs/RUS/qt3_prog/index.html">
+  <link rel="UP" title="Создание собственных виджетов." href="http://www.opennet.ru/docs/RUS/qt3_prog/c2572.html">
+  <link rel="PREVIOUS" title="Создание класса-потомка от QWidget." href="http://www.opennet.ru/docs/RUS/qt3_prog/x2614.html">
+  <link rel="NEXT" title="Двойная буферизация." href="http://www.opennet.ru/docs/RUS/qt3_prog/x2947.html">
+</head><body bgcolor="#dde1c2">
+<link rel="stylesheet" href="x2864_files/opennet4.css" type="text/css">
+<!--htdig_noindex-->
+<form method="get" action="http://www.opennet.ru/search.shtml">
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody><tr>
+<td style="background: url(&quot;/back.gif&quot;) repeat-x scroll left bottom rgb(233, 234, 214);" bgcolor="#e9ead6" valign="BOTTOM">
+<a href="http://www.opennet.ru/"><img src="x2864_files/opennet2.gif" alt="The OpenNET Project" border="0" height="60" width="249"></a><br>
+</td>
+
+<td bgcolor="#b0b190" width="1"><img src="x2864_files/p.gif" alt="" height="1" width="1"></td>
+
+<td align="RIGHT" bgcolor="#d9dac6" valign="TOP" width="470">
+<table border="0" cellpadding="1" width="470">
+<tbody><tr>
+<td bgcolor="#d9dac6" height="60">
+
+<script language="JavaScript">           
+var plugin=(navigator.mimeTypes && navigator.mimeTypes["application/x-shockwave-flash"]) ? navigator.mimeTypes["application/x-shockwave-flash"].enabledPlugin : 0;          
+          
+if ( plugin ) {          
+          
+ plugin=parseInt(plugin.description.substring(plugin.description.indexOf(".")-2))>=6;          
+          
+}          
+          
+else if (navigator.userAgent && navigator.userAgent.indexOf("MSIE")>=0           
+          
+   && (navigator.userAgent.indexOf("Windows 95")>=0 || navigator.userAgent.indexOf("Windows 98")>=0 || navigator.userAgent.indexOf("Windows NT")>=0)) {          
+          
+ document.write('<SCR'+'IPT LANGUAGE=VBScript\> \n');          
+          
+ document.write('on error resume next \n');          
+          
+ document.write('plugin=( IsObject(CreateObject("ShockwaveFlash.ShockwaveFlash.6")))\n');          
+          
+ document.write('</SCRIPT\> \n');          
+          
+}          
+          
+if ( plugin ) {          
+          
+     var swf_url = '/img/securit6.swf' + '?link1=' + 'http://click.opennet.ru/cgi-bin/opennet/hjump.cgi?securit6'; 
+     document.write('<OBJECT classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width=468 height=60>'); 
+     document.write('<param name=movie value="' + swf_url + '"><param name=menu value=false><param name=quality value=high><param name="play" value="true">'); 
+     document.write('<OBJECT TYPE="application/x-shockwave-flash" data="' + swf_url + '" width=468 height=60>'); 
+     document.write('<param name=movie value="' + swf_url + '"><param name=menu value=false><param name=quality value=high><param name="play" value="true">'); 
+     document.write('</object>'); 
+     document.write('</object>'); 
+                                           
+}else{                 
+    document.write('<a href=http://click.opennet.ru/cgi-bin/opennet/hjump.cgi?securit6 target=_blank><img src=/img/securit6.gif width=468 height=60 border=0></a>');                                           
+}           
+</script>          
+<noscript><a href="http://click.opennet.ru/cgi-bin/opennet/hjump.cgi?securit6" target="_blank"><img src="x2864_files/securit6.gif" border="0" height="60" width="468"></a></noscript>
+
+
+</td>
+</tr>
+</tbody></table>
+</td>
+
+<td bgcolor="#b0b190" width="1"><img src="x2864_files/p.gif" alt="" height="1" width="1"></td>
+<td style="background: url(&quot;/back.gif&quot;) repeat-x scroll left bottom rgb(233, 234, 214);" bgcolor="#e9ead6" width="40">&nbsp;</td>
+<td bgcolor="#b0b190" width="1"><img src="x2864_files/p.gif" alt="" height="1" width="1"></td>
+
+<td rowspan="3" align="RIGHT" bgcolor="#e9ead6" valign="TOP" width="130">
+<a href="http://www.lanbilling.ru/" target="_blank"><img src="x2864_files/lanbilling7.gif" border="0" height="125" width="130"></a>
+</td>
+
+</tr>
+
+<tr bgcolor="#b0b190"><td colspan="6"><img src="x2864_files/p.gif" alt="" height="1" width="1"></td></tr>
+
+
+<tr bgcolor="#e9ead6">
+<td colspan="5" align="CENTER">
+<table width="100%">
+<tbody><tr>
+<td rowspan="2" class="h" nowrap="nowrap" width="300">
+<input name="exclude" value="index|/man.shtml" type="hidden"><a href="http://www.opennet.ru/search.shtml" class="h"><u>Поиск</u></a>&nbsp;(<a href="http://www.opennet.ru/keywords/" class="h">ключи</a>):&nbsp;<input size="20" name="words" title="для поиска в google наберите &quot;g фраза&quot;" type="text">
+</td><td width="25%">
+&nbsp;   <a href="http://www.opennet.ru/prog/sml/" class="h"><b><u>ПРОГРАММЫ</u></b></a>
+</td><td width="25%">
+   <a href="http://www.opennet.ru/filebase.shtml" class="h"><b><u>СТАТЬИ</u></b></a>
+</td><td width="25%">
+   <a href="http://www.opennet.ru/tips/sml/" class="h"><b><u>СОВЕТЫ</u></b></a>
+</td><td width="25%">
+   <a href="http://www.opennet.ru/forum/" class="h"><b><u>ФОРУМ</u></b></a>
+</td></tr>
+<tr><td>
+&nbsp;   <a href="http://wiki.opennet.ru/" class="h"><b><u>WIKI</u></b></a>
+</td><td class="h">
+   <a href="http://www.opennet.ru/opennews/" class="h"><b><u>НОВОСТИ</u></b></a> (<a href="http://www.opennet.ru/news/opennet.shtml" class="h">+</a>)
+</td><td>
+   <a href="http://www.opennet.ru/man.shtml" class="h"><b><u>MAN'ы</u></b></a>
+</td><td>
+   <a href="http://www.opennet.ru/docs/" class="h"><b><u>ДОКУМЕНТАЦИЯ</u></b></a>
+</td></tr>
+</tbody></table>
+</td>
+<td bgcolor="#b0b190" width="1"><img src="x2864_files/p.gif" alt="" height="1" width="1"></td>
+</tr>
+<tr bgcolor="#b0b190"><td colspan="7"><img src="x2864_files/p.gif" alt="" height="2" width="1"></td></tr>
+</tbody></table>
+
+<div style="float: left; width: 279px; text-align: left; padding-right: 60px;" id="adv"><a href="http://www.ip-as.ru/" target="_blank"><img src="x2864_files/ipas3.gif" border="0" height="40" width="279"></a></div>
+<div style="padding-top: 0px; position: absolute; left: 50%; margin-left: -235px; width: 470px;" id="adv2">
+</div>
+<div style="width: 279px; float: right;" id="adv3"><a href="http://job.samsung.ru/" target="_blank"><img src="x2864_files/samsung_line9.gif" border="0" height="40" width="279"></a></div>
+<div style="clear: both;"></div>
+
+<br>
+
+<script language="JavaScript"><!--
+d=document;a='';r=escape(d.referrer);a+=';r='+r;
+js=10; d.write('<img src="http://top.list.ru/counter'+
+'?id=77689;js='+js+a+';rand='+Math.random()+
+'" alt="" height=1 width=1>');
+if(js>11)d.write('<'+'!-- ')//--></script><noscript><img src="x2864_files/counter.gif" alt="" height="1" width="1">
+</noscript>
+
+</form>
+<!--/htdig_noindex-->
+
+
+<table style="margin-bottom: 5px; margin-top: 5px;" border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody><tr><td>
+<table bgcolor="#e9ead6" border="0" cellpadding="4" cellspacing="0" width="100%">
+<tbody><tr bgcolor="#c7cbb1"><td><font color="#000090">
+<b><a href="http://www.opennet.ru/docs/">Каталог документации</a> / 
+<a href="http://www.opennet.ru/docs/124.shtml">Раздел "Программирование, языки"</a> /
+<a href="http://www.opennet.ru/docs/RUS/qt3_prog/">Оглавление документа</a>
+</b>
+</font></td></tr>
+</tbody></table>
+</td></tr>
+<tr bgcolor="#b0b190"><td><img src="x2864_files/p.gif" alt="" height="3" width="1"></td></tr>
+</tbody></table>
+
+  <div class="NAVHEADER">
+    <table summary="Header navigation table" border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tbody><tr>
+        <th colspan="3" align="center">Разработка графического интерфейса с помощью
+            библиотеки Qt3</th>
+      </tr>
+
+      <tr>
+        <td align="left" valign="bottom" width="10%"><a href="http://www.opennet.ru/docs/RUS/qt3_prog/x2614.html" accesskey="P">Пред.</a></td>
+
+        <td align="center" valign="bottom" width="80%">Глава 5. Создание собственных
+            виджетов.</td>
+
+        <td align="right" valign="bottom" width="10%"><a href="http://www.opennet.ru/docs/RUS/qt3_prog/x2947.html" accesskey="N">След.</a></td>
+      </tr>
+    </tbody></table>
+    <hr align="left" width="100%">
+  </div>
+
+  <div class="SECTION">
+    <h1 class="SECTION"><a name="INTEGRATINGCUSTOMWIDGETSWITHQTDESIGNER"></a>5.3. Интеграция
+    виджета в Qt Designer.</h1>
+
+    <p>Прежде, чем мы сможем использовать наш виджет в <span class="emphasis"><em class="EMPHASIS">Qt Designer</em></span>, мы должны
+    известить его об этом. Существует два подхода: подключение как
+    "простого виджета" и как плагина.</p>
+
+    <p>Методика "простого виджета" заключается в заполнении
+    полей диалога <span class="emphasis"><em class="EMPHASIS">Qt
+    Designer</em></span>. После этого виджет может вставляться в формы,
+    разрабатываемые в среде <span class="emphasis"><em class="EMPHASIS">Qt Designer</em></span>, но отображаться на форме, во
+    время редактирования и предварительного просмотра, он будет в виде
+    черного прямоугольника. Ниже приводится последовательность действий
+    по интеграции <tt class="CLASSNAME">HexSpinBox</tt> таким
+    способом:</p>
+
+    <ol type="1">
+      <li>
+        <p>Выберите пункт меню <strong class="COMMAND">Tools|Custom|Edit Custom Widget</strong>. Перед вами
+        появится диалоговое окно "Edit Custom Widgets".</p>
+      </li>
+
+      <li>
+        <p>Щелкните по кнопке "New Widget".</p>
+      </li>
+
+      <li>
+        <p>Измените имя класса <tt class="CLASSNAME">MyCustomWidget</tt> на <tt class="CLASSNAME">HexSpinBox</tt> и имя заголовочного файла
+        <tt class="FILENAME">mycustomwidget.h</tt> на <tt class="FILENAME">hexspinbox.h</tt>.</p>
+      </li>
+
+      <li>
+        <p>Измените "Size Hint" на (60, 20).</p>
+      </li>
+
+      <li>
+        <p>Измените "Size Policy" на (Minimum, Fixed).</p>
+      </li>
+    </ol>После этого виджет появится в секции "Custom
+    Widgets" в палитре компонентов <span class="emphasis"><em class="EMPHASIS">Qt Designer</em></span>.
+
+    <div class="MEDIAOBJECT">
+      <p><img src="x2864_files/fig5.png"></p>
+
+      <div class="CAPTION">
+        <p>Рисунок 5.6. Диалог "Edit Custom Widgets".</p>
+      </div>
+    </div><br>
+    Подключение виджета в виде плагина требует создания отдельной
+    библиотеки, которую <span class="emphasis"><em class="EMPHASIS">Qt
+    Designer</em></span> мог бы загружать во время своей работы и
+    создавать с ее помощью экземпляры виджета. При таком подходе на
+    форме, во время ее редактирования и предварительного просмотра,
+    будет отображаться настоящий виджет. Продемонстрируем подключение
+    виджета к <span class="emphasis"><em class="EMPHASIS">Qt
+    Designer</em></span>, в виде плагина, на примере <tt class="CLASSNAME">IconEditor</tt>.<br>
+    <br>
+
+    <p>Прежде всего, необходимо создать класс-потомок от <tt class="CLASSNAME">QWidgetPlugin</tt> и перекрыть некоторые виртуальные
+    функции. Весь код можно разместить в тех же самых файлах с
+    исходными текстами, но мы создадим файлы плагина отдельно.
+    Допустим, что файлы, с исходным кодом плагина, находятся в каталоге
+    <tt class="FILENAME">iconeditorplugin</tt>, а с исходным кодом
+    самого компонента -- в параллельном каталоге <tt class="FILENAME">iconeditor</tt>.</p>
+
+    <p>Заголовочный файл плагина:</p>
+    <pre class="SCREEN">#include &lt;qwidgetplugin.h&gt; 
+
+#include "../iconeditor/iconeditor.h" 
+
+class IconEditorPlugin : public QWidgetPlugin 
+{ 
+public: 
+  QStringList keys() const; 
+  QWidget *create(const QString &amp;key, QWidget *parent, 
+                  const char *name);      
+  QString includeFile(const QString &amp;key) const; 
+  QString group(const QString &amp;key) const; 
+  QIconSet iconSet(const QString &amp;key) const; 
+  QString toolTip(const QString &amp;key) const; 
+  QString whatsThis(const QString &amp;key) const; 
+  bool isContainer(const QString &amp;key) const; 
+};                  
+      
+</pre>Класс <tt class="CLASSNAME">IconEditorPlugin</tt> является своего
+рода "фабрикой", которая изготавливает и выпускает экземпляры
+виджета <tt class="CLASSNAME">IconEditor</tt>. Функции плагина
+используются средой <span class="emphasis"><em class="EMPHASIS">Qt
+Designer</em></span> для создания экземпляров класса и получения
+необходимой информации.
+    <pre class="SCREEN">QStringList IconEditorPlugin::keys() const 
+{ 
+  return QStringList() &lt;&lt; "IconEditor"; 
+}      
+      
+</pre>Функция <tt class="METHODNAME">keys()</tt> возвращает список
+виджетов, "выпускаемых" плагином-фабрикой. Наш плагин
+"выпускает" только один виджет -- <tt class="CLASSNAME">IconEditor</tt>.
+    <pre class="SCREEN">QWidget *IconEditorPlugin::create(const QString &amp;, QWidget *parent, 
+                                  const char *name) 
+{ 
+  return new IconEditor(parent, name); 
+}      
+      
+</pre>Функцию <tt class="METHODNAME">create()</tt> вызывает
+    <span class="emphasis"><em class="EMPHASIS">Qt
+    Designer</em></span>, когда необходимо создать экземпляр виджета.
+    Первый аргумент -- имя класса виджета. В данном примере мы можем
+    игнорировать его, поскольку наш плагин обслуживает только один
+    класс. Все остальные функции так же получают имя класса в первом
+    аргументе.
+    <pre class="SCREEN">QString IconEditorPlugin::includeFile(const QString &amp;) const 
+{ 
+  return "iconeditor.h"; 
+}      
+      
+</pre>Функция <tt class="METHODNAME">includeFile()</tt> возвращает имя
+заголовочного файла виджета, который представляет плагин. Имя файла
+заголовка подключается к коду, создаваемому утилитой <tt class="USERINPUT"><strong>uic</strong></tt>.
+    <pre class="SCREEN">bool IconEditorPlugin::isContainer(const QString &amp;) const 
+{ 
+  return false; 
+}      
+      
+</pre>Функция <tt class="METHODNAME">isContainer()</tt> возвращает
+<tt class="PARAMETER"><em>true</em></tt>, если виджет может содержать в
+себе другие виджеты, иначе -- <tt class="PARAMETER"><em>false</em></tt>. Например, <tt class="CLASSNAME">QFrame</tt> может содержать в себе другие виджеты. В нашем
+случае возвращается <tt class="PARAMETER"><em>false</em></tt>,
+поскольку нет смысла делать из <tt class="CLASSNAME">IconEditor</tt>
+контейнер для других виджетов. Строго говоря, любой виджет может быть
+площадкой для размещения других виджетов, но <span class="emphasis">
+    <em class="EMPHASIS">Qt Designer</em></span> отвергает такую
+    возможность, если <tt class="METHODNAME">isContainer()</tt>
+    возвращает <tt class="PARAMETER"><em>false</em></tt>.
+    <pre class="SCREEN">QString IconEditorPlugin::group(const QString &amp;) const 
+{ 
+  return "Plugin Widgets"; 
+}      
+      
+</pre>Функция <tt class="METHODNAME">group()</tt> возвращает имя секции
+палитры компонентов, в которой будет размещен виджет. Если такой секции
+пока нет, она будет создана автоматически.
+    <pre class="SCREEN">QIconSet IconEditorPlugin::iconSet(const QString &amp;) const 
+{ 
+  return QIconSet(QPixmap::fromMimeSource("iconeditor.png")); 
+}      
+      
+</pre>Функция <tt class="METHODNAME">iconSet()</tt> возвращает иконку
+для палитры компонентов.
+    <pre class="SCREEN">QString IconEditorPlugin::toolTip(const QString &amp;) const 
+{ 
+  return "Icon Editor"; 
+}      
+      
+</pre>Функция <tt class="METHODNAME">toolTip()</tt> возвращает текст
+подсказки, которая появляется при наведении указателя мыши на иконку
+виджета в палитре компонентов.
+    <pre class="SCREEN">QString IconEditorPlugin::whatsThis(const QString &amp;) const 
+{ 
+  return "Widget for creating and editing icons"; 
+}
+      
+</pre>Функция <tt class="METHODNAME">whatsThis()</tt> возвращает текст,
+который появляется по запросу "What's This?"
+    <span class="emphasis"><em class="EMPHASIS">Qt
+    Designer</em></span>-а.
+    <pre class="SCREEN">Q_EXPORT_PLUGIN(IconEditorPlugin)      
+      
+</pre>Файл с исходным текстом плагина должен завершаться вызовом
+макроса <tt class="PARAMETER"><em>Q_EXPORT_PLUGIN()</em></tt>.<br>
+    <br>
+
+    <p>Файл <tt class="FILENAME">.pro</tt> для сборки плагина выглядит
+    примерно так:</p>
+    <pre class="SCREEN">TEMPLATE   = lib 
+CONFIG    += plugin 
+HEADERS    = ../iconeditor/iconeditor.h 
+SOURCES    = iconeditorplugin.cpp \ 
+             ../iconeditor/iconeditor.cpp 
+IMAGES     = images/iconeditor.png 
+DESTDIR    = $(QTDIR)/plugins/designer      
+      
+</pre>Предполагается, что переменная окружения <tt class="VARNAME">QTDIR</tt> содержит путь к каталогу, куда была установлена
+библиотека Qt. Когда вы собираете плагин командой <tt class="USERINPUT"><strong>make</strong></tt> или <tt class="USERINPUT"><strong>nmake</strong></tt>, он автоматически
+устанавливается в каталог <tt class="FILENAME">plugins</tt>
+    <span class="emphasis"><em class="EMPHASIS">Qt
+    Designer</em></span>-а.<br>
+    <br>
+
+    <p>После сборки плагина вы можете использовать <tt class="CLASSNAME">IconEditor</tt> в <span class="emphasis"><em class="EMPHASIS">Qt Designer</em></span> точно так же, как встроенные
+    виджеты Qt.</p>
+  </div>
+
+  <div class="NAVFOOTER">
+    <hr align="left" width="100%">
+
+    <table summary="Footer navigation table" border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tbody><tr>
+        <td align="left" valign="top" width="33%"><a href="http://www.opennet.ru/docs/RUS/qt3_prog/x2614.html" accesskey="P">Пред.</a></td>
+
+        <td align="center" valign="top" width="34%"><a href="http://www.opennet.ru/docs/RUS/qt3_prog/index.html" accesskey="H">В начало</a></td>
+
+        <td align="right" valign="top" width="33%"><a href="http://www.opennet.ru/docs/RUS/qt3_prog/x2947.html" accesskey="N">След.</a></td>
+      </tr>
+
+      <tr>
+        <td align="left" valign="top" width="33%">Создание класса-потомка от QWidget.</td>
+
+        <td align="center" valign="top" width="34%"><a href="http://www.opennet.ru/docs/RUS/qt3_prog/c2572.html" accesskey="U">На уровень выше</a></td>
+
+        <td align="right" valign="top" width="33%">Двойная буферизация.</td>
+      </tr>
+    </tbody></table>
+  </div>
+
+<!--htdig_noindex-->
+<noindex>
+<br>
+
+<table id="ibm_adv"><tbody><tr valign="top"><td width="383">
+<iframe src="x2864_files/adv_ibm.htm" name="ibm" border="0" target="_blank" scrolling="no" frameborder="0" height="240" width="383"></iframe>
+</td><td>
+ 
+
+     <table align="center" bgcolor="#441144" border="1" cellpadding="2" cellspacing="0" width="95%">
+     <tbody> 
+
+       <tr>
+            <td align="center" bgcolor="#ffffff">
+               <a target="_blank" href="http://shop.linuxformat.ru/lxf_01_12_2012/?sid=nP5OTFA1" title="ПОДПИШИСЬ НА ЖУРНАЛ Linux Format 2012!">
+                  <font size="4" color="#5b1900" face="sans-serif">
+                  <b>ПОДПИШИСЬ НА ЖУРНАЛ Linux Format 2012!</b>
+                  </font>
+               </a>
+            </td>
+       </tr>
+     <tr>
+	  <td align="left" bgcolor="#ffffff">
+	  <table size="2" color="#5b1900" face="sans-serif" border="0">
+	  <tbody><tr>
+	  <td>
+		<a target="_blank" href="http://shop.linuxformat.ru/lxf_01_12_2012/?sid=nP5OTFA1">
+		<img src="x2864_files/lxf2012_200x300.gif" border="0" height="230" width="160">
+		</a>
+		</td>
+		<td>
+		 <p>
+         Журнал "Linux Format" (Линукс Формат)- Единственный в России и 
+странах СНГ журнал на русском языке, посвящённый Linux и 
+         свободному ПО. Журнал для IT-директоров, IT-менеджеров, 
+программистов, системных администраторов, учителей школ и 
+         преподавателей ВУЗов и всех пользователей ПК. В каждом выпуске:
+ Новости индустрии OpenSource, обзоры новинок свободного ПО, 
+         обучающие и методические статьи.
+</p>
+         <p>
+         Каждый, кто оформит подписку, получает бонусы и подарки- 
+объёмные наклейки на системный блок, диск с архивом номеров за 
+         2005-2011 г.г. и ежемесячно электронную версию журнала в 
+pdf-формате.
+			</p>
+			<p>
+			<a href="http://shop.linuxformat.ru/lxf_01_12_2012/?sid=nP5OTFA1">Оформить подписку на год</a>
+			</p>
+			</td>
+			</tr>
+			</tbody></table>
+		</td>
+    </tr>
+    </tbody>
+    </table>
+
+		</td></tr></tbody></table>
+
+</noindex>
+<!--/htdig_noindex-->
+
+
+<!-- footer -->
+<!--htdig_noindex-->
+<br>
+<table bgcolor="#b0b190" border="0" cellpadding="1" cellspacing="0" width="100%">
+<tbody><tr><td>
+<table valign="MIDDLE" border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody><tr>
+<td align="LEFT" bgcolor="#e9ead6" width="35%">
+<font size="-1">
+&nbsp;&nbsp;<a href="http://www.opennet.ru/cgi-bin/opennet/bookmark.cgi">Закладки&nbsp;на&nbsp;сайте</a><br>
+&nbsp;&nbsp;<a href="http://www.opennet.ru/cgi-bin/opennet/bookmark.cgi?submit=add" target="blank_">Проследить&nbsp;за&nbsp;страницей</a>
+</font>
+</td>
+<td align="RIGHT" bgcolor="#e9ead6" width="65%">
+<font size="-1">Created&nbsp;1996-2012&nbsp;by&nbsp;<b><a href="http://www.opennet.ru/contact.shtml" title="email mc@tyumen.ru">Maxim&nbsp;Chirkov</a></b></font>&nbsp;&nbsp;<br>
+<font size="-1"><a href="http://www.opennet.ru/add.shtml">Добавить</a>,&nbsp;<a href="http://www.opennet.ru/reklama.shtml">Реклама</a>,&nbsp;<a href="http://www.opennet.ru/banners2.shtml">Вебмастеру</a>,&nbsp;<a href="http://www.opennet.ru/guide.shtml">ГИД</a></font>&nbsp;&nbsp;
+</td>
+</tr>
+</tbody></table>
+</td></tr>
+</tbody></table>
+
+
+<div align="right"><table><tbody><tr><td>
+<a target="_blank" href="http://www.runnet.ru/"><img src="x2864_files/runnet.gif" alt="RUNNet" border="0" height="31" width="88"></a>
+<a target="_blank" href="http://top.list.ru/jump?from=77689"><img src="x2864_files/counter_002.gif" alt="TopList" border="0" height="31" width="38"></a>
+<script type="text/javascript"><!--
+document.write("<a href='http://www.liveinternet.ru/click' "+
+"target=_blank><img src='//counter.yadro.ru/hit?t45.6;r"+
+escape(document.referrer)+((typeof(screen)=="undefined")?"":
+";s"+screen.width+"*"+screen.height+"*"+(screen.colorDepth?
+screen.colorDepth:screen.pixelDepth))+";u"+escape(document.URL)+
+";"+Math.random()+
+"' alt='' title='LiveInternet' "+
+"border='0' width='31' height='31'><\/a>")
+//--></script>
+<a target="_blank" href="http://counter.rambler.ru/top100/"><img src="x2864_files/top100.gif" border="0" height="1" width="1"><img src="x2864_files/banner.gif" border="0" height="31" width="88"></a>
+</td></tr></tbody></table>
+</div>
+
+<!--/htdig_noindex-->
+<!-- end of footer -->
+
+</body></html>

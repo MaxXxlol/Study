@@ -1,0 +1,315 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0043)http://www.mechta34.com/it/qt4/qtdb003.html -->
+<HTML><HEAD><TITLE>Ю.В.Земсков. Программирование на C++ с использованием библиотеки Qt4</TITLE>
+<META http-equiv=Content-Type content="text/html; charset=windows-1251"><LINK 
+href="Images/s1.css" type=text/css rel=stylesheet>
+<META content="MSHTML 6.00.2900.2180" name=GENERATOR></HEAD>
+<BODY>
+<a href="qtdb002.htm">Назад</a> <a href="title.htm">Содержание</a> <a href="qtdb004.htm">Вперед</a>
+<H2>Разработка модели и представления таблицы БД</H2>Решим сначала простую 
+задачу: в ячейках последнего столбца таблицы, где хранится только два возможных 
+значения, будем отображать элемент <CODE>QCheckBox</CODE> и текст 
+"<CODE>Да</CODE>" или "<CODE>Нет</CODE>" (рис.). Кроме того, запретим 
+редактирование первого столбца, изменим цвет фона ячеек первого и последнего 
+столбцов, а также параметры шрифта во втором столбце. 
+<P align=center><IMG src="Images/qtdb02.png"> 
+<P>Для этого определим свою модель таблицы, использовав в качестве базового 
+класс <CODE>QSqlQueryModel</CODE>. А чтобы управлять размерами ячеек таблицы, 
+определим свой класс представления на основе стандартного 
+<CODE>QTableView</CODE>. В листингах . и . приведён текст программы. 
+<P><B>Листинг. Модель и представление таблицы БД (файл 
+<CODE>examples-qt/db02/db02.h</CODE>)</B> <PRE class=hl><A name=db02.h_1></A><SPAN class=line>    1 </SPAN><SPAN class=dir>#include &lt;QSqlQueryModel&gt;</SPAN>
+<A name=db02.h_2></A><SPAN class=line>    2 </SPAN><SPAN class=dir>#include &lt;QTableView&gt;</SPAN>
+<A name=db02.h_3></A><SPAN class=line>    3 </SPAN>
+<A name=db02.h_4></A><SPAN class=line>    4 </SPAN><SPAN class=kwc>class</SPAN> MyModel <SPAN class=sym>:</SPAN> <SPAN class=kwc>public</SPAN> QSqlQueryModel <SPAN class=sym>{</SPAN>
+<A name=db02.h_5></A><SPAN class=line>    5 </SPAN>    Q_OBJECT
+<A name=db02.h_6></A><SPAN class=line>    6 </SPAN><SPAN class=kwc>public</SPAN><SPAN class=sym>:</SPAN>
+<A name=db02.h_7></A><SPAN class=line>    7 </SPAN>    <SPAN class=kwd>MyModel</SPAN><SPAN class=sym>(</SPAN>QObject <SPAN class=sym>*</SPAN>parent <SPAN class=sym>=</SPAN> <SPAN class=num>0</SPAN><SPAN class=sym>);</SPAN>
+<A name=db02.h_8></A><SPAN class=line>    8 </SPAN>    Qt<SPAN class=sym>::</SPAN>ItemFlags <SPAN class=kwd>flags</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwb>const</SPAN> QModelIndex <SPAN class=sym>&amp;</SPAN>index<SPAN class=sym>)</SPAN> <SPAN class=kwb>const</SPAN><SPAN class=sym>;</SPAN>
+<A name=db02.h_9></A><SPAN class=line>    9 </SPAN>    QVariant <SPAN class=kwd>data</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwb>const</SPAN> QModelIndex <SPAN class=sym>&amp;</SPAN>index<SPAN class=sym>,</SPAN>
+<A name=db02.h_10></A><SPAN class=line>   10 </SPAN>                  <SPAN class=kwb>int</SPAN> role <SPAN class=sym>=</SPAN> Qt<SPAN class=sym>::</SPAN>DisplayRole<SPAN class=sym>)</SPAN> <SPAN class=kwb>const</SPAN><SPAN class=sym>;</SPAN>
+<A name=db02.h_11></A><SPAN class=line>   11 </SPAN>    <SPAN class=kwb>bool</SPAN> <SPAN class=kwd>setData</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwb>const</SPAN> QModelIndex <SPAN class=sym>&amp;</SPAN>index<SPAN class=sym>,</SPAN>
+<A name=db02.h_12></A><SPAN class=line>   12 </SPAN>                 <SPAN class=kwb>const</SPAN> QVariant <SPAN class=sym>&amp;</SPAN>value<SPAN class=sym>,</SPAN> <SPAN class=kwb>int</SPAN> role<SPAN class=sym>);</SPAN>
+<A name=db02.h_13></A><SPAN class=line>   13 </SPAN><SPAN class=kwc>private</SPAN><SPAN class=sym>:</SPAN>
+<A name=db02.h_14></A><SPAN class=line>   14 </SPAN>    <SPAN class=kwb>void</SPAN> <SPAN class=kwd>refresh</SPAN><SPAN class=sym>();</SPAN>
+<A name=db02.h_15></A><SPAN class=line>   15 </SPAN><SPAN class=sym>};</SPAN>
+<A name=db02.h_16></A><SPAN class=line>   16 </SPAN>
+<A name=db02.h_17></A><SPAN class=line>   17 </SPAN><SPAN class=kwc>class</SPAN> MyView <SPAN class=sym>:</SPAN> <SPAN class=kwc>public</SPAN> QTableView <SPAN class=sym>{</SPAN>
+<A name=db02.h_18></A><SPAN class=line>   18 </SPAN>    Q_OBJECT
+<A name=db02.h_19></A><SPAN class=line>   19 </SPAN><SPAN class=kwc>public</SPAN><SPAN class=sym>:</SPAN>
+<A name=db02.h_20></A><SPAN class=line>   20 </SPAN>    <SPAN class=kwd>MyView</SPAN><SPAN class=sym>(</SPAN>QWidget <SPAN class=sym>*</SPAN>parent <SPAN class=sym>=</SPAN> <SPAN class=num>0</SPAN><SPAN class=sym>);</SPAN>
+<A name=db02.h_21></A><SPAN class=line>   21 </SPAN><SPAN class=kwc>private</SPAN><SPAN class=sym>:</SPAN>
+<A name=db02.h_22></A><SPAN class=line>   22 </SPAN>    <SPAN class=kwc>virtual</SPAN> <SPAN class=kwb>void</SPAN> <SPAN class=kwd>resizeEvent</SPAN><SPAN class=sym>(</SPAN>QResizeEvent <SPAN class=sym>*</SPAN>event<SPAN class=sym>);</SPAN>
+<A name=db02.h_23></A><SPAN class=line>   23 </SPAN><SPAN class=sym>};</SPAN>
+</PRE>
+<P><B>Листинг. Модель и представление таблицы БД (файл 
+<CODE>examples-qt/db02/db02.cpp</CODE>)</B> <PRE class=hl><A name=db02.cpp_1></A><SPAN class=line>    1 </SPAN><SPAN class=slc>// Таблица базы данных: пользовательская модель и представление</SPAN>
+<A name=db02.cpp_2></A><SPAN class=line>    2 </SPAN>
+<A name=db02.cpp_3></A><SPAN class=line>    3 </SPAN><SPAN class=dir>#include &lt;QtGui&gt;</SPAN>
+<A name=db02.cpp_4></A><SPAN class=line>    4 </SPAN><SPAN class=dir>#include &lt;QtSql&gt;</SPAN>
+<A name=db02.cpp_5></A><SPAN class=line>    5 </SPAN>
+<A name=db02.cpp_6></A><SPAN class=line>    6 </SPAN><SPAN class=dir>#include</SPAN> <SPAN class=dstr>"db02.h"</SPAN><SPAN class=dir></SPAN>
+<A name=db02.cpp_7></A><SPAN class=line>    7 </SPAN>
+<A name=db02.cpp_8></A><SPAN class=line>    8 </SPAN>MyModel<SPAN class=sym>::</SPAN><SPAN class=kwd>MyModel</SPAN><SPAN class=sym>(</SPAN>QObject <SPAN class=sym>*</SPAN>parent<SPAN class=sym>)</SPAN>
+<A name=db02.cpp_9></A><SPAN class=line>    9 </SPAN>                <SPAN class=sym>:</SPAN> <SPAN class=kwd>QSqlQueryModel</SPAN><SPAN class=sym>(</SPAN>parent<SPAN class=sym>) {</SPAN>
+<A name=db02.cpp_10></A><SPAN class=line>   10 </SPAN>    <SPAN class=kwd>refresh</SPAN><SPAN class=sym>();</SPAN>
+<A name=db02.cpp_11></A><SPAN class=line>   11 </SPAN><SPAN class=sym>}</SPAN>
+<A name=db02.cpp_12></A><SPAN class=line>   12 </SPAN>
+<A name=db02.cpp_13></A><SPAN class=line>   13 </SPAN>Qt<SPAN class=sym>::</SPAN>ItemFlags MyModel<SPAN class=sym>::</SPAN><SPAN class=kwd>flags</SPAN><SPAN class=sym>(</SPAN>
+<A name=db02.cpp_14></A><SPAN class=line>   14 </SPAN>        <SPAN class=kwb>const</SPAN> QModelIndex <SPAN class=sym>&amp;</SPAN>index<SPAN class=sym>)</SPAN> <SPAN class=kwb>const</SPAN> <SPAN class=sym>{</SPAN>
+<A name=db02.cpp_15></A><SPAN class=line>   15 </SPAN>
+<A name=db02.cpp_16></A><SPAN class=line>   16 </SPAN>    Qt<SPAN class=sym>::</SPAN>ItemFlags flags <SPAN class=sym>=</SPAN> QSqlQueryModel<SPAN class=sym>::</SPAN><SPAN class=kwd>flags</SPAN><SPAN class=sym>(</SPAN>index<SPAN class=sym>);</SPAN>
+<A name=db02.cpp_17></A><SPAN class=line>   17 </SPAN>    <SPAN class=kwa>if</SPAN> <SPAN class=sym>(</SPAN>index<SPAN class=sym>.</SPAN><SPAN class=kwd>column</SPAN><SPAN class=sym>() &gt;=</SPAN> <SPAN class=num>1</SPAN> <SPAN class=sym>&amp;&amp;</SPAN> index<SPAN class=sym>.</SPAN><SPAN class=kwd>column</SPAN><SPAN class=sym>() &lt;</SPAN> <SPAN class=num>4</SPAN><SPAN class=sym>)</SPAN>
+<A name=db02.cpp_18></A><SPAN class=line>   18 </SPAN>        flags <SPAN class=sym>|=</SPAN> Qt<SPAN class=sym>::</SPAN>ItemIsEditable<SPAN class=sym>;</SPAN>
+<A name=db02.cpp_19></A><SPAN class=line>   19 </SPAN>    <SPAN class=kwa>if</SPAN> <SPAN class=sym>(</SPAN>index<SPAN class=sym>.</SPAN><SPAN class=kwd>column</SPAN><SPAN class=sym>() ==</SPAN> <SPAN class=num>4</SPAN><SPAN class=sym>)</SPAN>
+<A name=db02.cpp_20></A><SPAN class=line>   20 </SPAN>        flags <SPAN class=sym>|=</SPAN> Qt<SPAN class=sym>::</SPAN>ItemIsUserCheckable<SPAN class=sym>;</SPAN>
+<A name=db02.cpp_21></A><SPAN class=line>   21 </SPAN>    <SPAN class=kwa>return</SPAN> flags<SPAN class=sym>;</SPAN>
+<A name=db02.cpp_22></A><SPAN class=line>   22 </SPAN><SPAN class=sym>}</SPAN>
+<A name=db02.cpp_23></A><SPAN class=line>   23 </SPAN>
+<A name=db02.cpp_24></A><SPAN class=line>   24 </SPAN>QVariant MyModel<SPAN class=sym>::</SPAN><SPAN class=kwd>data</SPAN><SPAN class=sym>(</SPAN>
+<A name=db02.cpp_25></A><SPAN class=line>   25 </SPAN>            <SPAN class=kwb>const</SPAN> QModelIndex <SPAN class=sym>&amp;</SPAN>index<SPAN class=sym>,</SPAN>
+<A name=db02.cpp_26></A><SPAN class=line>   26 </SPAN>            <SPAN class=kwb>int</SPAN> role<SPAN class=sym>)</SPAN> <SPAN class=kwb>const</SPAN> <SPAN class=sym>{</SPAN>
+<A name=db02.cpp_27></A><SPAN class=line>   27 </SPAN>
+<A name=db02.cpp_28></A><SPAN class=line>   28 </SPAN>    QVariant value <SPAN class=sym>=</SPAN> QSqlQueryModel<SPAN class=sym>::</SPAN><SPAN class=kwd>data</SPAN><SPAN class=sym>(</SPAN>index<SPAN class=sym>,</SPAN> role<SPAN class=sym>);</SPAN>
+<A name=db02.cpp_29></A><SPAN class=line>   29 </SPAN>
+<A name=db02.cpp_30></A><SPAN class=line>   30 </SPAN>    <SPAN class=kwa>switch</SPAN> <SPAN class=sym>(</SPAN>role<SPAN class=sym>) {</SPAN>
+<A name=db02.cpp_31></A><SPAN class=line>   31 </SPAN>
+<A name=db02.cpp_32></A><SPAN class=line>   32 </SPAN>    <SPAN class=kwa>case</SPAN> Qt<SPAN class=sym>::</SPAN>DisplayRole<SPAN class=sym>:</SPAN> <SPAN class=slc>// Данные для отображения</SPAN>
+<A name=db02.cpp_33></A><SPAN class=line>   33 </SPAN>    <SPAN class=kwa>case</SPAN> Qt<SPAN class=sym>::</SPAN>EditRole<SPAN class=sym>:</SPAN>    <SPAN class=slc>// Данные для редактирования</SPAN>
+<A name=db02.cpp_34></A><SPAN class=line>   34 </SPAN>        <SPAN class=kwa>if</SPAN> <SPAN class=sym>(</SPAN>index<SPAN class=sym>.</SPAN><SPAN class=kwd>column</SPAN><SPAN class=sym>() ==</SPAN> <SPAN class=num>0</SPAN><SPAN class=sym>)</SPAN>
+<A name=db02.cpp_35></A><SPAN class=line>   35 </SPAN>            <SPAN class=kwa>return</SPAN> value<SPAN class=sym>.</SPAN><SPAN class=kwd>toString</SPAN><SPAN class=sym>().</SPAN><SPAN class=kwd>prepend</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"№"</SPAN><SPAN class=sym>));</SPAN>
+<A name=db02.cpp_36></A><SPAN class=line>   36 </SPAN>        <SPAN class=kwa>else if</SPAN> <SPAN class=sym>(</SPAN>index<SPAN class=sym>.</SPAN><SPAN class=kwd>column</SPAN><SPAN class=sym>() ==</SPAN> <SPAN class=num>2</SPAN> <SPAN class=sym>&amp;&amp;</SPAN> role <SPAN class=sym>==</SPAN> Qt<SPAN class=sym>::</SPAN>DisplayRole<SPAN class=sym>)</SPAN>
+<A name=db02.cpp_37></A><SPAN class=line>   37 </SPAN>            <SPAN class=kwa>return</SPAN> value<SPAN class=sym>.</SPAN><SPAN class=kwd>toDate</SPAN><SPAN class=sym>().</SPAN><SPAN class=kwd>toString</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"dd.MM.yyyy"</SPAN><SPAN class=sym>);</SPAN>
+<A name=db02.cpp_38></A><SPAN class=line>   38 </SPAN>        <SPAN class=kwa>else if</SPAN> <SPAN class=sym>(</SPAN>index<SPAN class=sym>.</SPAN><SPAN class=kwd>column</SPAN><SPAN class=sym>() ==</SPAN> <SPAN class=num>3</SPAN> <SPAN class=sym>&amp;&amp;</SPAN> role <SPAN class=sym>==</SPAN> Qt<SPAN class=sym>::</SPAN>DisplayRole<SPAN class=sym>)</SPAN>
+<A name=db02.cpp_39></A><SPAN class=line>   39 </SPAN>            <SPAN class=kwa>return</SPAN> <SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"%1"</SPAN><SPAN class=sym>)</SPAN>
+<A name=db02.cpp_40></A><SPAN class=line>   40 </SPAN>                   <SPAN class=sym>.</SPAN><SPAN class=kwd>arg</SPAN><SPAN class=sym>(</SPAN>value<SPAN class=sym>.</SPAN><SPAN class=kwd>toDouble</SPAN><SPAN class=sym>(),</SPAN> <SPAN class=num>0</SPAN><SPAN class=sym>,</SPAN> <SPAN class=str>'f'</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>2</SPAN><SPAN class=sym>);</SPAN>
+<A name=db02.cpp_41></A><SPAN class=line>   41 </SPAN>        <SPAN class=kwa>else if</SPAN> <SPAN class=sym>(</SPAN>index<SPAN class=sym>.</SPAN><SPAN class=kwd>column</SPAN><SPAN class=sym>() ==</SPAN> <SPAN class=num>4</SPAN><SPAN class=sym>)</SPAN>
+<A name=db02.cpp_42></A><SPAN class=line>   42 </SPAN>            <SPAN class=kwa>return</SPAN> value<SPAN class=sym>.</SPAN><SPAN class=kwd>toInt</SPAN><SPAN class=sym>() !=</SPAN> <SPAN class=num>0</SPAN> ? <SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Да"</SPAN><SPAN class=sym>) :</SPAN> <SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Нет"</SPAN><SPAN class=sym>);</SPAN>
+<A name=db02.cpp_43></A><SPAN class=line>   43 </SPAN>        <SPAN class=kwa>else</SPAN>
+<A name=db02.cpp_44></A><SPAN class=line>   44 </SPAN>            <SPAN class=kwa>return</SPAN> value<SPAN class=sym>;</SPAN>
+<A name=db02.cpp_45></A><SPAN class=line>   45 </SPAN>
+<A name=db02.cpp_46></A><SPAN class=line>   46 </SPAN>    <SPAN class=kwa>case</SPAN> Qt<SPAN class=sym>::</SPAN>TextColorRole<SPAN class=sym>:</SPAN> <SPAN class=slc>// Цвет текста</SPAN>
+<A name=db02.cpp_47></A><SPAN class=line>   47 </SPAN>        <SPAN class=kwa>if</SPAN><SPAN class=sym>(</SPAN>index<SPAN class=sym>.</SPAN><SPAN class=kwd>column</SPAN><SPAN class=sym>() ==</SPAN> <SPAN class=num>1</SPAN><SPAN class=sym>)</SPAN>
+<A name=db02.cpp_48></A><SPAN class=line>   48 </SPAN>            <SPAN class=kwa>return</SPAN> <SPAN class=kwd>qVariantFromValue</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>QColor</SPAN><SPAN class=sym>(</SPAN>Qt<SPAN class=sym>::</SPAN>blue<SPAN class=sym>));</SPAN>
+<A name=db02.cpp_49></A><SPAN class=line>   49 </SPAN>        <SPAN class=kwa>else</SPAN>
+<A name=db02.cpp_50></A><SPAN class=line>   50 </SPAN>            <SPAN class=kwa>return</SPAN> value<SPAN class=sym>;</SPAN>
+<A name=db02.cpp_51></A><SPAN class=line>   51 </SPAN>
+<A name=db02.cpp_52></A><SPAN class=line>   52 </SPAN>    <SPAN class=kwa>case</SPAN> Qt<SPAN class=sym>::</SPAN>TextAlignmentRole<SPAN class=sym>:</SPAN> <SPAN class=slc>// Выравнивание</SPAN>
+<A name=db02.cpp_53></A><SPAN class=line>   53 </SPAN>        <SPAN class=kwa>if</SPAN><SPAN class=sym>(</SPAN>index<SPAN class=sym>.</SPAN><SPAN class=kwd>column</SPAN><SPAN class=sym>() ==</SPAN> <SPAN class=num>3</SPAN><SPAN class=sym>)</SPAN>
+<A name=db02.cpp_54></A><SPAN class=line>   54 </SPAN>            <SPAN class=kwa>return</SPAN> <SPAN class=kwb>int</SPAN><SPAN class=sym>(</SPAN>Qt<SPAN class=sym>::</SPAN>AlignRight <SPAN class=sym>|</SPAN> Qt<SPAN class=sym>::</SPAN>AlignVCenter<SPAN class=sym>);</SPAN>
+<A name=db02.cpp_55></A><SPAN class=line>   55 </SPAN>        <SPAN class=kwa>else if</SPAN><SPAN class=sym>(</SPAN>index<SPAN class=sym>.</SPAN><SPAN class=kwd>column</SPAN><SPAN class=sym>() ==</SPAN> <SPAN class=num>2</SPAN> <SPAN class=sym>||</SPAN> index<SPAN class=sym>.</SPAN><SPAN class=kwd>column</SPAN><SPAN class=sym>() ==</SPAN> <SPAN class=num>4</SPAN><SPAN class=sym>)</SPAN>
+<A name=db02.cpp_56></A><SPAN class=line>   56 </SPAN>            <SPAN class=kwa>return</SPAN> <SPAN class=kwb>int</SPAN><SPAN class=sym>(</SPAN>Qt<SPAN class=sym>::</SPAN>AlignHCenter <SPAN class=sym>|</SPAN> Qt<SPAN class=sym>::</SPAN>AlignVCenter<SPAN class=sym>);</SPAN>
+<A name=db02.cpp_57></A><SPAN class=line>   57 </SPAN>        <SPAN class=kwa>else</SPAN>
+<A name=db02.cpp_58></A><SPAN class=line>   58 </SPAN>            <SPAN class=kwa>return</SPAN> <SPAN class=kwb>int</SPAN><SPAN class=sym>(</SPAN>Qt<SPAN class=sym>::</SPAN>AlignLeft <SPAN class=sym>|</SPAN> Qt<SPAN class=sym>::</SPAN>AlignVCenter<SPAN class=sym>);</SPAN>
+<A name=db02.cpp_59></A><SPAN class=line>   59 </SPAN>
+<A name=db02.cpp_60></A><SPAN class=line>   60 </SPAN>    <SPAN class=kwa>case</SPAN> Qt<SPAN class=sym>::</SPAN>FontRole<SPAN class=sym>:</SPAN> <SPAN class=slc>// Шрифт</SPAN>
+<A name=db02.cpp_61></A><SPAN class=line>   61 </SPAN>        <SPAN class=kwa>if</SPAN><SPAN class=sym>(</SPAN>index<SPAN class=sym>.</SPAN><SPAN class=kwd>column</SPAN><SPAN class=sym>() ==</SPAN> <SPAN class=num>1</SPAN><SPAN class=sym>) {</SPAN>
+<A name=db02.cpp_62></A><SPAN class=line>   62 </SPAN>            QFont font <SPAN class=sym>=</SPAN> <SPAN class=kwd>QFont</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Helvetica"</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>10</SPAN><SPAN class=sym>,</SPAN> QFont<SPAN class=sym>::</SPAN>Bold<SPAN class=sym>);</SPAN>
+<A name=db02.cpp_63></A><SPAN class=line>   63 </SPAN>            <SPAN class=kwa>return</SPAN> <SPAN class=kwd>qVariantFromValue</SPAN><SPAN class=sym>(</SPAN>font<SPAN class=sym>);</SPAN>
+<A name=db02.cpp_64></A><SPAN class=line>   64 </SPAN>        <SPAN class=sym>}</SPAN><SPAN class=kwa>else</SPAN>
+<A name=db02.cpp_65></A><SPAN class=line>   65 </SPAN>            <SPAN class=kwa>return</SPAN> value<SPAN class=sym>;</SPAN>
+<A name=db02.cpp_66></A><SPAN class=line>   66 </SPAN>
+<A name=db02.cpp_67></A><SPAN class=line>   67 </SPAN>    <SPAN class=kwa>case</SPAN> Qt<SPAN class=sym>::</SPAN>BackgroundColorRole<SPAN class=sym>: {</SPAN>  <SPAN class=slc>// Цвет фона</SPAN>
+<A name=db02.cpp_68></A><SPAN class=line>   68 </SPAN>        <SPAN class=kwb>int</SPAN> a <SPAN class=sym>= (</SPAN>index<SPAN class=sym>.</SPAN><SPAN class=kwd>row</SPAN><SPAN class=sym>() %</SPAN> <SPAN class=num>2</SPAN><SPAN class=sym>)</SPAN> ? <SPAN class=num>14</SPAN> <SPAN class=sym>:</SPAN> <SPAN class=num>0</SPAN><SPAN class=sym>;</SPAN>
+<A name=db02.cpp_69></A><SPAN class=line>   69 </SPAN>        <SPAN class=kwa>if</SPAN><SPAN class=sym>(</SPAN>index<SPAN class=sym>.</SPAN><SPAN class=kwd>column</SPAN><SPAN class=sym>() ==</SPAN> <SPAN class=num>0</SPAN><SPAN class=sym>)</SPAN>
+<A name=db02.cpp_70></A><SPAN class=line>   70 </SPAN>            <SPAN class=kwa>return</SPAN> <SPAN class=kwd>qVariantFromValue</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>QColor</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>220</SPAN><SPAN class=sym>,</SPAN><SPAN class=num>240</SPAN><SPAN class=sym>-</SPAN>a<SPAN class=sym>,</SPAN><SPAN class=num>230</SPAN><SPAN class=sym>-</SPAN>a<SPAN class=sym>));</SPAN>
+<A name=db02.cpp_71></A><SPAN class=line>   71 </SPAN>        <SPAN class=kwa>else if</SPAN><SPAN class=sym>(</SPAN>index<SPAN class=sym>.</SPAN><SPAN class=kwd>column</SPAN><SPAN class=sym>() ==</SPAN> <SPAN class=num>4</SPAN><SPAN class=sym>)</SPAN>
+<A name=db02.cpp_72></A><SPAN class=line>   72 </SPAN>            <SPAN class=kwa>return</SPAN> <SPAN class=kwd>qVariantFromValue</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwd>QColor</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>200</SPAN><SPAN class=sym>,</SPAN><SPAN class=num>220</SPAN><SPAN class=sym>-</SPAN>a<SPAN class=sym>,</SPAN><SPAN class=num>255</SPAN><SPAN class=sym>-</SPAN>a<SPAN class=sym>));</SPAN>
+<A name=db02.cpp_73></A><SPAN class=line>   73 </SPAN>        <SPAN class=kwa>else</SPAN>
+<A name=db02.cpp_74></A><SPAN class=line>   74 </SPAN>            <SPAN class=kwa>return</SPAN> value<SPAN class=sym>;</SPAN>
+<A name=db02.cpp_75></A><SPAN class=line>   75 </SPAN>    <SPAN class=sym>}</SPAN>
+<A name=db02.cpp_76></A><SPAN class=line>   76 </SPAN>    <SPAN class=kwa>case</SPAN> Qt<SPAN class=sym>::</SPAN>CheckStateRole<SPAN class=sym>:</SPAN>  <SPAN class=slc>// Галочка</SPAN>
+<A name=db02.cpp_77></A><SPAN class=line>   77 </SPAN>        <SPAN class=kwa>if</SPAN> <SPAN class=sym>(</SPAN>index<SPAN class=sym>.</SPAN><SPAN class=kwd>column</SPAN><SPAN class=sym>() ==</SPAN> <SPAN class=num>4</SPAN><SPAN class=sym>)</SPAN>
+<A name=db02.cpp_78></A><SPAN class=line>   78 </SPAN>            <SPAN class=kwa>return</SPAN> <SPAN class=sym>(</SPAN>QSqlQueryModel<SPAN class=sym>::</SPAN><SPAN class=kwd>data</SPAN><SPAN class=sym>(</SPAN>index<SPAN class=sym>).</SPAN><SPAN class=kwd>toInt</SPAN><SPAN class=sym>() !=</SPAN> <SPAN class=num>0</SPAN><SPAN class=sym>)</SPAN> ?
+<A name=db02.cpp_79></A><SPAN class=line>   79 </SPAN>                    Qt<SPAN class=sym>::</SPAN>Checked <SPAN class=sym>:</SPAN> Qt<SPAN class=sym>::</SPAN>Unchecked<SPAN class=sym>;</SPAN>
+<A name=db02.cpp_80></A><SPAN class=line>   80 </SPAN>        <SPAN class=kwa>else</SPAN>
+<A name=db02.cpp_81></A><SPAN class=line>   81 </SPAN>            <SPAN class=kwa>return</SPAN> value<SPAN class=sym>;</SPAN>
+<A name=db02.cpp_82></A><SPAN class=line>   82 </SPAN>
+<A name=db02.cpp_83></A><SPAN class=line>   83 </SPAN>    <SPAN class=kwa>case</SPAN> Qt<SPAN class=sym>::</SPAN>SizeHintRole<SPAN class=sym>:</SPAN>  <SPAN class=slc>// Размер ячейки</SPAN>
+<A name=db02.cpp_84></A><SPAN class=line>   84 </SPAN>        <SPAN class=kwa>if</SPAN> <SPAN class=sym>(</SPAN>index<SPAN class=sym>.</SPAN><SPAN class=kwd>column</SPAN><SPAN class=sym>() ==</SPAN> <SPAN class=num>0</SPAN><SPAN class=sym>)</SPAN>
+<A name=db02.cpp_85></A><SPAN class=line>   85 </SPAN>            <SPAN class=kwa>return</SPAN> <SPAN class=kwd>QSize</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>70</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>10</SPAN><SPAN class=sym>);</SPAN>
+<A name=db02.cpp_86></A><SPAN class=line>   86 </SPAN>        <SPAN class=kwa>if</SPAN> <SPAN class=sym>(</SPAN>index<SPAN class=sym>.</SPAN><SPAN class=kwd>column</SPAN><SPAN class=sym>() ==</SPAN> <SPAN class=num>4</SPAN><SPAN class=sym>)</SPAN>
+<A name=db02.cpp_87></A><SPAN class=line>   87 </SPAN>            <SPAN class=kwa>return</SPAN> <SPAN class=kwd>QSize</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>60</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>10</SPAN><SPAN class=sym>);</SPAN>
+<A name=db02.cpp_88></A><SPAN class=line>   88 </SPAN>        <SPAN class=kwa>else</SPAN>
+<A name=db02.cpp_89></A><SPAN class=line>   89 </SPAN>            <SPAN class=kwa>return</SPAN> <SPAN class=kwd>QSize</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>110</SPAN><SPAN class=sym>,</SPAN> <SPAN class=num>10</SPAN><SPAN class=sym>);</SPAN>
+<A name=db02.cpp_90></A><SPAN class=line>   90 </SPAN>    <SPAN class=sym>}</SPAN>
+<A name=db02.cpp_91></A><SPAN class=line>   91 </SPAN>    <SPAN class=kwa>return</SPAN> value<SPAN class=sym>;</SPAN>
+<A name=db02.cpp_92></A><SPAN class=line>   92 </SPAN><SPAN class=sym>}</SPAN>
+<A name=db02.cpp_93></A><SPAN class=line>   93 </SPAN>
+<A name=db02.cpp_94></A><SPAN class=line>   94 </SPAN><SPAN class=kwb>bool</SPAN> MyModel<SPAN class=sym>::</SPAN><SPAN class=kwd>setData</SPAN><SPAN class=sym>(</SPAN>
+<A name=db02.cpp_95></A><SPAN class=line>   95 </SPAN>            <SPAN class=kwb>const</SPAN> QModelIndex <SPAN class=sym>&amp;</SPAN>index<SPAN class=sym>,</SPAN>
+<A name=db02.cpp_96></A><SPAN class=line>   96 </SPAN>            <SPAN class=kwb>const</SPAN> QVariant <SPAN class=sym>&amp;</SPAN>value<SPAN class=sym>,</SPAN>
+<A name=db02.cpp_97></A><SPAN class=line>   97 </SPAN>            <SPAN class=kwb>int</SPAN> <SPAN class=com>/* role */</SPAN><SPAN class=sym>) {</SPAN>
+<A name=db02.cpp_98></A><SPAN class=line>   98 </SPAN>    <SPAN class=kwa>if</SPAN> <SPAN class=sym>(</SPAN>index<SPAN class=sym>.</SPAN><SPAN class=kwd>column</SPAN><SPAN class=sym>() &lt;</SPAN> <SPAN class=num>1</SPAN> <SPAN class=sym>||</SPAN> index<SPAN class=sym>.</SPAN><SPAN class=kwd>column</SPAN><SPAN class=sym>() &gt;</SPAN> <SPAN class=num>4</SPAN><SPAN class=sym>)</SPAN>
+<A name=db02.cpp_99></A><SPAN class=line>   99 </SPAN>        <SPAN class=kwa>return false</SPAN><SPAN class=sym>;</SPAN>
+<A name=db02.cpp_100></A><SPAN class=line>  100 </SPAN>
+<A name=db02.cpp_101></A><SPAN class=line>  101 </SPAN>    QModelIndex primaryKeyIndex <SPAN class=sym>=</SPAN> QSqlQueryModel<SPAN class=sym>::</SPAN><SPAN class=kwd>index</SPAN><SPAN class=sym>(</SPAN>
+<A name=db02.cpp_102></A><SPAN class=line>  102 </SPAN>                index<SPAN class=sym>.</SPAN><SPAN class=kwd>row</SPAN><SPAN class=sym>(),</SPAN> <SPAN class=num>0</SPAN><SPAN class=sym>);</SPAN>
+<A name=db02.cpp_103></A><SPAN class=line>  103 </SPAN>    <SPAN class=kwb>int</SPAN> id <SPAN class=sym>=</SPAN> QSqlQueryModel<SPAN class=sym>::</SPAN><SPAN class=kwd>data</SPAN><SPAN class=sym>(</SPAN>primaryKeyIndex<SPAN class=sym>).</SPAN><SPAN class=kwd>toInt</SPAN><SPAN class=sym>();</SPAN>
+<A name=db02.cpp_104></A><SPAN class=line>  104 </SPAN>
+<A name=db02.cpp_105></A><SPAN class=line>  105 </SPAN>    <SPAN class=slc>//clear(); // Если надо полностью перерисовать таблицу.</SPAN>
+<A name=db02.cpp_106></A><SPAN class=line>  106 </SPAN>
+<A name=db02.cpp_107></A><SPAN class=line>  107 </SPAN>    <SPAN class=kwb>bool</SPAN> ok<SPAN class=sym>;</SPAN>
+<A name=db02.cpp_108></A><SPAN class=line>  108 </SPAN>    QSqlQuery query<SPAN class=sym>;</SPAN>
+<A name=db02.cpp_109></A><SPAN class=line>  109 </SPAN>    <SPAN class=kwa>if</SPAN> <SPAN class=sym>(</SPAN>index<SPAN class=sym>.</SPAN><SPAN class=kwd>column</SPAN><SPAN class=sym>() ==</SPAN> <SPAN class=num>1</SPAN><SPAN class=sym>) {</SPAN>
+<A name=db02.cpp_110></A><SPAN class=line>  110 </SPAN>        query<SPAN class=sym>.</SPAN><SPAN class=kwd>prepare</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"update employee set name = ? where id = ?"</SPAN><SPAN class=sym>);</SPAN>
+<A name=db02.cpp_111></A><SPAN class=line>  111 </SPAN>        query<SPAN class=sym>.</SPAN><SPAN class=kwd>addBindValue</SPAN><SPAN class=sym>(</SPAN>value<SPAN class=sym>.</SPAN><SPAN class=kwd>toString</SPAN><SPAN class=sym>());</SPAN>
+<A name=db02.cpp_112></A><SPAN class=line>  112 </SPAN>        query<SPAN class=sym>.</SPAN><SPAN class=kwd>addBindValue</SPAN><SPAN class=sym>(</SPAN>id<SPAN class=sym>);</SPAN>
+<A name=db02.cpp_113></A><SPAN class=line>  113 </SPAN>    <SPAN class=sym>}</SPAN><SPAN class=kwa>else if</SPAN><SPAN class=sym>(</SPAN>index<SPAN class=sym>.</SPAN><SPAN class=kwd>column</SPAN><SPAN class=sym>() ==</SPAN> <SPAN class=num>2</SPAN><SPAN class=sym>) {</SPAN>
+<A name=db02.cpp_114></A><SPAN class=line>  114 </SPAN>        query<SPAN class=sym>.</SPAN><SPAN class=kwd>prepare</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"update employee set born = ? where id = ?"</SPAN><SPAN class=sym>);</SPAN>
+<A name=db02.cpp_115></A><SPAN class=line>  115 </SPAN>        query<SPAN class=sym>.</SPAN><SPAN class=kwd>addBindValue</SPAN><SPAN class=sym>(</SPAN>value<SPAN class=sym>.</SPAN><SPAN class=kwd>toDate</SPAN><SPAN class=sym>());</SPAN>
+<A name=db02.cpp_116></A><SPAN class=line>  116 </SPAN>        query<SPAN class=sym>.</SPAN><SPAN class=kwd>addBindValue</SPAN><SPAN class=sym>(</SPAN>id<SPAN class=sym>);</SPAN>
+<A name=db02.cpp_117></A><SPAN class=line>  117 </SPAN>    <SPAN class=sym>}</SPAN><SPAN class=kwa>else if</SPAN><SPAN class=sym>(</SPAN>index<SPAN class=sym>.</SPAN><SPAN class=kwd>column</SPAN><SPAN class=sym>() ==</SPAN> <SPAN class=num>3</SPAN><SPAN class=sym>) {</SPAN>
+<A name=db02.cpp_118></A><SPAN class=line>  118 </SPAN>        query<SPAN class=sym>.</SPAN><SPAN class=kwd>prepare</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"update employee set salary = ? where id = ?"</SPAN><SPAN class=sym>);</SPAN>
+<A name=db02.cpp_119></A><SPAN class=line>  119 </SPAN>        query<SPAN class=sym>.</SPAN><SPAN class=kwd>addBindValue</SPAN><SPAN class=sym>(</SPAN>value<SPAN class=sym>.</SPAN><SPAN class=kwd>toDouble</SPAN><SPAN class=sym>());</SPAN>
+<A name=db02.cpp_120></A><SPAN class=line>  120 </SPAN>        query<SPAN class=sym>.</SPAN><SPAN class=kwd>addBindValue</SPAN><SPAN class=sym>(</SPAN>id<SPAN class=sym>);</SPAN>
+<A name=db02.cpp_121></A><SPAN class=line>  121 </SPAN>    <SPAN class=sym>}</SPAN><SPAN class=kwa>else if</SPAN><SPAN class=sym>(</SPAN>index<SPAN class=sym>.</SPAN><SPAN class=kwd>column</SPAN><SPAN class=sym>() ==</SPAN> <SPAN class=num>4</SPAN><SPAN class=sym>) {</SPAN>
+<A name=db02.cpp_122></A><SPAN class=line>  122 </SPAN>        query<SPAN class=sym>.</SPAN><SPAN class=kwd>prepare</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"update employee set married = ? where id = ?"</SPAN><SPAN class=sym>);</SPAN>
+<A name=db02.cpp_123></A><SPAN class=line>  123 </SPAN>        query<SPAN class=sym>.</SPAN><SPAN class=kwd>addBindValue</SPAN><SPAN class=sym>(</SPAN>value<SPAN class=sym>.</SPAN><SPAN class=kwd>toInt</SPAN><SPAN class=sym>());</SPAN>
+<A name=db02.cpp_124></A><SPAN class=line>  124 </SPAN>        query<SPAN class=sym>.</SPAN><SPAN class=kwd>addBindValue</SPAN><SPAN class=sym>(</SPAN>id<SPAN class=sym>);</SPAN>
+<A name=db02.cpp_125></A><SPAN class=line>  125 </SPAN>    <SPAN class=sym>}</SPAN>
+<A name=db02.cpp_126></A><SPAN class=line>  126 </SPAN>    ok <SPAN class=sym>=</SPAN> query<SPAN class=sym>.</SPAN><SPAN class=kwd>exec</SPAN><SPAN class=sym>();</SPAN>
+<A name=db02.cpp_127></A><SPAN class=line>  127 </SPAN>    <SPAN class=kwd>refresh</SPAN><SPAN class=sym>();</SPAN>
+<A name=db02.cpp_128></A><SPAN class=line>  128 </SPAN>    <SPAN class=kwa>return</SPAN> ok<SPAN class=sym>;</SPAN>
+<A name=db02.cpp_129></A><SPAN class=line>  129 </SPAN><SPAN class=sym>}</SPAN>
+<A name=db02.cpp_130></A><SPAN class=line>  130 </SPAN>
+<A name=db02.cpp_131></A><SPAN class=line>  131 </SPAN><SPAN class=kwb>void</SPAN> MyModel<SPAN class=sym>::</SPAN><SPAN class=kwd>refresh</SPAN><SPAN class=sym>() {</SPAN>
+<A name=db02.cpp_132></A><SPAN class=line>  132 </SPAN>    <SPAN class=kwd>setQuery</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"select * from employee"</SPAN><SPAN class=sym>);</SPAN>
+<A name=db02.cpp_133></A><SPAN class=line>  133 </SPAN>
+<A name=db02.cpp_134></A><SPAN class=line>  134 </SPAN>    <SPAN class=kwd>setHeaderData</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>0</SPAN><SPAN class=sym>,</SPAN> Qt<SPAN class=sym>::</SPAN>Horizontal<SPAN class=sym>,</SPAN>
+<A name=db02.cpp_135></A><SPAN class=line>  135 </SPAN>                  <SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Табельн.</SPAN><SPAN class=esc>\n</SPAN><SPAN class=str>номер"</SPAN><SPAN class=sym>));</SPAN>
+<A name=db02.cpp_136></A><SPAN class=line>  136 </SPAN>    <SPAN class=kwd>setHeaderData</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>1</SPAN><SPAN class=sym>,</SPAN> Qt<SPAN class=sym>::</SPAN>Horizontal<SPAN class=sym>,</SPAN>
+<A name=db02.cpp_137></A><SPAN class=line>  137 </SPAN>                  <SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Имя"</SPAN><SPAN class=sym>));</SPAN>
+<A name=db02.cpp_138></A><SPAN class=line>  138 </SPAN>    <SPAN class=kwd>setHeaderData</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>2</SPAN><SPAN class=sym>,</SPAN> Qt<SPAN class=sym>::</SPAN>Horizontal<SPAN class=sym>,</SPAN>
+<A name=db02.cpp_139></A><SPAN class=line>  139 </SPAN>                  <SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"День рождения"</SPAN><SPAN class=sym>));</SPAN>
+<A name=db02.cpp_140></A><SPAN class=line>  140 </SPAN>    <SPAN class=kwd>setHeaderData</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>3</SPAN><SPAN class=sym>,</SPAN> Qt<SPAN class=sym>::</SPAN>Horizontal<SPAN class=sym>,</SPAN>
+<A name=db02.cpp_141></A><SPAN class=line>  141 </SPAN>                  <SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Зарплата"</SPAN><SPAN class=sym>));</SPAN>
+<A name=db02.cpp_142></A><SPAN class=line>  142 </SPAN>    <SPAN class=kwd>setHeaderData</SPAN><SPAN class=sym>(</SPAN><SPAN class=num>4</SPAN><SPAN class=sym>,</SPAN> Qt<SPAN class=sym>::</SPAN>Horizontal<SPAN class=sym>,</SPAN>
+<A name=db02.cpp_143></A><SPAN class=line>  143 </SPAN>                  <SPAN class=kwd>tr</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"Женат/</SPAN><SPAN class=esc>\n</SPAN><SPAN class=str>замужем"</SPAN><SPAN class=sym>));</SPAN>
+<A name=db02.cpp_144></A><SPAN class=line>  144 </SPAN><SPAN class=sym>}</SPAN>
+<A name=db02.cpp_145></A><SPAN class=line>  145 </SPAN>
+<A name=db02.cpp_146></A><SPAN class=line>  146 </SPAN><SPAN class=slc>//------------------------------------</SPAN>
+<A name=db02.cpp_147></A><SPAN class=line>  147 </SPAN>MyView<SPAN class=sym>::</SPAN><SPAN class=kwd>MyView</SPAN><SPAN class=sym>(</SPAN>QWidget <SPAN class=sym>*</SPAN>parent<SPAN class=sym>)</SPAN>
+<A name=db02.cpp_148></A><SPAN class=line>  148 </SPAN>      <SPAN class=sym>:</SPAN> <SPAN class=kwd>QTableView</SPAN><SPAN class=sym>(</SPAN>parent<SPAN class=sym>) {</SPAN>
+<A name=db02.cpp_149></A><SPAN class=line>  149 </SPAN>
+<A name=db02.cpp_150></A><SPAN class=line>  150 </SPAN><SPAN class=sym>}</SPAN>
+<A name=db02.cpp_151></A><SPAN class=line>  151 </SPAN>
+<A name=db02.cpp_152></A><SPAN class=line>  152 </SPAN><SPAN class=kwb>void</SPAN> MyView<SPAN class=sym>::</SPAN><SPAN class=kwd>resizeEvent</SPAN><SPAN class=sym>(</SPAN>QResizeEvent <SPAN class=sym>*</SPAN>event<SPAN class=sym>) {</SPAN>
+<A name=db02.cpp_153></A><SPAN class=line>  153 </SPAN>    <SPAN class=kwd>resizeRowsToContents</SPAN><SPAN class=sym>();</SPAN>
+<A name=db02.cpp_154></A><SPAN class=line>  154 </SPAN>    <SPAN class=kwd>resizeColumnsToContents</SPAN><SPAN class=sym>();</SPAN>
+<A name=db02.cpp_155></A><SPAN class=line>  155 </SPAN>    QTableView<SPAN class=sym>::</SPAN><SPAN class=kwd>resizeEvent</SPAN><SPAN class=sym>(</SPAN>event<SPAN class=sym>);</SPAN>
+<A name=db02.cpp_156></A><SPAN class=line>  156 </SPAN><SPAN class=sym>}</SPAN>
+<A name=db02.cpp_157></A><SPAN class=line>  157 </SPAN>
+<A name=db02.cpp_158></A><SPAN class=line>  158 </SPAN><SPAN class=slc>//------------------------------------</SPAN>
+<A name=db02.cpp_159></A><SPAN class=line>  159 </SPAN><SPAN class=kwb>int</SPAN> <SPAN class=kwd>main</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwb>int</SPAN> argc<SPAN class=sym>,</SPAN> <SPAN class=kwb>char</SPAN> <SPAN class=sym>*</SPAN>argv<SPAN class=sym>[]) {</SPAN>
+<A name=db02.cpp_160></A><SPAN class=line>  160 </SPAN>
+<A name=db02.cpp_161></A><SPAN class=line>  161 </SPAN>    QApplication <SPAN class=kwd>app</SPAN><SPAN class=sym>(</SPAN>argc<SPAN class=sym>,</SPAN> argv<SPAN class=sym>);</SPAN>
+<A name=db02.cpp_162></A><SPAN class=line>  162 </SPAN>
+<A name=db02.cpp_163></A><SPAN class=line>  163 </SPAN>    QTextCodec <SPAN class=sym>*</SPAN>codec <SPAN class=sym>=</SPAN> QTextCodec<SPAN class=sym>::</SPAN><SPAN class=kwd>codecForName</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"CP1251"</SPAN><SPAN class=sym>);</SPAN>
+<A name=db02.cpp_164></A><SPAN class=line>  164 </SPAN>    QTextCodec<SPAN class=sym>::</SPAN><SPAN class=kwd>setCodecForTr</SPAN><SPAN class=sym>(</SPAN>codec<SPAN class=sym>);</SPAN>
+<A name=db02.cpp_165></A><SPAN class=line>  165 </SPAN>    QTextCodec<SPAN class=sym>::</SPAN><SPAN class=kwd>setCodecForCStrings</SPAN><SPAN class=sym>(</SPAN>codec<SPAN class=sym>);</SPAN>
+<A name=db02.cpp_166></A><SPAN class=line>  166 </SPAN>
+<A name=db02.cpp_167></A><SPAN class=line>  167 </SPAN>    QSqlDatabase db <SPAN class=sym>=</SPAN> QSqlDatabase<SPAN class=sym>::</SPAN><SPAN class=kwd>addDatabase</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"QMYSQL"</SPAN><SPAN class=sym>);</SPAN>
+<A name=db02.cpp_168></A><SPAN class=line>  168 </SPAN>    db<SPAN class=sym>.</SPAN><SPAN class=kwd>setDatabaseName</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"db1"</SPAN><SPAN class=sym>);</SPAN>
+<A name=db02.cpp_169></A><SPAN class=line>  169 </SPAN>    db<SPAN class=sym>.</SPAN><SPAN class=kwd>setUserName</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"root"</SPAN><SPAN class=sym>);</SPAN>
+<A name=db02.cpp_170></A><SPAN class=line>  170 </SPAN>    db<SPAN class=sym>.</SPAN><SPAN class=kwd>setPassword</SPAN><SPAN class=sym>(</SPAN><SPAN class=str>"password"</SPAN><SPAN class=sym>);</SPAN>
+<A name=db02.cpp_171></A><SPAN class=line>  171 </SPAN>    db<SPAN class=sym>.</SPAN><SPAN class=kwd>open</SPAN><SPAN class=sym>();</SPAN>
+<A name=db02.cpp_172></A><SPAN class=line>  172 </SPAN>
+<A name=db02.cpp_173></A><SPAN class=line>  173 </SPAN>    // QSqlQuery q<SPAN class=sym>;</SPAN>
+<A name=db02.cpp_174></A><SPAN class=line>  174 </SPAN>    <SPAN class=slc>// Для корректного отображения кириллицы, возможно,</SPAN>
+<A name=db02.cpp_175></A><SPAN class=line>  175 </SPAN>    <SPAN class=slc>// придётся установить кодировку:</SPAN>
+<A name=db02.cpp_176></A><SPAN class=line>  176 </SPAN>    <SPAN class=slc>//q.exec(QObject::tr("SET NAMES 'cp1251'"));</SPAN>
+<A name=db02.cpp_177></A><SPAN class=line>  177 </SPAN>
+<A name=db02.cpp_178></A><SPAN class=line>  178 </SPAN>    MyModel <SPAN class=sym>*</SPAN>model <SPAN class=sym>=</SPAN> <SPAN class=kwa>new</SPAN> <SPAN class=kwd>MyModel</SPAN><SPAN class=sym>();</SPAN>
+<A name=db02.cpp_179></A><SPAN class=line>  179 </SPAN>
+<A name=db02.cpp_180></A><SPAN class=line>  180 </SPAN>    MyView <SPAN class=sym>*</SPAN>view <SPAN class=sym>=</SPAN> <SPAN class=kwa>new</SPAN> <SPAN class=kwd>MyView</SPAN><SPAN class=sym>();</SPAN>
+<A name=db02.cpp_181></A><SPAN class=line>  181 </SPAN>    view<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setModel</SPAN><SPAN class=sym>(</SPAN>model<SPAN class=sym>);</SPAN>
+<A name=db02.cpp_182></A><SPAN class=line>  182 </SPAN>
+<A name=db02.cpp_183></A><SPAN class=line>  183 </SPAN>    view<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>setAlternatingRowColors</SPAN><SPAN class=sym>(</SPAN><SPAN class=kwa>true</SPAN><SPAN class=sym>);</SPAN>
+<A name=db02.cpp_184></A><SPAN class=line>  184 </SPAN>    view<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>resizeRowsToContents</SPAN><SPAN class=sym>();</SPAN>
+<A name=db02.cpp_185></A><SPAN class=line>  185 </SPAN>    view<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>resizeColumnsToContents</SPAN><SPAN class=sym>();</SPAN>
+<A name=db02.cpp_186></A><SPAN class=line>  186 </SPAN>    view<SPAN class=sym>-&gt;</SPAN><SPAN class=kwd>show</SPAN><SPAN class=sym>();</SPAN>
+<A name=db02.cpp_187></A><SPAN class=line>  187 </SPAN>
+<A name=db02.cpp_188></A><SPAN class=line>  188 </SPAN>    <SPAN class=kwa>return</SPAN> app<SPAN class=sym>.</SPAN><SPAN class=kwd>exec</SPAN><SPAN class=sym>();</SPAN>
+<A name=db02.cpp_189></A><SPAN class=line>  189 </SPAN><SPAN class=sym>}</SPAN>
+</PRE>
+<UL>
+  <LI>(8-10) В конструкторе модели таблицы вызвали конструктор базового класса и 
+  определённый ниже метод <CODE>refresh</CODE>&nbsp;(131), в котором указаны 
+  заголовки столбцов и текст SQL-запроса, выполняемый для получения данных из 
+  БД. 
+  <LI>(13-22) В методе <CODE>flags</CODE> переопределили свойства ячеек таблицы. 
+
+  <LI>(16) Получили значения флагов-свойств, которые определены для данного 
+  столбца в базовом классе. 
+  <LI>(17-18) Для всех столбцов, кроме первого (вернее, нулевого) и последнего, 
+  выставили флаг разрешения редактирования <CODE>Qt::ItemIsEditable</CODE>. 
+  <LI>(19-20) Для последнего столбца установили признак 
+  <CODE>Qt::ItemIsUserCheckable</CODE>, в результате во всех его ячейках перед 
+  текстовой меткой будет отображаться элемент <CODE>QCheckBox</CODE>. 
+  <LI>(24-92) В методе <CODE>data</CODE> переопределяются данные, "хранящиеся" в 
+  ячейках таблицы. В зависимости от параметра <CODE>role</CODE> (роль), это либо 
+  сами данные, читаемые из БД, либо параметры их отображения. 
+  <LI>(28) Получили значение, определённое в базовом классе. 
+  <LI>(30-90) Определяем параметры ячейки таблицы, в зависимости от значения 
+  параметра <CODE>role</CODE>: <CODE>Qt::DisplayRole</CODE> (данные для 
+  отображения ячейки таблицы), <CODE>Qt::EditRole</CODE> (данные для режима 
+  редактирования), <CODE>Qt::TextColorRole</CODE> (цвет текста), 
+  <CODE>Qt::TextAlignmentRole</CODE> (выравнивание текста), 
+  <CODE>Qt::FontRole</CODE> (параметры шрифта), 
+  <CODE>Qt::BackgroundColorRole</CODE> (цвет фона ячейки), 
+  <CODE>Qt::CheckStateRole</CODE> (надо ли отображать элемент 
+  <CODE>QCheckBox</CODE>), <CODE>Qt::SizeHintRole</CODE> (предпочитаемые размеры 
+  ячейки). 
+  <LI>(34-35) Для самого первого столбца перед числом добавили символ "№". 
+  <LI>(36-37) Для столбца с датами рождения в режиме отображения задали формат 
+  "число.месяц.год" (по умолчанию действует формат "год-месяц-число"). 
+  <LI>(38-40) Для столбца зарплат в режиме отображения установили точность два 
+  знака после запятой. 
+  <LI>(41-42) В последнем столбце отображаем текст "Да" или "Нет". 
+  <LI>(43-44) Для всех остальных стрлбцов (остался только столбец с именами 
+  работников) ничего не изменяем. 
+  <LI>(46-50) Для столбца с именами установили голубой цвет символов, для всех 
+  остальных -- цвет по умолчанию. 
+  <LI>(52-58) Числа выравниваем по правому краю, даты и надписи "Да/Нет" -- по 
+  центру, остальные ячейки -- по левому краю. Во всех случаях центрируем по 
+  вертикали. 
+  <LI>(60-65) Для столбца имён задали жирный шрифт "Helvetica" размером 10 
+  пунктов, для всех остальных ячеек -- шрифт по умолчанию. 
+  <LI>(67-74) Установили цвет фона для ячеек самого первого и последнего 
+  столбцов (для чётных строк -- немного светлее, чем для нечётных). Для всех 
+  остальных столбцов -- цвет фона по умолчанию. 
+  <LI>(76-81) Для ячеек последнего столбца устанавливаем галочку или сбрасываем 
+  её, в зависимости от значения, хранящегося в БД. 
+  <LI>(83-90) Установили предпочтительные размеры ячеек. 
+  <LI>(94-129) В методе <CODE>setData</CODE> переопределяются данные, которые 
+  будут записываться в БД. 
+  <LI>(98-99) Могут изменяться только ячейки из столбцов с 1 по 4. 
+  <LI>(101-103) Выяснили значение поля <CODE>id</CODE> (целочисленный 
+  идентификатор) изменяемой записи. 
+  <LI>(107-128) Определили текст SQL-запроса для обновления данных каждого 
+  столбца таблицы. 
+  <LI>(131-144) Задали текст SQL-запроса для чтения данных из БД и отображаемые 
+  заголовки столбцов таблицы. 
+  <LI>(147-150) В конструкторе представления таблицы не забыли вызвать 
+  конструктор базового класса. 
+  <LI>(152-156) Определяем действия, выполняемые при изменении размеров таблицы 
+  (в данном случае делается автоматическая подгонка размеров по содержимому 
+  ячеек). 
+  <LI>(159-189) Процедура <CODE>main</CODE> повторяет текст предыдущей 
+  программы, только в (178-181) используется наш класс модели и класс для 
+  представления таблицы. </LI></UL>
+<P>Для своей модели мы использовали базовый класс <CODE>QSqlQueryModel</CODE>, 
+работающий с произвольным набором SQL-запросов для чтения и записи данных в БД. 
+Но за всё приходится платить: нам пришлось подробно расписывать реализацию 
+методов <CODE>data</CODE> и <CODE>setData</CODE>. В данном случае мы имели дело 
+с единственной таблицей базы данных, поэтому можно было в качестве базового 
+класса взять <CODE>QSqlTableModel</CODE>. 
+<P>Проверьте, как работает эта программа. Намного лучше, чем предыдущая, не 
+правда ли? Размеры ячеек теперь не "прыгают" при редактировании, а при щелчке 
+левой кнопкой мыши по элементу <CODE>QCheckBox</CODE> в ячейках последнего 
+столбца автоматически изменяется текстовая метка "Да/Нет". Но ввести трёхзначную 
+зарплату всё ещё не получается. Мы исправим данный недостаток в следующем 
+разделе. </P>
+<a href="qtdb002.htm">Назад</a> <a href="title.htm">Содержание</a> <a href="qtdb004.htm">Вперед</a>
+</BODY></HTML>
