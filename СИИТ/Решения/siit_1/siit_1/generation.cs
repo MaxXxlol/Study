@@ -125,19 +125,19 @@ namespace siit_1
             int[] new_chrom = new int[1000];
 
             //unified crossover
-            for (int i = 0; i < 1000; i++)
-            {
-                if (rand.Next() % 2 == 1) new_chrom[i] = chrom_1[i];
-                else new_chrom[i] = chrom_2[i];
-            }
-
-            //one point crossover
-            //int point = rand.Next() % 1000;
-            //for(int i = 0; i < 1000; i++)
+            //for (int i = 0; i < 1000; i++)
             //{
-            //    if (i < point) new_chrom[i] = chrom_1[i];
+            //    if (rand.Next() % 2 == 1) new_chrom[i] = chrom_1[i];
             //    else new_chrom[i] = chrom_2[i];
             //}
+
+            //one point crossover
+            int point = rand.Next() % 1000;
+            for(int i = 0; i < 1000; i++)
+            {
+                if (i < point) new_chrom[i] = chrom_1[i];
+                else new_chrom[i] = chrom_2[i];
+            }
 
             return new_chrom;
         }
