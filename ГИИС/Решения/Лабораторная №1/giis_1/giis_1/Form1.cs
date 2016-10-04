@@ -22,9 +22,6 @@ namespace giis_1
             label1.Text = hScrollBar1.Value.ToString();
             pictureBox1.Image = DrawFilledRectangle(pictureBox1.Width, pictureBox1.Height);
             label4.Text = getHexColor();
-
-
-
         }
         private Bitmap DrawFilledRectangle(int x, int y)
         {
